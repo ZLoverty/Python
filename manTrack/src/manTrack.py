@@ -4,6 +4,7 @@ from matplotlib.figure import Figure
 from matplotlib.image import imread
 import matplotlib.patches as mpatches
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import ctypes
 import os
 import numpy as np
 import pandas as pd
@@ -20,40 +21,68 @@ class mplApp(tk.Frame):
     def createVars(self):
         self.mousePos = [0, 0]
         self.mousePosStringVar = tk.StringVar()
+        self.mode = tk.StringVar()
+        
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
+        self.mode.set('I')
         self.dID = -1
         self.tID = -1
     def create_widgets(self):
-        self.loadButton = tk.Button(self, text='Load', command=self.imgOpenDialog)
-        self.loadButton.pack()
-        self.loadDataButton = tk.Button(self, text='Load data', command=self.dataOpenDialog)
-        self.loadDataButton.pack()
-        self.drawDataButton = tk.Button(self, text='Draw data', command=self.drawData)
-        self.drawDataButton.pack()
-        self.reloadButton = tk.Button(self, text='Reload', command=self.reloadButtonCallback)
-        self.reloadButton.pack()
-        self.PPUEntry = tk.Entry(self)
-        self.PPUEntry.pack()
-        self.mousePositionLabel = tk.Label(self, textvariable=self.mousePosStringVar)
-        self.mousePositionLabel.pack()
-        self.mouseDeleteModeButton = tk.Button(self, text='Delete mode', command=self.mouseDeleteModeButtonCallback)
-        self.mouseDeleteModeButton.pack()
         
-        self.mouseTrackModeButton = tk.Button(self, text='Track mode', command=self.mouseTrackModeButtonCallback)
-        self.mouseTrackModeButton.pack()
-        self.mergeDataButton = tk.Button(self, text='Merge data', command=self.mergeDataButtonCallback)
-        self.mergeDataButton.pack()
-        self.saveDataButton = tk.Button(self, text='Save data', command=self.saveDataButtonCallback)
-        self.saveDataButton.pack()
-
+        self.buttonFrame = tk.Frame(self)
+        self.buttonFrame.pack(side='left')
+        loadLabel = tk.Label(self.buttonFrame, text='DATA LOADING', font=('Helvetica', 10, 'bold'))
+        loadLabel.pack(fill='x')
+        self.loadButton = tk.Button(self.buttonFrame, text='Load', command=self.imgOpenDialog)
+        self.loadButton.pack(fill='x')
+        self.loadDataButton = tk.Button(self.buttonFrame, text='Load data', command=self.dataOpenDialog)
+        self.loadDataButton.pack(fill='x')
+        self.drawDataButton = tk.Button(self.buttonFrame, text='Draw data', command=self.drawData)
+        self.drawDataButton.pack(fill='x')
+        self.reloadButton = tk.Button(self.buttonFrame, text='Reload', command=self.reloadButtonCallback)
+        self.reloadButton.pack(fill='x')
+        spaceFrame1 = tk.Frame(self.buttonFrame, height=30)
+        spaceFrame1.pack()
         
-        self.testButton = tk.Button(self, text='test', command=self.testButtonCallback)
-        self.testButton.pack()
+        saveLabel = tk.Label(self.buttonFrame, text='DATA SAVING', font=('Helvetica', 10, 'bold'))
+        saveLabel.pack(fill='x')
+        self.mergeDataButton = tk.Button(self.buttonFrame, text='Merge data', command=self.mergeDataButtonCallback)
+        self.mergeDataButton.pack(fill='x')
+        self.saveDataButton = tk.Button(self.buttonFrame, text='Save data', command=self.saveDataButtonCallback)
+        self.saveDataButton.pack(fill='x')
+        
+        
+        spaceFrame2 = tk.Frame(self.buttonFrame, height=30)
+        spaceFrame2.pack()  
+        modeLabel = tk.Label(self.buttonFrame, text='MODE', font=('Helvetica', 10, 'bold'))
+        modeLabel.pack(fill='x')
+        MODES = [('Idle mode', 'I'), ('Delete mode', 'D'), ('Track mode', 'T')]
+        for text, mode in MODES:
+            rb = tk.Radiobutton(self.buttonFrame, text=text, variable=self.mode, value=mode, indicatoron=0,
+                                command=self.modeCallback)
+            rb.pack(fill='x')
+        
+        spaceFrame2 = tk.Frame(self.buttonFrame, height=30)
+        spaceFrame2.pack()
+        PPULabel = tk.Label(self.buttonFrame, text='INPUT PPU', font=('Helvetica', 10, 'bold'))
+        PPULabel.pack(fill='x')
+        self.PPUEntry = tk.Entry(self.buttonFrame)
+        self.PPUEntry.pack(fill='x')
+        # self.mouseDeleteModeButton = tk.Button(self.buttonFrame, text='Delete mode', command=self.mouseDeleteModeButtonCallback)
+        # self.mouseDeleteModeButton.pack(fill='x')
+        # self.mouseTrackModeButton = tk.Button(self.buttonFrame, text='Track mode', command=self.mouseTrackModeButtonCallback)
+        # self.mouseTrackModeButton.pack(fill='x')
+        self.mousePositionLabel = tk.Label(self.buttonFrame, textvariable=self.mousePosStringVar)
+        self.mousePositionLabel.pack(fill='x')
+        
+        
+        # self.testButton = tk.Button(self.buttonFrame, text='test', command=self.testButtonCallback)
+        # self.testButton.pack()
         
     def initCanvas(self, ax):        
         self.canvas = FigureCanvasTkAgg(self.fig, master=self) ## Use matplotlib.backend to generate GUI widget
         self.canvas.draw()
-        self.canvas.get_tk_widget().pack()
+        self.canvas.get_tk_widget().pack(side='left')
         self.pID = self.canvas.mpl_connect('motion_notify_event', self.mousePosCallback)
     """
     Callbacks
@@ -71,14 +100,17 @@ class mplApp(tk.Frame):
         hcanvas = h
         wcanvas = w
         self.compressRatio = 1
-        if wcanvas > 800:
-            wcanvas = 800
+        user32 = ctypes.windll.user32
+        wmax = math.floor(0.92*user32.GetSystemMetrics(0))
+        hmax = math.floor(0.92*user32.GetSystemMetrics(1))
+        if wcanvas > wmax:
+            wcanvas = wmax
             hcanvas = h/w*wcanvas
-            self.compressRatio = 800/w
-        if hcanvas > 600:
-            hcanvas = 600
+            self.compressRatio = wmax/w
+        if hcanvas > hmax:
+            hcanvas = hmax
             wcanvas = w/h*hcanvas
-            self.compressRatio = 600/h
+            self.compressRatio = hmax/h
         self.fig = Figure(figsize=(wcanvas/dpi,hcanvas/dpi),dpi=dpi)
         self.ax = self.fig.add_axes([0,0,1,1])
         self.ax.imshow(img, cmap='gray')
@@ -111,21 +143,27 @@ class mplApp(tk.Frame):
         self.canvas.draw()
 
     def reloadButtonCallback(self):
-        self.canvas.get_tk_widget().destroy()
+        try:
+            self.canvas.get_tk_widget().destroy()
+        except:
+            ValueError('No image opened')
         img = self.img
         h, w = img.shape
         dpi = 100
         hcanvas = h
         wcanvas = w
         self.compressRatio = 1
-        if wcanvas > 800:
-            wcanvas = 800
+        user32 = ctypes.windll.user32
+        wmax = math.floor(0.92*user32.GetSystemMetrics(0))
+        hmax = math.floor(0.92*user32.GetSystemMetrics(1))
+        if wcanvas > wmax:
+            wcanvas = wmax
             hcanvas = h/w*wcanvas
-            self.compressRatio = 800/w
-        if hcanvas > 600:
-            hcanvas = 600
+            self.compressRatio = wmax/w
+        if hcanvas > hmax:
+            hcanvas = hmax
             wcanvas = w/h*hcanvas
-            self.compressRatio = 600/h
+            self.compressRatio = hmax/h
         self.fig = Figure(figsize=(wcanvas/dpi,hcanvas/dpi),dpi=dpi)
         self.ax = self.fig.add_axes([0,0,1,1])
         self.ax.imshow(img, cmap='gray')
@@ -134,8 +172,7 @@ class mplApp(tk.Frame):
         self.dID = self.canvas.mpl_connect('pick_event', self.mouseDeleteCallback)
         self.canvas.mpl_disconnect(self.tID)
     def mouseTrackModeButtonCallback(self):
-        self.tID = self.canvas.mpl_connect('button_press_event', self.mouseTrackPressCallback) #####
-        
+        self.tID = self.canvas.mpl_connect('button_press_event', self.mouseTrackPressCallback)
         self.canvas.mpl_disconnect(self.dID)    
     def mouseDeleteCallback(self, event):
         def common_member(a, b): 
@@ -203,6 +240,7 @@ class mplApp(tk.Frame):
     def mousePosCallback(self, event):
         h, w = self.img.shape
         self.mousePos = [event.x/self.compressRatio, h - event.y/self.compressRatio]
+        self.mousePos = [math.floor(self.mousePos[0]), math.floor(self.mousePos[0])]
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
     def mergeDataButtonCallback(self):
         self.data = self.data.append(self.addedData, ignore_index=False)
@@ -210,6 +248,17 @@ class mplApp(tk.Frame):
     def saveDataButtonCallback(self):
         saveName = TFD.asksaveasfilename(initialdir=os.getcwd(), title='Select file')
         self.data.to_csv(saveName, index=False, sep='\t',float_format='%.3f')
+    def modeCallback(self):
+        if self.mode.get() == 'I':
+            self.canvas.mpl_disconnect(self.dID)
+            self.canvas.mpl_disconnect(self.tID)
+        elif self.mode.get() == 'D':
+            self.dID = self.canvas.mpl_connect('pick_event', self.mouseDeleteCallback)
+            self.canvas.mpl_disconnect(self.tID)
+        elif self.mode.get() == 'T':
+            self.tID = self.canvas.mpl_connect('button_press_event', self.mouseTrackPressCallback)
+            self.canvas.mpl_disconnect(self.dID)
+            
     def testButtonCallback(self):
         pass
     
