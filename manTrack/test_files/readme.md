@@ -1,3 +1,3 @@
 Test files for manTrack:
-* An microscopic image of swarming bacteria;
-* A preliminary particle finding result (x, y, angle, t) data file.
+* A microscopic image of swarming bacteria - test_img.tif;
+* A preliminary particle finding result (x, y, angle, t) data file - test_data.dat.
