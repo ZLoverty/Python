@@ -2,6 +2,7 @@ import tkinter as tk
 import tkinter.filedialog as TFD
 from matplotlib.figure import Figure
 from matplotlib.image import imread
+from matplotlib import colors
 import matplotlib.patches as mpatches
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import ctypes
@@ -22,13 +23,17 @@ class mplApp(tk.Frame):
         self.mousePos = [0, 0]
         self.mousePosStringVar = tk.StringVar()
         self.mode = tk.StringVar()
+        self.colorButtonText = tk.StringVar()
         
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
         self.mode.set('I')
+        self.colorButtonText.set('Color plot')
+        
         self.dID = -1
         self.tID = -1
         self.deletedArtist = []
         self.addedArtist = []
+        self.artistList = []
     def create_widgets(self):
         # DATA LOADING buttons
         self.buttonFrame = tk.Frame(self)
@@ -78,6 +83,8 @@ class mplApp(tk.Frame):
         self.backwardButton = tk.Button(self.buttonFrame, text='Backward', state='disabled', command=self.backwardButtonCallback)
         self.backwardButton.pack(fill='x')
         
+        self.testButton = tk.Button(self.buttonFrame, text='Color/Mono plot', command=self.testButtonCallback)
+        self.testButton.pack(fill='x')
         # self.testButton = tk.Button(self.buttonFrame, text='test', command=self.testButtonCallback)
         # self.testButton.pack(fill='x')
     def initCanvas(self, ax):        
@@ -139,8 +146,10 @@ class mplApp(tk.Frame):
             angle = value.Angle
             elli = mpatches.Ellipse(xy, width, height, angle)
             elli.set_fill(False)
+            elli.set_color('green')
             self.ax.add_patch(elli)
-            elli.set_picker(True)         
+            elli.set_picker(True)
+            self.artistList.append(elli)
         self.canvas.draw()
 
     def reloadButtonCallback(self):
@@ -187,6 +196,7 @@ class mplApp(tk.Frame):
                 return -1
         h, w = self.img.shape
         artist = event.artist
+        # pdb.set_trace()
         artist.set_visible(False)
         self.canvas.draw()
         xy = artist.center
@@ -202,7 +212,7 @@ class mplApp(tk.Frame):
         deletedDataFrame = self.data.iloc[index]
 
         try:
-            self.deletedData = self.deletedData.append(deletedDataFrame, ignore_index=True)
+            self.deletedData = self.deletedData.append(deletedDataFrame, ignore_index=False)
         except:
             self.deletedData = deletedDataFrame
         self.backwardButton.config(state='normal')
@@ -254,13 +264,16 @@ class mplApp(tk.Frame):
         self.mousePos = [math.floor(self.mousePos[0]), math.floor(self.mousePos[1])]
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
     def mergeDataButtonCallback(self):
-        if self.addedData.empty == False:
-            self.data = self.data.append(self.addedData, ignore_index=True)
-            self.addedData = None
-        if self.deletedData.empty == False:
-            for index, value in self.deletedData.iterrows():
-                self.data.drop(axis=0, index=index, inplace=True)
-            self.deletedData = None
+        if self.mode.get() == 'T':
+            if self.addedData.empty == False:
+                self.data = self.data.append(self.addedData, ignore_index=True)
+                del self.addedData
+        elif self.mode.get() == 'D':
+            if self.deletedData.empty == False:
+                for index, value in self.deletedData.iterrows():
+                    self.data.drop(index=index, inplace=True)
+                del self.deletedData
+        self.mode.set('I')
     def saveDataButtonCallback(self):
         saveName = TFD.asksaveasfilename(initialdir=os.getcwd(), title='Select file')
         self.data.to_csv(saveName, index=False, sep='\t',float_format='%.3f')
@@ -287,7 +300,7 @@ class mplApp(tk.Frame):
             # when self.deletedData is empty, set "Backward" button to DISABLED
             if self.deletedData.empty == True:
                 self.backwardButton.config(state='disabled')
-                self.deletedData = None
+                # self.deletedData = None
         if self.mode.get() == 'T':
             # Delete ellipse according to the last row of self.deletedData
             artist = self.addedArtist.pop()
@@ -300,7 +313,21 @@ class mplApp(tk.Frame):
             # when self.deletedData is empty, set "Backward" button to DISABLED
             if self.addedData.empty == True:
                 self.backwardButton.config(state='disabled')
-                self.addedData = None
+                # self.addedData = None
+    def testButtonCallback(self):
+        if self.colorButtonText.get() == 'Color plot':
+            for artist in self.artistList:
+                angle = artist.angle
+                cohsv = (angle/180, 1, 1)
+                corgb = colors.hsv_to_rgb(cohsv)
+                artist.set_color(corgb)            
+            self.canvas.draw()
+            self.colorButtonText.set('Mono plot')
+        elif self.colorButtonText.get() == 'Mono plot':
+            for artist in self.artistList:
+                artist.set_color('green')            
+            self.canvas.draw()
+            self.colorButtonText.set('Color plot')
                 
 if __name__ == '__main__':
     root = tk.Tk(className="manTrack")
