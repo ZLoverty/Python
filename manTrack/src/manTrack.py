@@ -24,6 +24,9 @@ class mplApp(tk.Frame):
         self.mousePosStringVar = tk.StringVar()
         self.mode = tk.StringVar()
         self.colorButtonText = tk.StringVar()
+        self.dataStatStringVar = tk.StringVar()
+        self.deleteTmpStringVar = tk.StringVar()
+        self.addTmpStringVar = tk.StringVar()        
         
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
         self.mode.set('I')
@@ -58,6 +61,8 @@ class mplApp(tk.Frame):
         self.mergeDataButton.pack(fill='x')
         self.saveDataButton = tk.Button(self.buttonFrame, text='Save data', command=self.saveDataButtonCallback)
         self.saveDataButton.pack(fill='x')
+        self.saveFigButton = tk.Button(self.buttonFrame, text='Save figure', command=self.saveFigButtonCallback)
+        self.saveFigButton.pack(fill='x')
         
         # MODE buttons
         spaceFrame2 = tk.Frame(self.buttonFrame, height=30)
@@ -68,23 +73,33 @@ class mplApp(tk.Frame):
         for text, mode in MODES:
             rb = tk.Radiobutton(self.buttonFrame, text=text, variable=self.mode, value=mode, indicatoron=0,
                                 command=self.modeCallback)
-            rb.pack(fill='x')        
+            rb.pack(fill='x')
+
+        # Miscellulose buttons and other widgets
         spaceFrame2 = tk.Frame(self.buttonFrame, height=30)
         spaceFrame2.pack()
         PPULabel = tk.Label(self.buttonFrame, text='INPUT PPU', font=('Helvetica', 10, 'bold'))
         PPULabel.pack(fill='x')
         self.PPUEntry = tk.Entry(self.buttonFrame)
         self.PPUEntry.pack(fill='x')
-
         self.mousePositionLabel = tk.Label(self.buttonFrame, textvariable=self.mousePosStringVar)
-        self.mousePositionLabel.pack(fill='x')
-        
-        
+        self.mousePositionLabel.pack(fill='x')                
         self.backwardButton = tk.Button(self.buttonFrame, text='Backward', state='disabled', command=self.backwardButtonCallback)
-        self.backwardButton.pack(fill='x')
+        self.backwardButton.pack(fill='x')       
+        self.colorButton = tk.Button(self.buttonFrame, text='Color/Mono plot', command=self.colorButtonCallback)
+        self.colorButton.pack(fill='x')
         
-        self.testButton = tk.Button(self.buttonFrame, text='Color/Mono plot', command=self.testButtonCallback)
-        self.testButton.pack(fill='x')
+        # Status block, tracking status of background data
+        spaceFrame2 = tk.Frame(self.buttonFrame, height=30)
+        spaceFrame2.pack()
+        statLabel = tk.Label(self.buttonFrame, text='STATUS BLOCK', font=('Helvetica', 10, 'bold'))
+        statLabel.pack(fill='x')
+        self.dataStatLabel = tk.Label(self.buttonFrame, textvariable=self.dataStatStringVar)
+        self.dataStatLabel.pack(fill='x')
+        self.deleteTmpLabel = tk.Label(self.buttonFrame, textvariable=self.deleteTmpStringVar)
+        self.deleteTmpLabel.pack(fill='x')
+        self.addTmpLabel = tk.Label(self.buttonFrame, textvariable=self.addTmpStringVar)
+        self.addTmpLabel.pack(fill='x')
         # self.testButton = tk.Button(self.buttonFrame, text='test', command=self.testButtonCallback)
         # self.testButton.pack(fill='x')
     def initCanvas(self, ax):        
@@ -128,9 +143,10 @@ class mplApp(tk.Frame):
         dataDir = TFD.askopenfilename()
         if dataDir.endswith('.dat'):
             self.data = pd.read_csv(dataDir, delimiter='\t')
+            self.updateStatus()
         else:
             ValueError('Wrong data type, please open *.dat text file')
-          
+         
     def drawData(self):
         try:
             self.PPU = float(self.PPUEntry.get())          
@@ -198,7 +214,10 @@ class mplApp(tk.Frame):
         artist = event.artist
         # pdb.set_trace()
         artist.set_visible(False)
+        artist.set_picker(None)
         self.canvas.draw()
+        """
+        ### common_member sometimes cause trouble
         xy = artist.center
         x = xy[0]
         y = h - xy[1]
@@ -207,9 +226,12 @@ class mplApp(tk.Frame):
         index = self.data[xData==x].index.tolist()     
         index_y = self.data[yData==y].index.tolist()
         index = common_member(index, index_y)
+        #########################################
+        """
+        index = self.artistList.index(artist)
         print(artist, index, ' deleted!')
         print(len(self.data), ' particles left')        
-        deletedDataFrame = self.data.iloc[index]
+        deletedDataFrame = self.data.iloc[index].to_frame().transpose()
 
         try:
             self.deletedData = self.deletedData.append(deletedDataFrame, ignore_index=False)
@@ -217,6 +239,7 @@ class mplApp(tk.Frame):
             self.deletedData = deletedDataFrame
         self.backwardButton.config(state='normal')
         self.deletedArtist.append(artist)
+        self.updateStatus()
     def mouseTrackPressCallback(self, event):
         print('you pressed', event.button, event.xdata, event.ydata)
         self.x1 = event.xdata
@@ -258,6 +281,7 @@ class mplApp(tk.Frame):
             self.addedData = addedDataFrame
         self.addedArtist.append(elli)
         self.backwardButton.config(state='normal')
+        self.updateStatus()
     def mousePosCallback(self, event):
         h, w = self.img.shape
         self.mousePos = [event.x/self.compressRatio, h - event.y/self.compressRatio]
@@ -270,10 +294,13 @@ class mplApp(tk.Frame):
                 del self.addedData
         elif self.mode.get() == 'D':
             if self.deletedData.empty == False:
-                for index, value in self.deletedData.iterrows():
+                # if len(self.deletedData)==1
+                for index, value in self.deletedData.iterrows():                    
                     self.data.drop(index=index, inplace=True)
                 del self.deletedData
-        self.mode.set('I')
+        # self.mode.set('I')
+        # self.modeCallback()
+        self.updateStatus()
     def saveDataButtonCallback(self):
         saveName = TFD.asksaveasfilename(initialdir=os.getcwd(), title='Select file')
         self.data.to_csv(saveName, index=False, sep='\t',float_format='%.3f')
@@ -293,6 +320,7 @@ class mplApp(tk.Frame):
             # draw ellipse according to the last row of self.deletedArtist
             artist = self.deletedArtist.pop()
             artist.set_visible(True)
+            artist.set_picker(True)
             self.canvas.draw()       
             # delete the last row of self.deletedData
             idx = self.deletedData.last_valid_index()
@@ -305,6 +333,7 @@ class mplApp(tk.Frame):
             # Delete ellipse according to the last row of self.deletedData
             artist = self.addedArtist.pop()
             artist.set_visible(False)
+            artist.set_picker(None)
             self.canvas.draw()       
             # delete the last row of self.addedData
             idx = self.addedData.last_valid_index()
@@ -314,7 +343,7 @@ class mplApp(tk.Frame):
             if self.addedData.empty == True:
                 self.backwardButton.config(state='disabled')
                 # self.addedData = None
-    def testButtonCallback(self):
+    def colorButtonCallback(self):
         if self.colorButtonText.get() == 'Color plot':
             for artist in self.artistList:
                 angle = artist.angle
@@ -328,7 +357,28 @@ class mplApp(tk.Frame):
                 artist.set_color('green')            
             self.canvas.draw()
             self.colorButtonText.set('Color plot')
-                
+    def saveFigButtonCallback(self):
+        saveName = TFD.asksaveasfilename(initialdir=os.getcwd(), title='Select file', defaultextension='.png')
+        self.fig.savefig(saveName, format='png')
+    def testButtonCallback(self):
+        pdb.set_trace()
+        
+    """
+    Miscellulose
+    """
+    def updateStatus(self):
+        try:
+            self.dataStatStringVar.set('Data | ' + str(len(self.data)))
+        except:
+            self.dataStatStringVar.set('Data | 0')
+        try:
+            self.deleteTmpStringVar.set('AddTmp | ' + str(len(self.deletedData)))
+        except:
+            self.deleteTmpStringVar.set('AddTmp | 0 particles')
+        try:
+            self.addTmpStringVar.set('DelTmp | ' + str(len(self.addedData)))
+        except:
+            self.addTmpStringVar.set('DelTmp | 0 particles')
 if __name__ == '__main__':
     root = tk.Tk(className="manTrack")
     app = mplApp(master=root)
