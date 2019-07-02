@@ -41,14 +41,18 @@ if __name__ == '__main__':
     num_images = img.shape[0]
     num_particles = 3
     nTotal = 100
+    fid = open('xyt.dat', 'w')
+    fid.write('X\tY\tframe\n')
     for num, frame in enumerate(img):
         print('Processing image ' + str(num) + ' ...')
         max_coor, pk_value = track_spheres(frame, mask, num_particles)
-        
+        for coor in max_coor.transpose():
+            fid.write('%f\t%f\t%d\n' % (coor[0], coor[1], num))
         # plt.imshow(frame)
         # plt.plot(max_coor[1], max_coor[0], 'ro')
         # plt.show('block')
         if num >= nTotal - 1:
             break
+    fid.close()
     t2 = time.monotonic()
     print('Python processed ' + str(nTotal) + ' images in ' + str(t2-t1) + ' secs')
