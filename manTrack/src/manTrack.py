@@ -149,6 +149,8 @@ class mplApp(tk.Frame):
         self.artistList = []
         self.addedData = pd.DataFrame()
         self.deletedData = pd.DataFrame()
+        self.mode.set('I')
+        self.modeCallback()
     def dataOpenDialog(self):
         dataDir = TFD.askopenfilename(initialdir = self.workingDir)
         if dataDir != '':
@@ -208,8 +210,8 @@ class mplApp(tk.Frame):
         self.ax.imshow(img, cmap='gray')
         self.initCanvas()
         self.artistList = []
-        # self.mode.set('I')
-        # self.modeCallback()
+        self.mode.set('I')
+        self.modeCallback()
     def mouseDeleteModeButtonCallback(self):
         self.dID = self.canvas.mpl_connect('pick_event', self.mouseDeleteCallback)
         self.canvas.mpl_disconnect(self.tID)
@@ -319,6 +321,8 @@ class mplApp(tk.Frame):
     def saveDataButtonCallback(self):
         saveName = TFD.asksaveasfilename(initialdir=self.workingDir, title='Select file')
         if saveName != '':
+            folder, filename = os.path.split(saveName)
+            self.workingDir = folder
             self.data.to_csv(saveName, index=False, sep='\t',float_format='%.3f')
     def modeCallback(self):
         if self.mode.get() == 'I':
@@ -377,6 +381,8 @@ class mplApp(tk.Frame):
     def saveFigButtonCallback(self):
         saveName = TFD.asksaveasfilename(initialdir=self.workingDir, title='Select file', defaultextension='.png')
         if saveName != '':
+            folder, filename = os.path.split(saveName)
+            self.workingDir = folder
             self.fig.savefig(saveName, format='png')
     def testButtonCallback(self):
         pdb.set_trace()
