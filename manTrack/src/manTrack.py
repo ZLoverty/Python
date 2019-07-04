@@ -31,6 +31,7 @@ class mplApp(tk.Frame):
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
         self.mode.set('I')
         self.colorButtonText.set('Color plot')
+        self.workingDir = os.getcwd()
         
         self.dID = -1
         self.tID = -1
@@ -105,7 +106,7 @@ class mplApp(tk.Frame):
         self.addTmpLabel.pack(fill='x')
         self.testButton = tk.Button(self.buttonFrame, text='test', command=self.testButtonCallback)
         self.testButton.pack(fill='x')
-    def initCanvas(self, ax):        
+    def initCanvas(self):        
         self.canvas = FigureCanvasTkAgg(self.fig, master=self) ## Use matplotlib.backend to generate GUI widget
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(side='left')
@@ -142,15 +143,22 @@ class mplApp(tk.Frame):
         self.fig = Figure(figsize=(wcanvas/dpi,hcanvas/dpi),dpi=dpi)
         self.ax = self.fig.add_axes([0,0,1,1])
         self.ax.imshow(img, cmap='gray')
-        self.initCanvas(self.ax)
-        
+        self.initCanvas()
+        self.deletedArtist = []
+        self.addedArtist = []
+        self.artistList = []
+        self.addedData = pd.DataFrame()
+        self.deletedData = pd.DataFrame()
     def dataOpenDialog(self):
         dataDir = TFD.askopenfilename(initialdir = self.workingDir)
-        if dataDir.endswith('.dat'):
-            self.data = pd.read_csv(dataDir, delimiter='\t')
-            self.updateStatus()
-        else:
-            ValueError('Wrong data type, please open *.dat text file')
+        if dataDir != '':
+            folder, filename = os.path.split(dataDir)
+            self.workingDir = folder
+            if dataDir.endswith('.dat'):
+                self.data = pd.read_csv(dataDir, delimiter='\t')
+                self.updateStatus()
+            else:
+                ValueError('Wrong data type, please open *.dat text file')
          
     def drawData(self):
         try:
@@ -198,7 +206,7 @@ class mplApp(tk.Frame):
         self.fig = Figure(figsize=(wcanvas/dpi,hcanvas/dpi),dpi=dpi)
         self.ax = self.fig.add_axes([0,0,1,1])
         self.ax.imshow(img, cmap='gray')
-        self.initCanvas(self.ax)
+        self.initCanvas()
         self.artistList = []
         # self.mode.set('I')
         # self.modeCallback()
@@ -236,9 +244,9 @@ class mplApp(tk.Frame):
         index = common_member(index, index_y)
         #########################################
         """
+        xy = artist.center
         index = self.artistList.index(artist)
-        print(artist, index, ' deleted!')
-        print(len(self.data), ' particles left')        
+        print('Delete an ellipse at (%.1f, %.1f) ...' % (xy[0], xy[1]))      
         deletedDataFrame = self.data.iloc[index].to_frame().transpose()
 
         try:
@@ -249,7 +257,7 @@ class mplApp(tk.Frame):
         self.deletedArtist.append(artist)
         self.updateStatus()
     def mouseTrackPressCallback(self, event):
-        print('you pressed', event.button, event.xdata, event.ydata)
+        # print('you pressed', event.button, event.xdata, event.ydata)
         self.x1 = event.xdata
         self.y1 = event.ydata
         self.releaseID = self.canvas.mpl_connect('button_release_event', self.mouseTrackReleaseCallback)      
@@ -257,7 +265,7 @@ class mplApp(tk.Frame):
     def mouseTrackReleaseCallback(self, event):
         self.canvas.mpl_disconnect(self.releaseID) 
         h, w = self.img.shape
-        print('you released', event.button, event.xdata, event.ydata)
+        # print('you released', event.button, event.xdata, event.ydata)
         self.x2 = event.xdata
         self.y2 = event.ydata               
         No = -1;
@@ -275,7 +283,8 @@ class mplApp(tk.Frame):
         elli.set_fill(False)
         elli.set_color('red')
         self.ax.add_patch(elli)
-        self.canvas.draw()        
+        self.canvas.draw()
+        print('Add an ellipse at (%.1f, %.1f) ...' % (xy[0], xy[1]))
         if Angle < 0:
             Angle = Angle + math.pi
         Angle = math.degrees(Angle)
@@ -350,6 +359,7 @@ class mplApp(tk.Frame):
             if self.addedData.empty == True:
                 self.backwardButton.config(state='disabled')
                 # self.addedData = None
+        self.updateStatus()
     def colorButtonCallback(self):
         if self.colorButtonText.get() == 'Color plot':
             for artist in self.artistList:
