@@ -162,9 +162,9 @@ class mplApp(tk.Frame):
             angle = value.Angle
             elli = mpatches.Ellipse(xy, width, height, angle)
             elli.set_fill(False)
-            elli.set_color('green')
-            self.ax.add_patch(elli)
             elli.set_picker(True)
+            elli.set_color('green')
+            self.ax.add_patch(elli)            
             self.artistList.append(elli)
         self.canvas.draw()
 
@@ -194,6 +194,7 @@ class mplApp(tk.Frame):
         self.ax = self.fig.add_axes([0,0,1,1])
         self.ax.imshow(img, cmap='gray')
         self.initCanvas(self.ax)
+        self.artistList = []
     def mouseDeleteModeButtonCallback(self):
         self.dID = self.canvas.mpl_connect('pick_event', self.mouseDeleteCallback)
         self.canvas.mpl_disconnect(self.tID)
@@ -287,19 +288,17 @@ class mplApp(tk.Frame):
         self.mousePos = [event.x/self.compressRatio, h - event.y/self.compressRatio]
         self.mousePos = [math.floor(self.mousePos[0]), math.floor(self.mousePos[1])]
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
-    def mergeDataButtonCallback(self):
-        if self.mode.get() == 'T':
-            if self.addedData.empty == False:
-                self.data = self.data.append(self.addedData, ignore_index=True)
-                del self.addedData
-        elif self.mode.get() == 'D':
-            if self.deletedData.empty == False:
-                # if len(self.deletedData)==1
-                for index, value in self.deletedData.iterrows():                    
-                    self.data.drop(index=index, inplace=True)
-                del self.deletedData
-        # self.mode.set('I')
-        # self.modeCallback()
+    def mergeDataButtonCallback(self):        
+        if self.addedData.empty == False:
+            self.data = self.data.append(self.addedData, ignore_index=True)
+            self.addedData = pd.DataFrame()    
+        if self.deletedData.empty == False:
+            # if len(self.deletedData)==1
+            for index, value in self.deletedData.iterrows():                    
+                self.data.drop(index=index, inplace=True)
+            self.deletedData = pd.DataFrame()
+        self.mode.set('I')
+        self.modeCallback()
         self.updateStatus()
     def saveDataButtonCallback(self):
         saveName = TFD.asksaveasfilename(initialdir=os.getcwd(), title='Select file')
@@ -337,7 +336,7 @@ class mplApp(tk.Frame):
             self.canvas.draw()       
             # delete the last row of self.addedData
             idx = self.addedData.last_valid_index()
-            pdb.set_trace()
+            # pdb.set_trace()
             self.addedData.drop(axis=0, index=idx, inplace=True)
             # when self.deletedData is empty, set "Backward" button to DISABLED
             if self.addedData.empty == True:
@@ -372,13 +371,14 @@ class mplApp(tk.Frame):
         except:
             self.dataStatStringVar.set('Data | 0')
         try:
-            self.deleteTmpStringVar.set('AddTmp | ' + str(len(self.deletedData)))
+            self.deleteTmpStringVar.set('DelTmp | ' + str(len(self.deletedData)))
         except:
-            self.deleteTmpStringVar.set('AddTmp | 0 particles')
+            self.deleteTmpStringVar.set('DelTmp | 0')
         try:
-            self.addTmpStringVar.set('DelTmp | ' + str(len(self.addedData)))
+            self.addTmpStringVar.set('AddTmp | ' + str(len(self.addedData)))
         except:
-            self.addTmpStringVar.set('DelTmp | 0 particles')
+            self.addTmpStringVar.set('AddTmp | 0')
+            
 if __name__ == '__main__':
     root = tk.Tk(className="manTrack")
     app = mplApp(master=root)
