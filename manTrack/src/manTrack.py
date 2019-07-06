@@ -104,8 +104,10 @@ class mplApp(tk.Frame):
         self.deleteTmpLabel.pack(fill='x')
         self.addTmpLabel = tk.Label(self.buttonFrame, textvariable=self.addTmpStringVar)
         self.addTmpLabel.pack(fill='x')
-        self.testButton = tk.Button(self.buttonFrame, text='test', command=self.testButtonCallback)
-        self.testButton.pack(fill='x')
+        
+        
+        # self.testButton = tk.Button(self.buttonFrame, text='test', command=self.testButtonCallback)
+        # self.testButton.pack(fill='x')
     def initCanvas(self):        
         self.canvas = FigureCanvasTkAgg(self.fig, master=self) ## Use matplotlib.backend to generate GUI widget
         self.canvas.draw()
@@ -153,14 +155,14 @@ class mplApp(tk.Frame):
         self.modeCallback()
     def dataOpenDialog(self):
         dataDir = TFD.askopenfilename(initialdir = self.workingDir)
-        if dataDir != '':
+        if dataDir.endswith('.dat') or dataDir.endswith('.txt'):
             folder, filename = os.path.split(dataDir)
             self.workingDir = folder
-            if dataDir.endswith('.dat'):
-                self.data = pd.read_csv(dataDir, delimiter='\t')
-                self.updateStatus()
-            else:
-                ValueError('Wrong data type, please open *.dat text file')
+            self.data = pd.read_csv(dataDir, delimiter='\t')
+            self.updateStatus()
+        else:
+            print('Please open *.dat or *.txt file')
+
          
     def drawData(self):
         try:
