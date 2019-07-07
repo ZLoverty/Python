@@ -1,0 +1,1 @@
+Reversi AI (course project)
