@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.filedialog as TFD
+import tkinter.messagebox as TMB
 from matplotlib.figure import Figure
 from matplotlib.image import imread
 from matplotlib import colors
@@ -27,7 +28,12 @@ class mplApp(tk.Frame):
         self.dataStatStringVar = tk.StringVar()
         self.deleteTmpStringVar = tk.StringVar()
         self.addTmpStringVar = tk.StringVar()        
-        
+        self.PPUStringVar = tk.StringVar()
+        self.minorAxisStringVar = tk.StringVar()
+        self.PPULabelStringVar = tk.StringVar()
+        self.minorAxisLabelStringVar = tk.StringVar()
+        self.PPU = 100
+        self.minorAxis = 10
         self.mousePosStringVar.set(str(self.mousePos[0]) + ', ' + str(self.mousePos[1]))
         self.mode.set('I')
         self.colorButtonText.set('Color plot')
@@ -38,8 +44,11 @@ class mplApp(tk.Frame):
         self.deletedArtist = []
         self.addedArtist = []
         self.artistList = []
+        self.data = pd.DataFrame()
         self.addedData = pd.DataFrame()
         self.deletedData = pd.DataFrame()
+        self.PPUStringVar.set(str(self.PPU))
+        self.minorAxisStringVar.set(str(self.minorAxis))
         
     def create_widgets(self):
         # DATA LOADING buttons
@@ -82,12 +91,22 @@ class mplApp(tk.Frame):
         # Miscellulose buttons and other widgets
         spaceFrame2 = tk.Frame(self.buttonFrame, height=30)
         spaceFrame2.pack()
-        PPULabel = tk.Label(self.buttonFrame, text='INPUT PPU', font=('Helvetica', 10, 'bold'))
+        PPULabel = tk.Label(self.buttonFrame, text='INPUT PPU & MA', font=('Helvetica', 10, 'bold'))
         PPULabel.pack(fill='x')
-        self.PPUEntry = tk.Entry(self.buttonFrame)
-        self.PPUEntry.pack(fill='x')
-        self.mousePositionLabel = tk.Label(self.buttonFrame, textvariable=self.mousePosStringVar)
-        self.mousePositionLabel.pack(fill='x')                
+        inputFrame1 = tk.Frame(self.buttonFrame, height=12)
+        inputFrame1.pack()
+        PPULabel = tk.Label(inputFrame1, text='PPU', width = 7)
+        PPULabel.pack(side='left', fill='y')
+        self.PPUEntry = tk.Entry(inputFrame1, textvariable=self.PPUStringVar, width=8)
+        self.PPUEntry.pack(side='left', fill='y')
+        self.PPUEntry.bind('<Return>', self.PPUEnterCallback)
+        inputFrame2 = tk.Frame(self.buttonFrame, height=12)
+        inputFrame2.pack()
+        MALabel = tk.Label(inputFrame2, text='MinAxis', width = 7)
+        MALabel.pack(side='left', fill='y')
+        self.minorAxisEntry = tk.Entry(inputFrame2, textvariable=self.minorAxisStringVar, width=8)
+        self.minorAxisEntry.pack(fill='y')
+        self.minorAxisEntry.bind('<Return>', self.MAEnterCallback)                     
         self.backwardButton = tk.Button(self.buttonFrame, text='Backward', state='disabled', command=self.backwardButtonCallback)
         self.backwardButton.pack(fill='x')       
         self.colorButton = tk.Button(self.buttonFrame, text='Color/Mono plot', command=self.colorButtonCallback)
@@ -98,16 +117,22 @@ class mplApp(tk.Frame):
         spaceFrame2.pack()
         statLabel = tk.Label(self.buttonFrame, text='STATUS BLOCK', font=('Helvetica', 10, 'bold'))
         statLabel.pack(fill='x')
+        self.mousePositionLabel = tk.Label(self.buttonFrame, textvariable=self.mousePosStringVar)
+        self.mousePositionLabel.pack(fill='x') 
         self.dataStatLabel = tk.Label(self.buttonFrame, textvariable=self.dataStatStringVar)
         self.dataStatLabel.pack(fill='x')
         self.deleteTmpLabel = tk.Label(self.buttonFrame, textvariable=self.deleteTmpStringVar)
         self.deleteTmpLabel.pack(fill='x')
         self.addTmpLabel = tk.Label(self.buttonFrame, textvariable=self.addTmpStringVar)
         self.addTmpLabel.pack(fill='x')
-        
+        self.PPULabel = tk.Label(self.buttonFrame, textvariable=self.PPULabelStringVar)
+        self.PPULabel.pack(fill='x')
+        self.minorAxisLabel = tk.Label(self.buttonFrame, textvariable=self.minorAxisLabelStringVar)
+        self.minorAxisLabel.pack(fill='x')
         
         # self.testButton = tk.Button(self.buttonFrame, text='test', command=self.testButtonCallback)
         # self.testButton.pack(fill='x')
+        self.updateStatus()
     def initCanvas(self):        
         self.canvas = FigureCanvasTkAgg(self.fig, master=self) ## Use matplotlib.backend to generate GUI widget
         self.canvas.draw()
@@ -123,6 +148,9 @@ class mplApp(tk.Frame):
             pass
         imgDir = TFD.askopenfilename()
         folder, filename = os.path.split(imgDir)
+        if filename.endswith('.tif') is not True:
+            TMB.showerror('File type error', 'Please open *.tif file')
+            return
         self.workingDir = folder
         img = imread(imgDir)        
         self.img = img
@@ -146,13 +174,7 @@ class mplApp(tk.Frame):
         self.ax = self.fig.add_axes([0,0,1,1])
         self.ax.imshow(img, cmap='gray')
         self.initCanvas()
-        self.deletedArtist = []
-        self.addedArtist = []
-        self.artistList = []
-        self.addedData = pd.DataFrame()
-        self.deletedData = pd.DataFrame()
-        self.mode.set('I')
-        self.modeCallback()
+        
     def dataOpenDialog(self):
         dataDir = TFD.askopenfilename(initialdir = self.workingDir)
         if dataDir.endswith('.dat') or dataDir.endswith('.txt'):
@@ -161,15 +183,10 @@ class mplApp(tk.Frame):
             self.data = pd.read_csv(dataDir, delimiter='\t')
             self.updateStatus()
         else:
-            print('Please open *.dat or *.txt file')
+            TMB.showerror('File type error', 'Please open *.dat or *.txt file')
 
          
     def drawData(self):
-        try:
-            self.PPU = float(self.PPUEntry.get())          
-        except:
-            print('Enter pixel per unit in the blank')
-            return
         PPU = self.PPU
         h, w = self.img.shape
         for name, value in self.data.iterrows():
@@ -189,7 +206,8 @@ class mplApp(tk.Frame):
         try:
             self.canvas.get_tk_widget().destroy()
         except:
-            ValueError('No image opened')
+            TMB.showerror('Error', 'No image is open')
+            return
         img = self.img
         h, w = img.shape
         dpi = 100
@@ -212,8 +230,15 @@ class mplApp(tk.Frame):
         self.ax.imshow(img, cmap='gray')
         self.initCanvas()
         self.artistList = []
-        self.mode.set('I')
-        self.modeCallback()
+        if self.mode.get() == 'I':
+            self.canvas.mpl_disconnect(self.dID)
+            self.canvas.mpl_disconnect(self.tID)
+        elif self.mode.get() == 'D':
+            self.dID = self.canvas.mpl_connect('pick_event', self.mouseDeleteCallback)
+            self.canvas.mpl_disconnect(self.tID)
+        elif self.mode.get() == 'T':
+            self.tID = self.canvas.mpl_connect('button_press_event', self.mouseTrackPressCallback)
+            self.canvas.mpl_disconnect(self.dID)
     def mouseDeleteModeButtonCallback(self):
         self.dID = self.canvas.mpl_connect('pick_event', self.mouseDeleteCallback)
         self.canvas.mpl_disconnect(self.tID)
@@ -236,18 +261,6 @@ class mplApp(tk.Frame):
         artist.set_visible(False)
         artist.set_picker(None)
         self.canvas.draw()
-        """
-        ### common_member sometimes cause trouble
-        xy = artist.center
-        x = xy[0]
-        y = h - xy[1]
-        xData = self.data.X*self.PPU 
-        yData = self.data.Y*self.PPU 
-        index = self.data[xData==x].index.tolist()     
-        index_y = self.data[yData==y].index.tolist()
-        index = common_member(index, index_y)
-        #########################################
-        """
         xy = artist.center
         index = self.artistList.index(artist)
         print('Delete an ellipse at (%.1f, %.1f) ...' % (xy[0], xy[1]))      
@@ -267,21 +280,22 @@ class mplApp(tk.Frame):
         self.releaseID = self.canvas.mpl_connect('button_release_event', self.mouseTrackReleaseCallback)      
         
     def mouseTrackReleaseCallback(self, event):
-        self.canvas.mpl_disconnect(self.releaseID) 
+        self.canvas.mpl_disconnect(self.releaseID)
+        PPU = self.PPU
         h, w = self.img.shape
         # print('you released', event.button, event.xdata, event.ydata)
         self.x2 = event.xdata
         self.y2 = event.ydata               
         No = -1;
         Area = -1;
-        X = (self.x1 + self.x2) / 2 / self.PPU
-        Y = (h - (self.y1 + self.y2) / 2) / self.PPU
-        Major = ((self.x1 - self.x2)**2+(self.y1 - self.y2)**2)**.5 / self.PPU
-        Minor = Major / 4
+        X = (self.x1 + self.x2) / 2 / PPU
+        Y = (h - (self.y1 + self.y2) / 2) / PPU
+        Major = ((self.x1 - self.x2)**2+(self.y1 - self.y2)**2)**.5 / PPU
+        Minor = self.minorAxis/PPU
         Angle = math.atan((self.y1 - self.y2)/(self.x1 - self.x2))
-        xy = (X*self.PPU, h - Y*self.PPU)
-        width = Major*self.PPU
-        height =  Minor*self.PPU
+        xy = (X*PPU, h - Y*PPU)
+        width = Major*PPU
+        height =  Minor*PPU
         angle = Angle/math.pi*180
         elli = mpatches.Ellipse(xy, width, height, angle)
         elli.set_fill(False)
@@ -295,6 +309,10 @@ class mplApp(tk.Frame):
         Slice = 1
         data = np.array([[No, Area, X, Y, Major, Minor, Angle, Slice]])
         header = self.data.columns.tolist()
+        if len(header) != 8:
+            header = ['No', 'Area', 'X', 'Y', 'Major', 'Minor', 'Angle', 'Slice']
+            
+        # pdb.set_trace()
         addedDataFrame = pd.DataFrame(data=data, columns=header)
         try:
             self.addedData = self.addedData.append(addedDataFrame, ignore_index=True)
@@ -385,9 +403,22 @@ class mplApp(tk.Frame):
         if saveName != '':
             folder, filename = os.path.split(saveName)
             self.workingDir = folder
-            self.fig.savefig(saveName, format='png')
+            self.fig.savefig(saveName, format='png', dpi=300)
+    def submitButtonCallback(self):
+        self.updateStatus()
+        self.PPUStringVar.set('')
+        self.minorAxisStringVar.set('')        
+    def PPUEnterCallback(self, event):
+        self.PPU = float(self.PPUStringVar.get())
+        self.updateStatus()
+        self.PPUStringVar.set('')
+    def MAEnterCallback(self, event):
+        self.minorAxis = float(self.minorAxisStringVar.get())
+        self.updateStatus()
+        self.minorAxisStringVar.set('')
     def testButtonCallback(self):
         pdb.set_trace()
+    
         
     """
     Miscellulose
@@ -405,6 +436,14 @@ class mplApp(tk.Frame):
             self.addTmpStringVar.set('AddTmp | ' + str(len(self.addedData)))
         except:
             self.addTmpStringVar.set('AddTmp | 0')
+        try:
+            self.PPULabelStringVar.set('PPU | ' + str(self.PPU))
+        except:
+            self.PPULabelStringVar.set('PPU | 0')
+        try:
+            self.minorAxisLabelStringVar.set('Minor axis | ' + str(self.minorAxis))
+        except:
+            self.minorAxisLabelStringVar.set('Minor axis | 0')
             
 if __name__ == '__main__':
     root = tk.Tk(className="manTrack")
