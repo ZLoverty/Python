@@ -128,13 +128,32 @@ def readseq(folder):
     fileList = fileList.assign(Name=nameList, Dir=dirList)
     fileList = fileList.sort_values(by=['Name'])
     return fileList
+
+def boxsize_effect_spatial(img, boxsize, mpp):
+    # img: the image to be tested, array-like
+    # boxsize: a list of boxsize to be tested, list-like
+    # mpp: microns per pixel, float
+    data = {}
+    for bs in boxsize:
+        X, Y, I = divide_windows(img, windowsize=[bs, bs], step=bs)
+        CI = corrI(X, Y, I)
+        dc = distance_corr(X, Y, CI)
+        bsm = bs * mpp # boxsize in microns
+        dc.R = dc.R * mpp
+        data['{0:.1f}'.format(bsm)] = dc
+    for kw in data:
+        dc = data[kw]
+        length = len(dc)
+        smooth_length = int(np.ceil(length/5)*2+1)
+        plt.plot(dc.R, savgol_filter(dc.C, smooth_length, 3), label=kw)
+    plt.legend()
+    return data
     
 if __name__ == '__main__':
-    folder = sys.argv[1]
-    wsize = sys.argv[2]
-    step = sys.argv[3]
+    folder = r'I:\Github\Python\Correlation\test_images\boxsize_effect'
+    wsize = 50
+    step = 50
     t1 = time.monotonic()    
-    # folder = r'I:\Google Drive\Code\Python\Correlation\test_image'
     data_seq = corrIseq(folder, windowsize=[wsize, wsize], step=step)
     data_seq.to_csv(os.path.join(folder, 'Icorrdata.dat'), index=False)
     t2 = time.monotonic()
