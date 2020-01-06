@@ -7,6 +7,7 @@ import pandas as pd
 import sys
 import time
 import pdb
+from scipy.signal import savgol_filter
 
 def corrS(X, Y, U, V):
     # X, Y, U, V represent a vector field
