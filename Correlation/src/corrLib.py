@@ -145,7 +145,7 @@ def boxsize_effect_spatial(img, boxsize, mpp):
     for kw in data:
         dc = data[kw]
         length = len(dc)
-        smooth_length = int(np.ceil(length/5)*2+1)
+        smooth_length = int(np.ceil(length/20)*2+1)
         plt.plot(dc.R, savgol_filter(dc.C, smooth_length, 3), label=kw)
     plt.legend()
     return data
