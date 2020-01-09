@@ -149,15 +149,26 @@ def boxsize_effect_spatial(img, boxsize, mpp):
         plt.plot(dc.R, savgol_filter(dc.C, smooth_length, 3), label=kw)
     plt.legend()
     return data
+
+def density_fluctuation(img8):
+    # Gradually increase box size and calculate dN=std(I) and N=mean(I)
+    row, col = img8.shape
+    # choose maximal box size to be 1/3 of the shorter edge of the image 
+    # to guarantee we have multiple boxes for each calculation, so that
+    # the statistical quantities are meaningful.
+    l = min(row, col)
+    boxsize = np.unique(np.floor(np.logspace(0, np.log10(l/3), 100)))
+    NList = []
+    dNList = []
+    for bs in boxsize:
+        X, Y, I = divide_windows(img8, windowsize=[bs, bs], step=bs)
+        N = (255-I.mean())*bs*bs
+        dN = I.std()*bs*bs
+        NList.append(N)
+        dNList.append(dN)
+    df_data = pd.DataFrame().assign(n=NList, d=dNList)
+    return df_data
     
 if __name__ == '__main__':
-    folder = r'I:\Github\Python\Correlation\test_images\boxsize_effect'
-    wsize = 50
-    step = 50
-    t1 = time.monotonic()    
-    data_seq = corrIseq(folder, windowsize=[wsize, wsize], step=step)
-    data_seq.to_csv(os.path.join(folder, 'Icorrdata.dat'), index=False)
-    t2 = time.monotonic()
-    t = (t2 - t1) / 3600
-    print('Wall time: %.2f h' % t)
-    
+    img = io.imread(r'I:\Github\Python\Correlation\test_images\boxsize_effect\0001.tif')
+    data = density_fluctuation(img)
