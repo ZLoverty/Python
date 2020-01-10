@@ -128,7 +128,46 @@ def readseq(folder):
     fileList = fileList.assign(Name=nameList, Dir=dirList)
     fileList = fileList.sort_values(by=['Name'])
     return fileList
-    
+
+def boxsize_effect_spatial(img, boxsize, mpp):
+    # img: the image to be tested, array-like
+    # boxsize: a list of boxsize to be tested, list-like
+    # mpp: microns per pixel, float
+    data = {}
+    for bs in boxsize:
+        X, Y, I = divide_windows(img, windowsize=[bs, bs], step=bs)
+        CI = corrI(X, Y, I)
+        dc = distance_corr(X, Y, CI)
+        bsm = bs * mpp # boxsize in microns
+        dc.R = dc.R * mpp
+        data['{0:.1f}'.format(bsm)] = dc
+    for kw in data:
+        dc = data[kw]
+        length = len(dc)
+        smooth_length = int(np.ceil(length/20)*2+1)
+        plt.plot(dc.R, savgol_filter(dc.C, smooth_length, 3), label=kw)
+    plt.legend()
+    return data
+
+def density_fluctuation(img8):
+    # Gradually increase box size and calculate dN=std(I) and N=mean(I)
+    row, col = img8.shape
+    # choose maximal box size to be 1/3 of the shorter edge of the image 
+    # to guarantee we have multiple boxes for each calculation, so that
+    # the statistical quantities are meaningful.
+    l = min(row, col)
+    boxsize = np.unique(np.floor(np.logspace(0, np.log10(l/3), 100)))
+    NList = []
+    dNList = []
+    for bs in boxsize:
+        X, Y, I = divide_windows(img8, windowsize=[bs, bs], step=bs)
+        N = bs*bs
+        dN = np.log10(I).std()*bs*bs
+        NList.append(N)
+        dNList.append(dN)
+    df_data = pd.DataFrame().assign(n=NList, d=dNList)
+    return df_data
+
 if __name__ == '__main__':
     folder = sys.argv[1]
     wsize = sys.argv[2]
