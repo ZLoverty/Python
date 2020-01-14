@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from myImageLib import dirrec
+from myImageLib import dirrec, bpass
 from skimage import io
 import os
 import pandas as pd
@@ -149,18 +149,23 @@ def boxsize_effect_spatial(img, boxsize, mpp):
     plt.legend()
     return data
 
-def density_fluctuation(img8):
-    # Gradually increase box size and calculate dN=std(I) and N=mean(I)
+def density_fluctuation(img8):    
+    def match_hist(im1, im2):
+        # match the histogram of im1 to that of im2
+        return (abs(((im1 - im1.mean()) / im1.std() * im2.std() + im2.mean()))+1).astype('uint8')
     row, col = img8.shape
+    l = min(row, col)
+    boxsize = np.unique(np.floor(np.logspace(0, np.log10(l/3), 100)))
+    # Gradually increase box size and calculate dN=std(I) and N=mean(I)    
     # choose maximal box size to be 1/3 of the shorter edge of the image 
     # to guarantee we have multiple boxes for each calculation, so that
     # the statistical quantities are meaningful.
-    l = min(row, col)
-    boxsize = np.unique(np.floor(np.logspace(0, np.log10(l/3), 100)))
+    bp = bpass(img8, 3, 100)
+    img8_mh = match_hist(bp, img8)
     NList = []
     dNList = []
     for bs in boxsize:
-        X, Y, I = divide_windows(img8, windowsize=[bs, bs], step=bs)
+        X, Y, I = divide_windows(img8_mh, windowsize=[bs, bs], step=bs)
         N = bs*bs
         dN = np.log10(I).std()*bs*bs
         NList.append(N)
@@ -169,14 +174,6 @@ def density_fluctuation(img8):
     return df_data
 
 if __name__ == '__main__':
-    folder = sys.argv[1]
-    wsize = sys.argv[2]
-    step = sys.argv[3]
-    t1 = time.monotonic()    
-    # folder = r'I:\Google Drive\Code\Python\Correlation\test_image'
-    data_seq = corrIseq(folder, windowsize=[wsize, wsize], step=step)
-    data_seq.to_csv(os.path.join(folder, 'Icorrdata.dat'), index=False)
-    t2 = time.monotonic()
-    t = (t2 - t1) / 3600
-    print('Wall time: %.2f h' % t)
+    img = io.imread(r'I:\Github\Python\Correlation\test_images\GNF\stat\40-1.tif')
+    df_data = density_fluctuation(img)
     

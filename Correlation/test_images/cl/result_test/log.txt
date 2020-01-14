@@ -1,0 +1,4 @@
+Mon Jan 13 11:42:39 2020 // 100-2 calculated
+Mon Jan 13 11:43:01 2020 // 40-2 calculated
+Mon Jan 13 11:43:25 2020 // 60-2 calculated
+Mon Jan 13 11:43:47 2020 // 80-2 calculated
