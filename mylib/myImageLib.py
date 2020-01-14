@@ -65,7 +65,6 @@ def bpass(*args):
     return im_new.astype('uint8')
 
 def bestcolor(n):
-    r = [57, 218, 62, 204, 83, 107, 146, 148]
-    g = [106, 124, 150, 37, 81, 76, 36, 139]
-    b = [177, 48, 81, 41, 84, 154, 40, 61]
-    return (r[n]/255, g[n]/255, b[n]/255)
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
+              '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    return colors[n]
