@@ -34,7 +34,7 @@ Convert *.nd2 file to image sequence of 8-bit grayscale images. Save this image 
 """ 
 
 """ SYNTAX
-python bpass.py nd2Dir
+python to8bit.py nd2Dir
 """
 
 """ TEST PARAMS
