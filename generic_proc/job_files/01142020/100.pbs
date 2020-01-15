@@ -3,7 +3,7 @@
 #PBS -m abe
 #PBS -M liux3141@umn.edu
 
-cd ~/code/Python/generic_proc/job_files/01142020
+cd ~/code/Python/generic_proc/py_files
 module load python3
 source activate pythonEnv 
 python to8bit.py ~/Data/Wei/overnight/100on.nd2 &
