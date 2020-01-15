@@ -27,6 +27,11 @@ with ND2Reader(nd2Dir) as images:
         img8 = to8bit(image)
         img_bpass = bpass(img8, bpassLow, bpassHigh)
         skimage.io.imsave(os.path.join(saveDir, '%5d.tif' % num), img_bpass)
+        
+""" DESCRIPTION
+Convert *.nd2 file to image sequence and apply bandpass filter to each image. Save this image sequence in a subfolder under the same folder as the *.nd2 file with corresponding name as the *.nd2 file name.
+""" SYNTAX
+python bpass.py nd2Dir bpassLow bpassHigh
 
 
     
