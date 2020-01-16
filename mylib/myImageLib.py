@@ -2,6 +2,9 @@ import os
 import numpy as np
 from scipy import fftpack
 from scipy.signal import medfilt2d, convolve2d, fftconvolve
+from scipy.optimize import curve_fit
+from scipy import exp
+
 def dirrec(path, filename):
     """
     Recursively look for all the directories of files with name <filename>.
@@ -116,3 +119,37 @@ def FastPeakFind(data):
             cent.append(xy)
     cent = np.asarray(cent).transpose()
     return cent
+
+def maxk(array, num_max):
+    array = np.asarray(array)
+    length = array.size
+    array = array.reshape((1, length))
+    idx = np.argsort(array)
+    idx2 = np.flip(idx)
+    return idx2[0, 0: num_max]
+
+def track_spheres_dt(img, num_particles):
+    def gauss1(x,a,x0,sigma):
+        return a*exp(-(x-x0)**2/(2*sigma**2)) 
+    cent = FastPeakFind(img)
+    num_particles = min(num_particles, cent.shape[1])
+    peaks = img[cent[0], cent[1]]
+    ind = maxk(peaks, num_particles)
+    max_coor_tmp = cent[:, ind]
+    max_coor = max_coor_tmp.astype('float32')
+    pk_value = peaks[ind]    
+    for num in range(0, num_particles):
+        x = max_coor_tmp[0, num]
+        y = max_coor_tmp[1, num]
+        fitx1 = np.asarray(range(x-7, x+8))
+        fity1 = np.asarray(img[range(x-7, x+8), y])        
+        popt,pcov = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
+        max_coor[0, num] = popt[1]
+        fitx2 = np.asarray(range(y-7, y+8))
+        fity2 = np.asarray(img[x, range(y-7, y+8)])
+        popt,pcov = curve_fit(gauss1, fitx2, fity2, p0=[1, y, 3])
+        max_coor[1, num] = popt[1]  
+    return max_coor, pk_value
+
+def gauss1(x,a,x0,sigma):
+    return a*exp(-(x-x0)**2/(2*sigma**2))  

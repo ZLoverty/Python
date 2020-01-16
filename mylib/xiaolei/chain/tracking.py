@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from skimage import io, util, filters, measure
 import os
 from scipy import ndimage
-from myImageLib import dirrec, to8bit, bpass, FastPeakFind
+from myImageLib import dirrec, to8bit, bpass, track_spheres_dt
 from corrLib import readseq
 
 def get_chain_mask(img, feature_size=7000, feature_number=1):
@@ -25,23 +25,23 @@ def get_chain_mask(img, feature_size=7000, feature_number=1):
         mask[coords[:, 0], coords[:, 1]] = 1
     return mask
 
-def dt_track_1(img, feature_size=7000, feature_number=1):
+def dt_track_1(img, target_number, feature_size=7000, feature_number=1):
     mask = get_chain_mask(img, feature_size, feature_number)
     isod = img > filters.threshold_isodata(img)
     masked_isod = mask * isod
     despeck = ndimage.median_filter(masked_isod, size=10)
     dt = ndimage.distance_transform_edt(despeck)
-    cent = FastPeakFind(dt)
-    return cent
+    max_coor, pk_value = track_spheres_dt(dt, target_number)
+    return max_coor
 
-def dt_track(folder, feature_size=7000, feature_number=1):
+def dt_track(folder, target_number, feature_size=7000, feature_number=1):
     traj = pd.DataFrame()
     l = readseq(folder)
     for num, i in l.iterrows():
         print('Processing frame ' + i.Name + ' ...')
         img = io.imread(i.Dir)
         try:
-            cent = dt_track_1(img, feature_size, feature_number)
+            cent = dt_track_1(img, target_number, feature_size, feature_number)
         except:
             ValueError('Frame {:05d} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
         subtraj = pd.DataFrame(data=cent.transpose(), columns=['y', 'x']).assign(Name=i.Name)
@@ -52,7 +52,7 @@ def dt_track(folder, feature_size=7000, feature_number=1):
 if __name__ == '__main__':
     pass
     # dt_track test code
-    # traj = dt_track(r'I:\Github\Python\mylib\xiaolei\chain\test_files')
+    # traj = dt_track(r'R:\Dip\DNA_chain\fluorescent\problem_image', 15)
 
     
     # avg_cos test code 

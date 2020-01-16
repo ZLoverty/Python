@@ -26,7 +26,7 @@ def track_spheres(img, mask, num_particles):
         y = max_coor_tmp[1, num]
         fitx1 = np.asarray(range(x-7, x+8))
         fity1 = np.asarray(corr[range(x-7, x+8), y])        
-        popt,pcov = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
+        popt, pcov = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
         max_coor[0, num] = popt[1]
         fitx2 = np.asarray(range(y-7, y+8))
         fity2 = np.asarray(corr[x, range(y-7, y+8)])
