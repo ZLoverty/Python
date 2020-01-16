@@ -12,6 +12,7 @@ import numpy as np
 import pandas as pd
 import math
 import pdb
+
 class mplApp(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -399,11 +400,17 @@ class mplApp(tk.Frame):
             self.canvas.draw()
             self.colorButtonText.set('Color plot')
     def saveFigButtonCallback(self):
-        saveName = TFD.asksaveasfilename(initialdir=self.workingDir, title='Select file', defaultextension='.png')
+        saveName = TFD.asksaveasfilename(initialdir=self.workingDir, title='Select file', defaultextension='.png', \
+                    filetypes = (("jpeg files","*.jpg"), ("PDF", "*.pdf"), ("all files","*.*")))
         if saveName != '':
             folder, filename = os.path.split(saveName)
             self.workingDir = folder
-            self.fig.savefig(saveName, format='png', dpi=300)
+            if filename.endswith('.png'):
+                self.fig.savefig(saveName, format='png', dpi=300)
+            elif filename.endswith('.pdf'):
+                self.fig.savefig(saveName, format='pdf')
+            else:
+                TMB.showerror('File type error', 'Please input a valid extension (pdf or png)')
     def submitButtonCallback(self):
         self.updateStatus()
         self.PPUStringVar.set('')
