@@ -29,7 +29,7 @@ def dt_track_1(img, feature_size=7000, feature_number=1):
     mask = get_chain_mask(img, feature_size, feature_number)
     isod = img > filters.threshold_isodata(img)
     masked_isod = mask * isod
-    despeck = ndimage.median_filter(masked_isod, size=3)
+    despeck = ndimage.median_filter(masked_isod, size=10)
     dt = ndimage.distance_transform_edt(despeck)
     cent = FastPeakFind(dt)
     return cent
