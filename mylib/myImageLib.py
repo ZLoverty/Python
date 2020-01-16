@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from scipy import fftpack
+from scipy.signal import medfilt2d, convolve2d, fftconvolve
 def dirrec(path, filename):
     """
     Recursively look for all the directories of files with name <filename>.
@@ -68,3 +69,50 @@ def bestcolor(n):
     colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd',
               '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
     return colors[n]
+
+def matlab_style_gauss2D(shape=(3,3),sigma=0.5):
+    """
+    2D gaussian mask - should give the same result as MATLAB's
+    fspecial('gaussian',[shape],[sigma])
+    """
+    m,n = [(ss-1.)/2. for ss in shape]
+    y,x = np.ogrid[-m:m+1,-n:n+1]
+    h = np.exp( -(x*x + y*y) / (2.*sigma*sigma) )
+    h[ h < np.finfo(h.dtype).eps*h.max() ] = 0
+    sumh = h.sum()
+    if sumh != 0:
+        h /= sumh
+    return h
+
+def FastPeakFind(data):
+    if str(data.dtype) != 'float32':
+        data = data.astype('float32')
+    mf = medfilt2d(data, kernel_size=3)
+    mf = mf.astype('float32')
+    thres = max(min(np.amax(mf,axis=0)), min(np.amax(mf,axis=1)))    
+    filt = matlab_style_gauss2D()
+    conv = convolve2d(mf, filt, mode='same')
+    w_idx = conv > thres
+    bw = conv.copy()
+    bw[w_idx] = 1
+    bw[~w_idx] = 0
+    thresholded = np.multiply(bw, conv)
+    edg = 3
+    shape = data.shape
+    idx = np.nonzero(thresholded[edg-1: shape[0]-edg-1, edg-1: shape[1]-edg-1])
+    idx = np.transpose(idx)
+    cent = []
+    for xy in idx:
+        x = xy[0]
+        y = xy[1]
+        if thresholded[x, y] >= thresholded[x-1, y-1] and \
+            thresholded[x, y] > thresholded[x-1, y] and \
+            thresholded[x, y] >= thresholded[x-1, y+1] and \
+            thresholded[x, y] > thresholded[x, y-1] and \
+            thresholded[x, y] > thresholded[x, y+1] and \
+            thresholded[x, y] >= thresholded[x+1, y-1] and \
+            thresholded[x, y] > thresholded[x+1, y] and \
+            thresholded[x, y] >= thresholded[x+1, y+1]:
+            cent.append(xy)
+    cent = np.asarray(cent).transpose()
+    return cent

@@ -25,7 +25,9 @@ def label_slope(x, y, location='n'):
     xt = 10**(xfmin + (xfmax - xfmin)*3/8)
     yt = 10**((ymax-ymin)/20)*10**np.log10(yf).mean()
     return xf, yf, xt, yt, popt[1]
-    
+
+
+
 if __name__ == '__main__':
     data = pd.read_csv(r'I:\Github\Python\Correlation\test_images\GNF\stat\data.csv')
     data = data.loc[data.Name=='100-1']
