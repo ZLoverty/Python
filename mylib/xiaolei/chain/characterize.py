@@ -65,47 +65,6 @@ def avg_cos(traj, order_pNo):
     df = pd.DataFrame().assign(frame=t, cos=cosL)
     return df
 
-def get_chain_mask(img, feature_size=7000, feature_number=1):
-    maxfilt = ndimage.maximum_filter(img, size=15)
-    maxfilt_thres = maxfilt > filters.threshold_minimum(maxfilt)
-    label_image = measure.label(maxfilt_thres, connectivity=1)
-    num = 0
-    coordsL = []
-    for region in measure.regionprops(label_image):
-        if region.area < feature_size:
-            continue
-        coordsL.append(region.coords)
-        num += 1
-        if num > feature_number:
-            break
-    mask = np.zeros(img.shape)
-    for coords in coordsL:
-        mask[coords[:, 0], coords[:, 1]] = 1
-    return mask
-
-def dt_track_1(img, feature_size=7000, feature_number=1):
-    mask = get_chain_mask(img, feature_size, feature_number)
-    isod = img > filters.threshold_isodata(img)
-    masked_isod = mask * isod
-    despeck = ndimage.median_filter(masked_isod, size=3)
-    dt = ndimage.distance_transform_edt(despeck)
-    cent = FastPeakFind(dt)
-    return cent
-
-def dt_track(folder, feature_size=7000, feature_number=1):
-    traj = pd.DataFrame()
-    l = readseq(folder)
-    for num, i in l.iterrows():
-        img = io.imread(i.Dir)
-        try:
-            cent = dt_track_1(img, feature_size, feature_number)
-        except:
-            ValueError('Frame {:05d} tracking failed, use dt_track_1(img) to find out the cause')
-        subtraj = pd.DataFrame(data=cent.transpose(), columns=['y', 'x']).assign(Name=i.Name)
-        traj = traj.append(subtraj)
-        traj = traj[['x', 'y', 'Name']]
-    return traj
-    
 if __name__ == '__main__':
     pass
     # dt_track test code

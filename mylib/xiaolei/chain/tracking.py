@@ -9,7 +9,7 @@ from corrLib import readseq
 
 def get_chain_mask(img, feature_size=7000, feature_number=1):
     maxfilt = ndimage.maximum_filter(img, size=15)
-    maxfilt_thres = maxfilt > filters.threshold_minimum(maxfilt)
+    maxfilt_thres = maxfilt > filters.threshold_isodata(maxfilt)
     label_image = measure.label(maxfilt_thres, connectivity=1)
     num = 0
     coordsL = []
@@ -38,11 +38,12 @@ def dt_track(folder, feature_size=7000, feature_number=1):
     traj = pd.DataFrame()
     l = readseq(folder)
     for num, i in l.iterrows():
+        print('Processing frame ' + i.Name + ' ...')
         img = io.imread(i.Dir)
         try:
             cent = dt_track_1(img, feature_size, feature_number)
         except:
-            ValueError('Frame {:05d} tracking failed, use dt_track_1(img) to find out the cause')
+            ValueError('Frame {:05d} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
         subtraj = pd.DataFrame(data=cent.transpose(), columns=['y', 'x']).assign(Name=i.Name)
         traj = traj.append(subtraj)
         traj = traj[['x', 'y', 'Name']]
