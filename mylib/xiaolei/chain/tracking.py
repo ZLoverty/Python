@@ -43,7 +43,8 @@ def dt_track(folder, target_number, feature_size=7000, feature_number=1):
         try:
             cent = dt_track_1(img, target_number, feature_size, feature_number)
         except:
-            ValueError('Frame {:05d} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
+            print('Frame {:05s} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
+            continue
         subtraj = pd.DataFrame(data=cent.transpose(), columns=['y', 'x']).assign(Name=i.Name)
         traj = traj.append(subtraj)
         traj = traj[['x', 'y', 'Name']]
