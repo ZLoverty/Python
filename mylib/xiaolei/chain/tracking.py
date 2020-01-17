@@ -5,8 +5,10 @@ from skimage import io, util, filters, measure
 import os
 from scipy import ndimage
 from corrLib import readseq
+import pdb
 
 def get_chain_mask(img, feature_size=7000, feature_number=1):
+    # pdb.set_trace()
     maxfilt = ndimage.maximum_filter(img, size=15)
     maxfilt_thres = maxfilt > filters.threshold_isodata(maxfilt)
     label_image = measure.label(maxfilt_thres, connectivity=1)
@@ -95,14 +97,18 @@ def find_maxima_num(img, num_particles):
     for num in range(0, num_particles):
         x = max_coor_tmp[0, num]
         y = max_coor_tmp[1, num]
-        fitx1 = np.asarray(range(x-7, x+8))
-        fity1 = np.asarray(img[range(x-7, x+8), y])        
-        popt,pcov = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
-        max_coor[0, num] = popt[1]
-        fitx2 = np.asarray(range(y-7, y+8))
-        fity2 = np.asarray(img[x, range(y-7, y+8)])
-        popt,pcov = curve_fit(gauss1, fitx2, fity2, p0=[1, y, 3])
-        max_coor[1, num] = popt[1]  
+        try:
+            fitx1 = np.asarray(range(x-7, x+8))
+            fity1 = np.asarray(img[range(x-7, x+8), y])        
+            popt1,pcov1 = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
+            max_coor[0, num] = popt1[1]      
+            fitx2 = np.asarray(range(y-7, y+8))
+            fity2 = np.asarray(img[x, range(y-7, y+8)])
+            popt2,pcov2 = curve_fit(gauss1, fitx2, fity2, p0=[1, y, 3])
+            max_coor[1, num] = popt2[1]
+        except:
+            print('Fitting error')
+            continue
     return max_coor, pk_value
 
 def dt_track_1(img, target_number, feature_size=7000, feature_number=1):
@@ -111,7 +117,7 @@ def dt_track_1(img, target_number, feature_size=7000, feature_number=1):
     masked_isod = mask * isod
     despeck = ndimage.median_filter(masked_isod, size=10)
     dt = ndimage.distance_transform_edt(despeck)
-    max_coor, pk_value = track_spheres_dt(dt, target_number)
+    max_coor, pk_value = find_maxima_num(dt, target_number)
     return max_coor
 
 def dt_track(folder, target_number, feature_size=7000, feature_number=1):
@@ -123,7 +129,7 @@ def dt_track(folder, target_number, feature_size=7000, feature_number=1):
         try:
             cent = dt_track_1(img, target_number, feature_size, feature_number)
         except:
-            # print('Frame {:05s} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
+            print('Frame {:s} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
             continue
         subtraj = pd.DataFrame(data=cent.transpose(), columns=['y', 'x']).assign(Name=i.Name)
         traj = traj.append(subtraj)
@@ -132,7 +138,7 @@ def dt_track(folder, target_number, feature_size=7000, feature_number=1):
     
 if __name__ == '__main__':
     # dt_track test code
-    traj = dt_track(r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0035.tif', 15)
+    traj = dt_track_1(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0008.tif', 15)
 
     
     # avg_cos test code 
