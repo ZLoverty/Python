@@ -139,16 +139,21 @@ def track_spheres_dt(img, num_particles):
     max_coor = max_coor_tmp.astype('float32')
     pk_value = peaks[ind]    
     for num in range(0, num_particles):
-        x = max_coor_tmp[0, num]
-        y = max_coor_tmp[1, num]
-        fitx1 = np.asarray(range(x-7, x+8))
-        fity1 = np.asarray(img[range(x-7, x+8), y])        
-        popt,pcov = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
-        max_coor[0, num] = popt[1]
-        fitx2 = np.asarray(range(y-7, y+8))
-        fity2 = np.asarray(img[x, range(y-7, y+8)])
-        popt,pcov = curve_fit(gauss1, fitx2, fity2, p0=[1, y, 3])
-        max_coor[1, num] = popt[1]  
+        try:
+            x = max_coor_tmp[0, num]
+            y = max_coor_tmp[1, num]
+            fitx1 = np.asarray(range(x-7, x+8))
+            fity1 = np.asarray(img[range(x-7, x+8), y])        
+            popt,pcov = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
+            max_coor[0, num] = popt[1]
+            fitx2 = np.asarray(range(y-7, y+8))
+            fity2 = np.asarray(img[x, range(y-7, y+8)])
+            popt,pcov = curve_fit(gauss1, fitx2, fity2, p0=[1, y, 3])
+            max_coor[1, num] = popt[1]
+        except:
+            print('Fitting failed')
+            max_coor[:, num] = max_coor_tmp[:, num]
+            continue
     return max_coor, pk_value
 
 def gauss1(x,a,x0,sigma):

@@ -51,9 +51,8 @@ def dt_track(folder, target_number, feature_size=7000, feature_number=1):
     return traj
     
 if __name__ == '__main__':
-    pass
     # dt_track test code
-    # traj = dt_track(r'R:\Dip\DNA_chain\fluorescent\problem_image', 15)
+    traj = dt_track(r'R:\Dip\DNA_chain\fluorescent\problem_image', 15)
 
     
     # avg_cos test code 
