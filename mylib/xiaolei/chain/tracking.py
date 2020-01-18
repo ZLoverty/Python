@@ -53,6 +53,7 @@ def track_spheres_dt(img, num_particles, min_dist=20):
     pk_value = []
     count = 0
     for num, i in enumerate(ind):
+        distance_check = True
         if num == 0:
             x1 = cent[0, i]
             y1 = cent[1, i]
@@ -62,8 +63,14 @@ def track_spheres_dt(img, num_particles, min_dist=20):
             continue
         x2 = cent[0, i]
         y2 = cent[1, i]
-        dist = ((x1-x2)**2 + (y1-y2)**2)**.5
-        if dist > min_dist:
+        for xy in max_coor_tmp:
+            x1 = xy[0]
+            y1 = xy[1]
+            dist = ((x1-x2)**2 + (y1-y2)**2)**.5
+            if dist < min_dist:
+                distance_check = False
+                break
+        if distance_check == True:
             max_coor_tmp.append([x2, y2])
             pk_value.append(peaks[i])
             count += 1
@@ -112,7 +119,7 @@ if __name__ == '__main__':
     fig = plt.figure()
     ax = fig.add_axes([0,0,1,1])
     folder = r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image'
-    traj = dt_track(folder, 15, min_dist=1)
+    traj = dt_track(folder, 15, min_dist=20)
     l = readseq(folder)
     # plt.ion()    
     for num, i in l.iterrows():        
@@ -123,7 +130,7 @@ if __name__ == '__main__':
         ax.plot(subtraj.x, subtraj.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
         plt.pause(.1)
         
-        plt.savefig(os.path.join(folder, r'mindist_0', i.Name + '.png', format='png'))
+        plt.savefig(os.path.join(folder, r'mindist_20', i.Name + '.png'), format='png')
         plt.cla()
         
     
