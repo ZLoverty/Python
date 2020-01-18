@@ -101,7 +101,7 @@ def dt_track_1(img, target_number, min_dist=20, feature_size=7000, feature_numbe
     mask = get_chain_mask(img, feature_size, feature_number)
     isod = img > filters.threshold_isodata(img)
     masked_isod = mask * isod
-    despeck = ndimage.median_filter(masked_isod, size=10)
+    despeck = ndimage.median_filter(masked_isod, size=15)
     dt = ndimage.distance_transform_edt(despeck)
     max_coor, pk_value = track_spheres_dt(dt, target_number, min_dist=min_dist)
     return max_coor
