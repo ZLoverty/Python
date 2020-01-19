@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from skimage import io, util, filters, measure
 import os
 from scipy import ndimage, optimize, exp
-from myImageLib import dirrec, to8bit, bpass, maxk, FastPeakFind, track_spheres_dt
+from myImageLib import dirrec, to8bit, bpass, maxk, FastPeakFind
 from corrLib import readseq
 import pdb
 
@@ -26,23 +26,11 @@ def get_chain_mask(img, feature_size=7000, feature_number=1):
         mask[coords[:, 0], coords[:, 1]] = 1
     return mask
 
-def dt_track(folder, target_number, min_dist=20, feature_size=7000, feature_number=1):
-    traj = pd.DataFrame()
-    l = readseq(folder)
-    for num, i in l.iterrows():
-        print('Processing frame ' + i.Name + ' ...')
-        img = io.imread(i.Dir)
-        try:
-            cent = dt_track_1(img, target_number, min_dist=min_dist, feature_size=feature_size, feature_number=feature_number)
-        except:
-            print('Frame {:s} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
-            continue
-        subtraj = pd.DataFrame(data=cent.transpose(), columns=['y', 'x']).assign(Name=i.Name)
-        traj = traj.append(subtraj)
-        traj = traj[['x', 'y', 'Name']]
-    return traj
-
+def gauss1(x,a,x0,sigma):
+    return a*exp(-(x-x0)**2/(2*sigma**2)) 
+        
 def track_spheres_dt(img, num_particles, min_dist=20):
+    # implement distance check
     def gauss1(x,a,x0,sigma):
         return a*exp(-(x-x0)**2/(2*sigma**2)) 
     cent = FastPeakFind(img)
@@ -97,17 +85,130 @@ def track_spheres_dt(img, num_particles, min_dist=20):
             continue
     return max_coor, pk_value
     
-def dt_track_1(img, target_number, min_dist=20, feature_size=7000, feature_number=1):
+def preprocessing_dt(img, feature_size=7000, feature_number=1, despeckle_size=15):
     mask = get_chain_mask(img, feature_size, feature_number)
     isod = img > filters.threshold_isodata(img)
     masked_isod = mask * isod
-    despeck = ndimage.median_filter(masked_isod, size=10)
+    despeck = ndimage.median_filter(masked_isod, size=15)
     dt = ndimage.distance_transform_edt(despeck)
-    max_coor, pk_value = track_spheres_dt(dt, target_number, min_dist=min_dist)
-    return max_coor
+    return dt
+
+def prelim_tracking_dt(dt):
+    # Find peaks on distance transform map, return integer coords of peaks (pd.DataFrame)
+    cent = FastPeakFind(dt)
+    coords = pd.DataFrame(data=cent.transpose(), columns=['y', 'x'])
+    return coords
+
+def sort_prelim(coords, img, radius):
+    # Sort prelim tracking according to peak score, for now peak score is defined as total mass.
+    # I have code in chain.ipynb for comparing bandwidth and quality of fitting. They are not included in this version because:
+    #   - They incur more computation
+    #   - The correlation between good tracking and fitting quality is not clear.
+    Y, X = np.ogrid[:img.shape[0], :img.shape[1]]
+    mass = []
+    for num, coord in coords.iterrows():
+        x = coord.x
+        y = coord.y
+        dist = ((X - x)**2 + (Y-y)**2)**.5
+        mass.append(img[dist<radius].sum())
+    mass = np.array(mass)
+    coords_rank = coords.assign(mass=mass).sort_values(by=['mass'], ascending=False)
+    return coords_rank[['x', 'y']]
+
+def refine(coords, target_number, min_dist=20):
+    # Many more infomation could be used here to refine the preliminary tracking result.
+    # coords is already sorted and the most possible coordinates are at top in coords
+    # We use two here:
+    #   - Distance check: a minimal distance min_dist can be set to avoid redundant tracking
+    #   - Total number check: Since the total number of particles is known, the function looks for that number of particles and skip those low possibility features.
+    count = 0
+    coords_tmp = pd.DataFrame()
+    for num, coord in coords.iterrows():
+        distance_check = True
+        if num == 0:
+            coords_tmp = coords_tmp.append(coord)
+            count += 1
+            continue
+        for num1, coord1 in coords_tmp.iterrows():
+            dist = ((coord.x-coord1.x)**2 + (coord.y-coord1.y)**2)**.5
+            # min distance check
+            if dist < min_dist:
+                distance_check = False
+                break
+        if distance_check == True:
+            coords_tmp = coords_tmp.append(coord)
+            count += 1
+        # Total number check
+        if count >= target_number:
+            break
+    return coords_tmp
+
+def subpixel_res(coords, dt, fitting_range):    
+    # Use gaussian fitting to get subpixel resolution
+    half_range = int(np.floor(fitting_range/2))
+    
+    for num, coord in coords.iterrows():
+        
+        try:
+            x = int(coord.x)
+            y = int(coord.y)
+            fitx1 = np.asarray(range(x-half_range, x+half_range-1))
+            fity1 = np.asarray(dt[y, fitx1])
+            popt, pcov = optimize.curve_fit(gauss1, fitx1, fity1, p0=[80, x, 10])
+            coords.x.loc[num] = popt[1]
+            fitx2 = np.asarray(range(y-half_range, y+half_range-1))
+            fity2 = np.asarray(dt[fitx2, x])
+            popt, pcov = optimize.curve_fit(gauss1, fitx2, fity2, p0=[80, y, 10])
+            coords.y.loc[num] = popt[1]
+        except:
+            print('Fitting failed')
+            continue
+    return coords
+    
+def dt_track_1(img, target_number, min_dist=20, radius=15, fitting_range=40, feature_size=7000, feature_number=1):
+    # Preprocessing
+    dt = preprocessing_dt(img, feature_size=feature_size, feature_number=feature_number, despeckle_size=15)
+    # Prelim tracking on dt    
+    # prelim_result = prelim_tracking_dt(dt)
+    coords_pre = prelim_tracking_dt(dt)
+    # Sorting
+    #   - Peak score
+    coords_sort = sort_prelim(coords_pre, img, radius)
+    # Refine result
+    #   - Distance check
+    #   - Total target number    
+    coords_refine = refine(coords_sort, target_number, min_dist)
+    #   - Gaussian fitting to get subpixel resolution
+    coords_sr = subpixel_res(coords_refine, dt, fitting_range)
+    return coords_sr
+    
+def dt_track(folder, target_number, min_dist=20, feature_size=7000, feature_number=1):
+    traj = pd.DataFrame()
+    l = readseq(folder)
+    for num, i in l.iterrows():
+        print('Processing frame ' + i.Name + ' ...')
+        img = io.imread(i.Dir)
+        try:
+            coords = dt_track_1(img, 15, min_dist=15)
+        except:
+            print('Frame {:s} tracking failed, use dt_track_1(img) to find out the cause'.format(i.Name))
+            continue
+        coords = coords.assign(Name=i.Name)
+        traj = traj.append(coords)
+    return traj   
+
     
 if __name__ == '__main__':
-    pass
+    pass    
+    # peack score (dt_track_1) test code
+    # img = io.imread(r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0035.tif')  
+    # coords = dt_track_1(img, 15, min_dist=15)
+    # plt.imshow(img, cmap='gray')
+    # plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
+    # for num, coord in coords.iterrows():
+        # plt.text(coord.x, coord.y, str(num), color='yellow')
+    # plt.show()
+    
     # min dist test code
     # img = io.imread(r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0035.tif')
     # new_track = dt_track_1(img, 15, min_dist=20)
@@ -121,23 +222,13 @@ if __name__ == '__main__':
     folder = r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image'
     traj = dt_track(folder, 15, min_dist=20)
     l = readseq(folder)
-    # plt.ion()    
-    for num, i in l.iterrows():        
+   
+    for num, i in l.iterrows():
+        plt.cla()
         img = io.imread(i.Dir)
         subtraj = traj.loc[traj.Name==i.Name]
         ax.imshow(img, cmap='gray')
         plt.axis('off')
         ax.plot(subtraj.x, subtraj.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
-        plt.pause(.1)
-        
-        plt.savefig(os.path.join(folder, r'mindist_20', i.Name + '.png'), format='png')
-        plt.cla()
-        
-    
-    # avg_cos test code 
-    # traj = pd.read_csv(r'E:\Github\Python\ForFun\Misc\cos\data.csv')
-    # order_pNo = [0, 13, 12, 11, 9, 8, 6, 7, 1, 2, 4, 3, 5, 14, 10]
-    # df = avg_cos(traj, order_pNo)
-    # plt.plot(df.frame, df.cos)
-    # plt.show()
-    
+        plt.pause(.1)        
+        # plt.savefig(os.path.join(folder, r'mindist_20', i.Name + '.png'), format='png')
