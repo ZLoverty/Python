@@ -27,7 +27,7 @@ def get_chain_mask(img, feature_size=7000, feature_number=1):
     return mask
 
 def gauss1(x,a,x0,sigma):
-    return a*exp(-(x-x0)**2/(2*sigma**2)) 
+    return a*np.exp(-(x-x0)**2/(2*sigma**2)) 
         
 def track_spheres_dt(img, num_particles, min_dist=20):
     # implement distance check
@@ -121,6 +121,7 @@ def refine(coords, target_number, min_dist=20):
     # We use two here:
     #   - Distance check: a minimal distance min_dist can be set to avoid redundant tracking
     #   - Total number check: Since the total number of particles is known, the function looks for that number of particles and skip those low possibility features.
+    #   - Idea: use gaussian filter to check if the intensity distribution of a located feature looks like a particle.
     count = 0
     coords_tmp = pd.DataFrame()
     for num, coord in coords.iterrows():
@@ -168,7 +169,7 @@ def subpixel_res(coords, dt, fitting_range):
 def dt_track_1(img, target_number, min_dist=20, radius=15, fitting_range=40, feature_size=7000, feature_number=1):
     # Preprocessing
     dt = preprocessing_dt(img, feature_size=feature_size, feature_number=feature_number, despeckle_size=15)
-    # Prelim tracking on dt    
+    # Prelim tracking on dt
     # prelim_result = prelim_tracking_dt(dt)
     coords_pre = prelim_tracking_dt(dt)
     # Sorting
@@ -176,8 +177,8 @@ def dt_track_1(img, target_number, min_dist=20, radius=15, fitting_range=40, fea
     coords_sort = sort_prelim(coords_pre, img, radius)
     # Refine result
     #   - Distance check
-    #   - Total target number    
-    coords_refine = refine(coords_sort, target_number, min_dist)
+    #   - Total target number
+    coords_refine = refine(coords_sort, target_number, min_dist=min_dist)
     #   - Gaussian fitting to get subpixel resolution
     coords_sr = subpixel_res(coords_refine, dt, fitting_range)
     return coords_sr
@@ -201,13 +202,13 @@ def dt_track(folder, target_number, min_dist=20, feature_size=7000, feature_numb
 if __name__ == '__main__':
     pass    
     # peack score (dt_track_1) test code
-    # img = io.imread(r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0035.tif')  
-    # coords = dt_track_1(img, 15, min_dist=15)
-    # plt.imshow(img, cmap='gray')
-    # plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
-    # for num, coord in coords.iterrows():
-        # plt.text(coord.x, coord.y, str(num), color='yellow')
-    # plt.show()
+    img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0019.tif')  
+    coords = dt_track_1(img, 15, min_dist=20)
+    plt.imshow(img, cmap='gray')
+    plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
+    for num, coord in coords.iterrows():
+        plt.text(coord.x, coord.y, str(num), color='yellow')
+    plt.show()
     
     # min dist test code
     # img = io.imread(r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0035.tif')
@@ -217,18 +218,18 @@ if __name__ == '__main__':
     # plt.show()
     
     # dt_track test code
-    fig = plt.figure()
-    ax = fig.add_axes([0,0,1,1])
-    folder = r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image'
-    traj = dt_track(folder, 15, min_dist=20)
-    l = readseq(folder)
+    # fig = plt.figure()
+    # ax = fig.add_axes([0,0,1,1])
+    # folder = r'E:\Github\Python\mylib\xiaolei\chain\test_files\problem_image'
+    # traj = dt_track(folder, 15, min_dist=20)
+    # l = readseq(folder)
    
-    for num, i in l.iterrows():
-        plt.cla()
-        img = io.imread(i.Dir)
-        subtraj = traj.loc[traj.Name==i.Name]
-        ax.imshow(img, cmap='gray')
-        plt.axis('off')
-        ax.plot(subtraj.x, subtraj.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
-        plt.pause(.1)        
+    # for num, i in l.iterrows():
+        # plt.cla()
+        # img = io.imread(i.Dir)
+        # subtraj = traj.loc[traj.Name==i.Name]
+        # ax.imshow(img, cmap='gray')
+        # plt.axis('off')
+        # ax.plot(subtraj.x, subtraj.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
+        # plt.pause(.1)        
         # plt.savefig(os.path.join(folder, r'mindist_20', i.Name + '.png'), format='png')
