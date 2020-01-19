@@ -120,6 +120,27 @@ def FastPeakFind(data):
     cent = np.asarray(cent).transpose()
     return cent
 
+def minimal_peakfind(img):
+    edg = 3
+    shape = img.shape
+    idx = np.nonzero(img[edg-1: shape[0]-edg-1, edg-1: shape[1]-edg-1])
+    idx = np.transpose(idx)
+    cent = []
+    for xy in idx:
+        x = xy[0]
+        y = xy[1]
+        if img[x, y] >= img[x-1, y-1] and \
+            img[x, y] > img[x-1, y] and \
+            img[x, y] >= img[x-1, y+1] and \
+            img[x, y] > img[x, y-1] and \
+            img[x, y] > img[x, y+1] and \
+            img[x, y] >= img[x+1, y-1] and \
+            img[x, y] > img[x+1, y] and \
+            img[x, y] >= img[x+1, y+1]:
+            cent.append(xy)
+    cent = np.asarray(cent).transpose()
+    return cent
+
 def maxk(array, num_max):
     array = np.asarray(array)
     length = array.size

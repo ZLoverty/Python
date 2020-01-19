@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io, util, filters, measure
 import os
-from scipy import ndimage, optimize, exp
-from myImageLib import dirrec, to8bit, bpass, maxk, FastPeakFind
+from scipy import ndimage, optimize, signal
+from myImageLib import dirrec, to8bit, bpass, maxk, minimal_peakfind, matlab_style_gauss2D
 from corrLib import readseq
 import pdb
 
@@ -91,11 +91,13 @@ def preprocessing_dt(img, feature_size=7000, feature_number=1, despeckle_size=15
     masked_isod = mask * isod
     despeck = ndimage.median_filter(masked_isod, size=15)
     dt = ndimage.distance_transform_edt(despeck)
-    return dt
+    filt = matlab_style_gauss2D(shape=(5,5))
+    conv = signal.convolve2d(dt, filt, mode='same')
+    return conv
 
 def prelim_tracking_dt(dt):
     # Find peaks on distance transform map, return integer coords of peaks (pd.DataFrame)
-    cent = FastPeakFind(dt)
+    cent = minimal_peakfind(dt)
     coords = pd.DataFrame(data=cent.transpose(), columns=['y', 'x'])
     return coords
 
@@ -136,6 +138,7 @@ def refine(coords, target_number, min_dist=20):
             if dist < min_dist:
                 distance_check = False
                 break
+        # pdb.set_trace()
         if distance_check == True:
             coords_tmp = coords_tmp.append(coord)
             count += 1
@@ -202,8 +205,8 @@ def dt_track(folder, target_number, min_dist=20, feature_size=7000, feature_numb
 if __name__ == '__main__':
     pass    
     # peack score (dt_track_1) test code
-    img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0019.tif')  
-    coords = dt_track_1(img, 15, min_dist=20)
+    img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0055.tif')  
+    coords = dt_track_1(img, 20, min_dist=20)
     plt.imshow(img, cmap='gray')
     plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
     for num, coord in coords.iterrows():
