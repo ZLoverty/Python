@@ -148,11 +148,12 @@ def boxsize_effect_spatial(img, boxsize, mpp):
         plt.plot(dc.R, savgol_filter(dc.C, smooth_length, 3), label=kw)
     plt.legend()
     return data
+    
+def match_hist(im1, im2):
+    # match the histogram of im1 to that of im2
+    return (abs(((im1 - im1.mean()) / im1.std() * im2.std() + im2.mean()))+1).astype('uint8')
 
-def density_fluctuation(img8):    
-    def match_hist(im1, im2):
-        # match the histogram of im1 to that of im2
-        return (abs(((im1 - im1.mean()) / im1.std() * im2.std() + im2.mean()))+1).astype('uint8')
+def density_fluctuation(img8):
     row, col = img8.shape
     l = min(row, col)
     boxsize = np.unique(np.floor(np.logspace(0, np.log10(l/3), 100)))
