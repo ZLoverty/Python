@@ -124,7 +124,6 @@ def sort_prelim(coords, img, radius):
     Y, X = np.ogrid[:gm.shape[0], :gm.shape[1]]
     corrL = []
     for num, coord in coords.iterrows():
-        print(num)
         x = int(coord.x)
         y = int(coord.y)
         crop = img[y-radius:y+radius, x-radius:x+radius]
@@ -224,7 +223,7 @@ def dt_track(folder, target_number, min_dist=20, feature_size=7000, feature_numb
 if __name__ == '__main__':
     pass    
     # peack score (dt_track_1) test code
-    img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0055.tif')  
+    img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0032.tif')  
     coords = dt_track_1(img, 15, min_dist=20)
     plt.imshow(img, cmap='gray')
     plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
