@@ -106,16 +106,35 @@ def sort_prelim(coords, img, radius):
     # I have code in chain.ipynb for comparing bandwidth and quality of fitting. They are not included in this version because:
     #   - They incur more computation
     #   - The correlation between good tracking and fitting quality is not clear.
-    Y, X = np.ogrid[:img.shape[0], :img.shape[1]]
-    mass = []
-    for num, coord in coords.iterrows():
-        x = coord.x
-        y = coord.y
-        dist = ((X - x)**2 + (Y-y)**2)**.5
-        mass.append(img[dist<radius].sum())
-    mass = np.array(mass)
-    coords_rank = coords.assign(mass=mass).sort_values(by=['mass'], ascending=False)
-    return coords_rank[['x', 'y']]
+    
+    # Y, X = np.ogrid[:img.shape[0], :img.shape[1]]
+    # mass = []
+    # for num, coord in coords.iterrows():
+        # x = coord.x
+        # y = coord.y
+        # dist = ((X - x)**2 + (Y-y)**2)**.5
+        # mass.append(img[dist<radius].sum())
+    # mass = np.array(mass)
+    # coords_rank = coords.assign(mass=mass).sort_values(by=['mass'], ascending=False)
+    # Create gaussian mask
+    radius = 15
+    gm = matlab_style_gauss2D(shape=(2*radius, 2*radius), sigma=4*radius)
+    gm = gm - gm.mean()
+    # Calculate xcorr
+    Y, X = np.ogrid[:gm.shape[0], :gm.shape[1]]
+    corrL = []
+    for num, coord in t.iterrows():
+        print(num)
+        x = int(coord.x)
+        y = int(coord.y)
+        crop = img[y-radius:y+radius, x-radius:x+radius]
+        crop = crop / crop.sum()
+        crop = crop - crop.mean()
+        corr = (crop * gm).sum()
+        corrL.append(corr)
+    # sort prelim tracking result
+    corrsort = t.assign(corr=corrL).sort_values(by=['corr'], ascending=False)
+    return corrsort[['x', 'y']]
 
 def refine(coords, target_number, min_dist=20):
     # Many more infomation could be used here to refine the preliminary tracking result.
