@@ -123,7 +123,7 @@ def sort_prelim(coords, img, radius):
     # Calculate xcorr
     Y, X = np.ogrid[:gm.shape[0], :gm.shape[1]]
     corrL = []
-    for num, coord in t.iterrows():
+    for num, coord in coords.iterrows():
         print(num)
         x = int(coord.x)
         y = int(coord.y)
@@ -133,7 +133,7 @@ def sort_prelim(coords, img, radius):
         corr = (crop * gm).sum()
         corrL.append(corr)
     # sort prelim tracking result
-    corrsort = t.assign(corr=corrL).sort_values(by=['corr'], ascending=False)
+    corrsort = coords.assign(corr=corrL).sort_values(by=['corr'], ascending=False)
     return corrsort[['x', 'y']]
 
 def refine(coords, target_number, min_dist=20):
@@ -228,8 +228,10 @@ if __name__ == '__main__':
     coords = dt_track_1(img, 15, min_dist=20)
     plt.imshow(img, cmap='gray')
     plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
+    count = 0
     for num, coord in coords.iterrows():
-        plt.text(coord.x, coord.y, str(num), color='yellow')
+        plt.text(coord.x, coord.y, str(count), color='yellow')
+        count += 1
     plt.show()
     
     # min dist test code
