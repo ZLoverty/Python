@@ -85,13 +85,13 @@ def track_spheres_dt(img, num_particles, min_dist=20):
             continue
     return max_coor, pk_value
     
-def preprocessing_dt(img, feature_size=7000, feature_number=1, despeckle_size=15):
+def preprocessing_dt(img, feature_size=7000, feature_number=1, despeckle_size=10):
     mask = get_chain_mask(img, feature_size, feature_number)
     isod = img > filters.threshold_isodata(img)
     masked_isod = mask * isod
-    despeck = ndimage.median_filter(masked_isod, size=15)
+    despeck = ndimage.median_filter(masked_isod, size=despeckle_size)
     dt = ndimage.distance_transform_edt(despeck)
-    filt = matlab_style_gauss2D(shape=(5,5))
+    filt = matlab_style_gauss2D(shape=(3,3))
     conv = signal.convolve2d(dt, filt, mode='same')
     return conv
 
@@ -171,7 +171,7 @@ def subpixel_res(coords, dt, fitting_range):
     
 def dt_track_1(img, target_number, min_dist=20, radius=15, fitting_range=40, feature_size=7000, feature_number=1):
     # Preprocessing
-    dt = preprocessing_dt(img, feature_size=feature_size, feature_number=feature_number, despeckle_size=15)
+    dt = preprocessing_dt(img, feature_size=feature_size, feature_number=feature_number, despeckle_size=10)
     # Prelim tracking on dt
     # prelim_result = prelim_tracking_dt(dt)
     coords_pre = prelim_tracking_dt(dt)
@@ -206,7 +206,7 @@ if __name__ == '__main__':
     pass    
     # peack score (dt_track_1) test code
     img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0055.tif')  
-    coords = dt_track_1(img, 20, min_dist=20)
+    coords = dt_track_1(img, 15, min_dist=20)
     plt.imshow(img, cmap='gray')
     plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
     for num, coord in coords.iterrows():
