@@ -93,6 +93,7 @@ def preprocessing_dt(img, feature_size=7000, feature_number=1, despeckle_size=10
     dt = ndimage.distance_transform_edt(despeck)
     filt = matlab_style_gauss2D(shape=(3,3))
     conv = signal.convolve2d(dt, filt, mode='same')
+    pdb.set_trace()
     return conv
 
 def prelim_tracking_dt(dt):
@@ -223,7 +224,7 @@ def dt_track(folder, target_number, min_dist=20, feature_size=7000, feature_numb
 if __name__ == '__main__':
     pass    
     # peack score (dt_track_1) test code
-    img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0032.tif')  
+    img = io.imread(r'I:\Github\Python\mylib\xiaolei\chain\test_files\problem_image\0156.tif')  
     coords = dt_track_1(img, 15, min_dist=20)
     plt.imshow(img, cmap='gray')
     plt.plot(coords.x, coords.y, marker='o', markersize=12, ls='', mec='red', mfc=(0,0,0,0))
