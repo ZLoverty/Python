@@ -5,8 +5,12 @@ import sys
 import os
 import time
 
+
 input_folder = sys.argv[1]
 output_folder = sys.argv[2]
+interval = 1
+if len(sys.argv) == 4:
+    interval = int(sys.argv[3])
 
 if os.path.exists(output_folder) == 0:
     os.makedirs(output_folder)
@@ -15,13 +19,18 @@ with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
     pass
 
 l = readseq(input_folder)
+count = 0
 for num, i in l.iterrows():
-    print('Frame ' + i.Name)
+    if count % interval != 0:
+        count += 1
+        continue
+    # print('Frame ' + i.Name)
     img = io.imread(i.Dir)
     df_data = density_fluctuation(img)
     df_data.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
     with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
+    count += 1
 """ TEST COMMAND
 python df_imseq.py input_folder output_folder
 """

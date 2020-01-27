@@ -156,17 +156,21 @@ def match_hist(im1, im2):
 def density_fluctuation(img8):
     row, col = img8.shape
     l = min(row, col)
-    boxsize = np.unique(np.floor(np.logspace(0, np.log10(l/3), 100)))
+    size_min = 20    
+    boxsize = np.unique(np.floor(np.logspace(np.log10(size_min), np.log10((l-size_min)/2), 100)))
     # Gradually increase box size and calculate dN=std(I) and N=mean(I)    
-    # choose maximal box size to be 1/3 of the shorter edge of the image 
+    # choose maximal box size to be (l-size_min)/2
     # to guarantee we have multiple boxes for each calculation, so that
     # the statistical quantities are meaningful.
+    # Step is chosen as 5*size_min to guarantee speed as well as good statistics
+    # instead of box size. When box size is large, number of boxes is too small
+    # to get good statistics.
     bp = bpass(img8, 3, 100)
     img8_mh = match_hist(bp, img8)
     NList = []
     dNList = []
     for bs in boxsize:
-        X, Y, I = divide_windows(img8_mh, windowsize=[bs, bs], step=bs)
+        X, Y, I = divide_windows(img8_mh, windowsize=[bs, bs], step=5*size_min)
         N = bs*bs
         dN = np.log10(I).std()*bs*bs
         NList.append(N)
