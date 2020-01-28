@@ -43,14 +43,12 @@ data = l.assign(ac=Iseq)[['Name', 'ac']]
 data.to_csv(os.path.join(output_folder, 'autocorr.csv'), index=False)
 
 """ TEST COMMAND
-python autocorr_imseq.py input_folder output_folder wsize step
+python autocorr_imseq.py input_folder output_folder 
 """
         
 """  TEST PARAMS
 input_folder = I:\Github\Python\Correlation\test_images\cl
 output_folder = I:\Github\Python\Correlation\test_images\cl\ac_result
-wsize = 20
-step = 20
 """
 
 """ LOG

@@ -73,6 +73,14 @@ def bestcolor(n):
               '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
     return colors[n]
 
+def wowcolor(n):
+    colors = ['#C41F3B', '#A330C9', '#FF7D0A', '#A9D271', '#40C7EB',
+              '#00FF96', '#F58CBA', '#FFF569', '#0070DE', '#8787ED',
+              '#C79C6E', '#BBBBBB', '#1f77b4', '#ff7f0e', '#2ca02c', 
+              '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', 
+              '#bcbd22', '#17becf']
+    return colors[n]
+
 def matlab_style_gauss2D(shape=(3,3),sigma=0.5):
     """
     2D gaussian mask - should give the same result as MATLAB's

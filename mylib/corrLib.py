@@ -7,6 +7,7 @@ import pandas as pd
 import sys
 import time
 import pdb
+from numpy.polynomial.polynomial import polyvander
 
 def corrS(X, Y, U, V):
     # X, Y, U, V represent a vector field
@@ -165,6 +166,10 @@ def density_fluctuation(img8):
     # Step is chosen as 5*size_min to guarantee speed as well as good statistics
     # instead of box size. When box size is large, number of boxes is too small
     # to get good statistics.
+    # Papers by Narayan et al. used different method to calculate density fluctuation
+    # Igor Aranson commented on the averaging methods saying that in a spatially
+    # homogeous system (small spatial temporal correlation) two methods should match.
+    # This suggests that I need to test both methods.
     bp = bpass(img8, 3, 100)
     img8_mh = match_hist(bp, img8)
     NList = []
@@ -177,6 +182,21 @@ def density_fluctuation(img8):
         dNList.append(dN)
     df_data = pd.DataFrame().assign(n=NList, d=dNList)
     return df_data
+
+def corrlength(corrData, fitting_range=1000):
+    # Extract correlation length from spatial correlation DataFrame.
+    xx = np.array(corrData.R)
+    yy = np.array(corrData.C)
+    x = xx[xx<fitting_range]
+    y = yy[xx<fitting_range]
+    p = np.polyfit(x, y, 8)
+    xsolve = np.array(range(0, fitting_range))
+    yfit = np.dot(polyvander(xsolve, 8), np.flip(p).transpose())
+    try:
+        corrlen = xsolve[yfit>1/np.e].max()
+    except:
+        corrlen = 0
+    return corrlen
 
 if __name__ == '__main__':
     img = io.imread(r'I:\Github\Python\Correlation\test_images\GNF\stat\40-1.tif')
