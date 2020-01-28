@@ -49,6 +49,12 @@ Mon Jan 13 11:22:05 2020 // 40-2 calculated
 Mon Jan 13 11:22:27 2020 // 60-2 calculated
 Mon Jan 13 11:22:50 2020 // 80-2 calculated
 """
+
+""" SPEED PER FRAME
+# min_size=20, step=min_size, t=1min 35s
+# min_size=20, step=boxsize, t=3.1s
+# min_size=20, step=5*min_size, t=5.14 s
+"""
     
     
     

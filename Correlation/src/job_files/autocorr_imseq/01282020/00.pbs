@@ -1,0 +1,13 @@
+#!/bin/bash -l
+#PBS -l walltime=48:00:00,nodes=1:ppn=8,mem=2gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv 
+python autocorr_imseq.py ~/Data/Wei/transient/030 ~/Data/Wei/transient/ac_result/030 40 40 &
+python autocorr_imseq.py ~/Data/Wei/transient/050 ~/Data/Wei/transient/ac_result/050 40 40 &
+python autocorr_imseq.py ~/Data/Wei/transient/090 ~/Data/Wei/transient/ac_result/090 40 40 &
+wait
+

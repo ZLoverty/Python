@@ -32,7 +32,7 @@ for num, i in l.iterrows():
         f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
     count += 1
 """ TEST COMMAND
-python df_imseq.py input_folder output_folder
+python df_imseq.py input_folder output_folder [interval]
 """
         
 """  TEST PARAMS
