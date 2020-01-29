@@ -1,0 +1,19 @@
+#!/bin/bash -l
+#PBS -l walltime=20:00:00,nodes=1:ppn=8,mem=2gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv 
+python df_imseq.py ~/Data/Wei/transient/020 ~/Data/Wei/transient/df_result_500/020 50 &
+python df_imseq.py ~/Data/Wei/transient/030 ~/Data/Wei/transient/df_result_500/030 50 &
+python df_imseq.py ~/Data/Wei/transient/040 ~/Data/Wei/transient/df_result_500/040 50 &
+python df_imseq.py ~/Data/Wei/transient/050 ~/Data/Wei/transient/df_result_500/050 50 &
+python df_imseq.py ~/Data/Wei/transient/060 ~/Data/Wei/transient/df_result_500/060 50 &
+python df_imseq.py ~/Data/Wei/transient/070 ~/Data/Wei/transient/df_result_500/070 50 &
+python df_imseq.py ~/Data/Wei/transient/080 ~/Data/Wei/transient/df_result_500/080 50 &
+python df_imseq.py ~/Data/Wei/transient/090 ~/Data/Wei/transient/df_result_500/090 50 &
+python df_imseq.py ~/Data/Wei/transient/100 ~/Data/Wei/transient/df_result_500/100 50 &
+wait
+
