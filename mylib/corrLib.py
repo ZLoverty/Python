@@ -168,7 +168,7 @@ def density_fluctuation(img8):
     # to get good statistics.
     # Papers by Narayan et al. used different method to calculate density fluctuation
     # Igor Aranson commented on the averaging methods saying that in a spatially
-    # homogeous system (small spatial temporal correlation) two methods should match.
+    # homogeneous system (small spatial temporal correlation) two methods should match.
     # This suggests that I need to test both methods.
     bp = bpass(img8, 3, 500)
     img8_mh = match_hist(bp, img8)
