@@ -26,7 +26,30 @@ def label_slope(x, y, location='n'):
     yt = 10**((ymax-ymin)/20)*10**np.log10(yf).mean()
     return xf, yf, xt, yt, popt[1]
 
-
+def reformat_sequence(original):
+    """
+    This is not done yet. The basic working principles are implemented. Input and output are not well defined.
+    """
+    upg = 5 # unit per group
+    gpr = 4 # group per row
+    with open(r'I:\Github\Python\ForFun\DNA\test_files\flic_formatted.txt', 'w') as fw:
+        pass
+    with open(r'I:\Github\Python\ForFun\DNA\test_files\flic.txt', 'r') as f:
+        seq = f.read().replace('\n', '')
+        with open(r'I:\Github\Python\ForFun\DNA\test_files\flic_formatted.txt', 'a') as fw:
+            count = 1
+            line_count = 1
+            for i in range(0, int(len(seq)/upg)+1):
+                if count % gpr == 1:
+                    fw.write('{:05d}  '.format((line_count-1)*upg*gpr))
+                    line_count += 1
+                fw.write(seq[upg*i:upg*i+upg])
+                if count % gpr != 0:
+                    fw.write(' ')
+                else:
+                    fw.write('\n')
+                count += 1
+    return reformatted
 
 if __name__ == '__main__':
     data = pd.read_csv(r'I:\Github\Python\Correlation\test_images\GNF\stat\data.csv')
