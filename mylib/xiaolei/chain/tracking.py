@@ -93,7 +93,6 @@ def preprocessing_dt(img, feature_size=7000, feature_number=1, despeckle_size=10
     dt = ndimage.distance_transform_edt(despeck)
     filt = matlab_style_gauss2D(shape=(3,3))
     conv = signal.convolve2d(dt, filt, mode='same')
-    pdb.set_trace()
     return conv
 
 def prelim_tracking_dt(dt):
