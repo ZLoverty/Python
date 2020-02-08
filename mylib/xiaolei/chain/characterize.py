@@ -65,8 +65,63 @@ def avg_cos(traj, order_pNo):
     df = pd.DataFrame().assign(frame=t, cos=cosL)
     return df
 
+def get_angle_and_arc(traj, order_pNo):
+    data = pd.DataFrame()
+    for frame in traj.frame.drop_duplicates():
+        subtraj = traj.loc[traj.frame==frame]        
+        count = 0
+        bond_length = 0
+        theta = []
+        s = []
+        k = 0
+        # handle imperfect tracking frames, by skipping the frames
+        try:
+            for i in order_pNo:
+                if k == 0:
+                    try:
+                        x1 = subtraj.x.loc[subtraj.particle==i].values[0]
+                        y1 = subtraj.y.loc[subtraj.particle==i].values[0]
+                        xt = x1
+                        yt = y1
+                        k += 1 # make sure we have particle 1
+                        continue
+                    except:
+                        continue
+                x2 = subtraj.x.loc[subtraj.particle==i].values[0]
+                y2 = subtraj.y.loc[subtraj.particle==i].values[0]
+                theta.append(np.arctan((y2-y1)/(x2-x1)))
+                bond_length += ((y2-yt)**2 + (x2-xt)**2)**.5
+                s.append(bond_length)
+                xt = x2
+                yt = y2
+            subdata = pd.DataFrame().assign(s=s, theta=theta, frame=frame)
+            data = data.append(subdata)
+        except:
+            continue
+    return data
+    
+def fourier_coef(data, n=10): # in unit same as input data (usually pixel)
+    # data is pd.DataFrame containing theta and arc_length
+    # n is number of expanded terms
+    L = data.s.max() + data.s.min()
+    data = data.assign(ds=data.s.diff())
+    a = []
+    for i in range(0, n):
+        coef = 0
+        for num, r in data.iterrows():
+            if num == 0:
+                coef += r.theta * np.cos(i*np.pi*r.s/2/L) * r.s 
+                continue            
+            coef += r.theta * np.cos(i*np.pi*(r.s-r.ds/2)/L) * r.ds 
+        coef = coef * (2 / L)**0.5
+        a.append(coef)
+    return np.array(a)
+    
 if __name__ == '__main__':
     pass
+    traj = pd.read_csv(r'E:\Github\Python\mylib\xiaolei\chain\test_files\lp\tracking1.csv')
+    order_pNo = np.array([0,1,2,3,4,5,6])
+    aaa = get_angle_and_arc(traj, order_pNo)
     # dt_track test code
     # traj = dt_track(r'I:\Github\Python\mylib\xiaolei\chain\test_files')
     
