@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io, util, filters, measure
 import os
-from scipy import ndimage
+from scipy import ndimage, optimize
 from myImageLib import dirrec, to8bit, bpass, FastPeakFind
 from corrLib import readseq
-
+import pdb
 
 def avg_cos_1(traj, order_pNo):
     # average cos's of adjacent particles, for single frame
@@ -101,12 +101,13 @@ def get_angle_and_arc(traj, order_pNo):
     return data
     
 def fourier_coef(data, n=10): # in unit same as input data (usually pixel)
-    # data is pd.DataFrame containing theta and arc_length
+    # data is pd.DataFrame containing theta and arc_length of a single frame
     # n is number of expanded terms
     L = data.s.max() + data.s.min()
     data = data.assign(ds=data.s.diff())
     a = []
-    for i in range(0, n):
+    number = []
+    for i in range(1, n+1): # the expansion starts from n=1
         coef = 0
         for num, r in data.iterrows():
             if num == 0:
@@ -114,14 +115,61 @@ def fourier_coef(data, n=10): # in unit same as input data (usually pixel)
                 continue            
             coef += r.theta * np.cos(i*np.pi*(r.s-r.ds/2)/L) * r.ds 
         coef = coef * (2 / L)**0.5
+        number.append(i)
         a.append(coef)
-    return np.array(a)
+    return pd.DataFrame().assign(n=number, a=a)
+
+def fourier_coef_video(data, n=10):
+    # data is pd.DataFrame containing theta and arc_length of multiple frames
+    # n is number of expanded terms
+    data_all = pd.DataFrame()
+    for frame in data.frame.drop_duplicates():
+        subdata = data.loc[data.frame==frame]
+        a = fourier_coef(subdata, n=12)
+        subdata = a.assign(frame=frame)
+        data_all = data_all.append(subdata)
+    return data_all
+
+def temp_var(data, dt):
+    varan = []
+    n = []
+    for i in data.n.drop_duplicates():
+        varan_tmp = 0
+        count = 0
+        for t in range(1, 700):
+            an1 = data.loc[(data.frame==t)&(data.n==i)].a.values[0]
+            an2 = data.loc[(data.frame==t+dt)&(data.n==i)].a.values[0]
+            varan_tmp += (an2 - an1)**2
+            count += 1
+        varan_tmp /= count
+        varan.append(varan_tmp)
+        n.append(i)        
+    return pd.DataFrame().assign(n=n, var=varan)
+    
+def compute_lp(varan, L, nf=8):
+    # varan is the temporal variance data, returned by function temp_var
+    # L is the contour length of the chain, L should be in a unit that is consistent with all previous calculations
+    # Need to verify!!!
+    def lin(x, a):
+        return -2 * x + a
+    fitx = np.log(varan.loc[varan.n <= nf]['n'])
+    fity =  np.log(varan.loc[varan.n <= nf]['var'])
+    po, pc = optimize.curve_fit(lin, fitx, fity, p0=1)
+    lp = L**2 / np.pi**2 / np.exp(po)
+    return lp[0]
     
 if __name__ == '__main__':
     pass
-    traj = pd.read_csv(r'E:\Github\Python\mylib\xiaolei\chain\test_files\lp\tracking1.csv')
-    order_pNo = np.array([0,1,2,3,4,5,6])
-    aaa = get_angle_and_arc(traj, order_pNo)
+    # dt = 100
+    # data = pd.read_csv(r'E:\Github\Python\mylib\xiaolei\chain\test_files\lp\coef.csv', index_col=0)
+    # varan = temp_var(data, dt)
+    
+    # data = pd.read_csv(r'E:\Github\Python\mylib\xiaolei\chain\test_files\lp\arc_and_angle.csv', index_col=0)
+    # data_all = fourier_coef_video(data, n=12)
+    
+    # traj = pd.read_csv(r'E:\Github\Python\mylib\xiaolei\chain\test_files\lp\tracking1.csv')
+    # order_pNo = np.array([0,1,2,3,4,5,6])
+    # aaa = get_angle_and_arc(traj, order_pNo)
     # dt_track test code
     # traj = dt_track(r'I:\Github\Python\mylib\xiaolei\chain\test_files')
     
