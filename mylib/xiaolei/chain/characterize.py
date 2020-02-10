@@ -133,10 +133,11 @@ def fourier_coef_video(data, n=10):
 def temp_var(data, dt):
     varan = []
     n = []
+    nframe = len(data.frame.drop_duplicates())
     for i in data.n.drop_duplicates():
         varan_tmp = 0
         count = 0
-        for t in range(1, 700):
+        for t in range(1, nframe-dt):
             an1 = data.loc[(data.frame==t)&(data.n==i)].a.values[0]
             an2 = data.loc[(data.frame==t+dt)&(data.n==i)].a.values[0]
             varan_tmp += (an2 - an1)**2
@@ -160,9 +161,9 @@ def compute_lp(varan, L, nf=8):
     
 if __name__ == '__main__':
     pass
-    # dt = 100
-    # data = pd.read_csv(r'E:\Github\Python\mylib\xiaolei\chain\test_files\lp\coef.csv', index_col=0)
-    # varan = temp_var(data, dt)
+    dt = 100
+    data = pd.read_csv(r'I:\Github\Python\mylib\xiaolei\chain\test_files\lp\coef.csv', index_col=0)
+    varan = temp_var(data, dt)
     
     # data = pd.read_csv(r'E:\Github\Python\mylib\xiaolei\chain\test_files\lp\arc_and_angle.csv', index_col=0)
     # data_all = fourier_coef_video(data, n=12)
