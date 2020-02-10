@@ -1,4 +1,5 @@
-from openpiv import tools, process, validation, filters, scaling 
+import pyprocess
+from smoothn import smoothn
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
@@ -7,63 +8,32 @@ from corrLib import readseq
 from scipy.signal import medfilt2d
 import os
 
-def tiffstackPIV(imgDir, winsize, searchsize, overlap, dt):    
-    imgs = io.imread(imgDir)    
+def imseqPIV(folder, winsize, overlap, dt):       
     data = pd.DataFrame()
-    for num, img in enumerate(imgs):
+    l = readseq(folder)
+    for num, i in l.iterrows():
         # read 2 adjacent images
         if num % 2 == 0:
-            I0 = img
+            I0 = io.imread(i.Dir)
             continue 
-        I1 = img
+        I1 = io.imread(i.Dir)
         # run PIV function "extended_search_area_piv()"
-        u0, v0 = process.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), 
-                                                             window_size=winsize, overlap=overlap, dt=dt, 
-                                                             search_area_size=searchsize)
-        x, y = process.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap) 
-        u1 = medfilt2d(u0, kernel_size=3)
-        v1 = medfilt2d(v0, kernel_size=3)
-        u1[np.isnan(u1)]=0
-        v1[np.isnan(v1)]=0
-        u2 = medfilt2d(u1, kernel_size=3)
-        v2 = medfilt2d(v1, kernel_size=3)
-        frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u2.flatten(), v2.flatten()]).T,
+        u0, v0 = pyprocess.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), window_size=winsize, overlap=overlap, dt=dt, search_area_size=winsize)
+        x, y = pyprocess.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap) 
+        # u1 = medfilt2d(u0, kernel_size=3)
+        # v1 = medfilt2d(v0, kernel_size=3)
+        # u1[np.isnan(u1)]=0
+        # v1[np.isnan(v1)]=0
+        # u2 = medfilt2d(u1, kernel_size=3)
+        # v2 = medfilt2d(v1, kernel_size=3)
+        u1 = smoothn(u0)[0]
+        v1 = smoothn(v0)[0]
+        frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u1.flatten(), v1.flatten()]).T,
                        columns=['x', 'y', 'u', 'v']).assign(frame=num)
         if num < 2:
             data = frame_data
         else:
             data = data.append(frame_data)
-    return data
-            
-def imseqPIV(folder, winsize, searchsize, overlap, dt):  
-    fileList = readseq(folder)
-    frame = 0
-    data = pd.DataFrame()
-    for num, i in fileList.iterrows():    
-        img = io.imread(i.Dir)
-        if frame % 2 == 0:
-            I0 = img
-            frame += 1
-            continue
-        I1 = img    
-        u0, v0 = process.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), 
-                                                             window_size=winsize, overlap=overlap, dt=dt, 
-                                                             search_area_size=searchsize)
-        x, y = process.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap)    
-        
-        u1 = medfilt2d(u0, kernel_size=3)
-        v1 = medfilt2d(v0, kernel_size=3)
-        u1[np.isnan(u1)]=0
-        v1[np.isnan(v1)]=0
-        u2 = medfilt2d(u1, kernel_size=3)
-        v2 = medfilt2d(v1, kernel_size=3)
-        frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u2.flatten(), v2.flatten()]).T,
-                       columns=['x', 'y', 'u', 'v']).assign(frame=frame)
-        if num < 2:
-            data = frame_data
-        else:
-            data = data.append(frame_data)
-        frame += 1
     return data
     
 if __name__ == '__main__':
@@ -74,7 +44,7 @@ if __name__ == '__main__':
     dt = 0.033 # frame interval (sec)
     # imgDir = r'R:\Dip\DF\PIV_analysis\1.tif'
     # data = tiffstackPIV(imgDir, winsize, searchsize, overlap, dt)
-    folder = r'I:\Data\Wei\transient\03'
-    data = imseqPIV(folder, winsize, searchsize, overlap, dt)
+    folder = r'D:\Wei\Dynamics_raw\60'
+    data = imseqPIV(folder, winsize, overlap, dt)
     data.to_csv(os.path.join(folder, 'pivData.csv'), index=False)
     # plt.quiver(data.x, data.y, data.u, data.v)

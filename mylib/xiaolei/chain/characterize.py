@@ -138,8 +138,11 @@ def temp_var(data, dt):
         varan_tmp = 0
         count = 0
         for t in range(1, nframe-dt):
-            an1 = data.loc[(data.frame==t)&(data.n==i)].a.values[0]
-            an2 = data.loc[(data.frame==t+dt)&(data.n==i)].a.values[0]
+            try:
+                an1 = data.loc[(data.frame==t)&(data.n==i)].a.values[0]
+                an2 = data.loc[(data.frame==t+dt)&(data.n==i)].a.values[0]
+            except:
+                continue
             varan_tmp += (an2 - an1)**2
             count += 1
         varan_tmp /= count
