@@ -8,6 +8,14 @@ from corrLib import readseq
 from scipy.signal import medfilt2d
 import os
 
+def PIV1(I0, I1, winsize, overlap, dt):
+    u0, v0 = pyprocess.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), window_size=winsize, overlap=overlap, dt=dt, search_area_size=winsize)
+    x, y = pyprocess.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap) 
+    u1 = smoothn(u0)[0]
+    v1 = smoothn(v0)[0]
+    frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u1.flatten(), v1.flatten()]).T, columns=['x', 'y', 'u', 'v'])
+    return frame_data
+    
 def imseqPIV(folder, winsize, overlap, dt):       
     data = pd.DataFrame()
     l = readseq(folder)
@@ -18,22 +26,11 @@ def imseqPIV(folder, winsize, overlap, dt):
             continue 
         I1 = io.imread(i.Dir)
         # run PIV function "extended_search_area_piv()"
-        u0, v0 = pyprocess.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), window_size=winsize, overlap=overlap, dt=dt, search_area_size=winsize)
-        x, y = pyprocess.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap) 
-        # u1 = medfilt2d(u0, kernel_size=3)
-        # v1 = medfilt2d(v0, kernel_size=3)
-        # u1[np.isnan(u1)]=0
-        # v1[np.isnan(v1)]=0
-        # u2 = medfilt2d(u1, kernel_size=3)
-        # v2 = medfilt2d(v1, kernel_size=3)
-        u1 = smoothn(u0)[0]
-        v1 = smoothn(v0)[0]
-        frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u1.flatten(), v1.flatten()]).T,
-                       columns=['x', 'y', 'u', 'v']).assign(frame=num)
+        frame_data = PIV1(I0, I1, winsize, overlap, dt)
         if num < 2:
-            data = frame_data
+            data = frame_data.assign(frame=num)
         else:
-            data = data.append(frame_data)
+            data = data.append(frame_data.assign(frame=num))
     return data
     
 if __name__ == '__main__':
