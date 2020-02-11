@@ -19,8 +19,8 @@ def corrS(X, Y, U, V):
     for i in range(0, row):
         for j in  range(0, col):
             vsq += U[i, j]**2 + V[i, j]**2
-    for xin in range(0, row):
-        for yin in range(0, col):
+    for xin in range(0, col):
+        for yin in range(0, row):
             count = 0
             CAt = 0
             CVt = 0
