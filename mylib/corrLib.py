@@ -34,7 +34,7 @@ def corrS(X, Y, U, V):
                     CVt += ua*ub + va*vb
                     count += 1
             CA[yin, xin] = CAt / count
-            CV[yin, xin] = CVt / vsq / count    
+            CV[yin, xin] = CVt / vsq     
     return CA, CV
 
 def corrI(X, Y, I):
