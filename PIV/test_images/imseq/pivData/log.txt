@@ -1,2 +1,6 @@
-Tue Feb 11 10:47:33 2020 // 0000-0001 calculated
-Tue Feb 11 10:47:35 2020 // 0002-0003 calculated
+Params
+winsize: 50
+overlap: 25
+fps: 30
+Wed Feb 12 11:07:30 2020 // 0000-0001 calculated
+Wed Feb 12 11:07:31 2020 // 0002-0003 calculated

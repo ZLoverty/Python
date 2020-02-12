@@ -14,7 +14,10 @@ fps = int(sys.argv[5])
 if os.path.exists(output_folder) == 0:
     os.makedirs(output_folder)
 with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
-    pass
+    f.write('Params\n')
+    f.write('winsize: ' + str(winsize) + '\n')
+    f.write('overlap: ' + str(overlap) + '\n')
+    f.write('fps: ' + str(fps) + '\n')
     
 dt = 1 / fps
 
