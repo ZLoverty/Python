@@ -6,10 +6,10 @@
 cd ~/code/Python/PIV/src/py_files
 module load python3
 source activate pythonEnv
-python piv_imseq.py ~/Data/02042020/20-1 ~/Data/Wei/02042020/piv_result/20-1 10 0 30 &
-python piv_imseq.py ~/Data/02042020/20-2 ~/Data/Wei/02042020/piv_result/20-2 10 0 30 &
-python piv_imseq.py ~/Data/02042020/20-3 ~/Data/Wei/02042020/piv_result/20-3 10 0 30 &
-python piv_imseq.py ~/Data/02042020/40-1 ~/Data/Wei/02042020/piv_result/40-1 10 0 30 &
-python piv_imseq.py ~/Data/02042020/40-2 ~/Data/Wei/02042020/piv_result/40-2 10 0 30 &
-python piv_imseq.py ~/Data/02042020/40-3 ~/Data/Wei/02042020/piv_result/40-3 10 0 30 &
+python piv_imseq.py ~/Data/Wei/02042020/20-1 ~/Data/Wei/02042020/piv_result/20-1 10 0 30 &
+python piv_imseq.py ~/Data/Wei/02042020/20-2 ~/Data/Wei/02042020/piv_result/20-2 10 0 30 &
+python piv_imseq.py ~/Data/Wei/02042020/20-3 ~/Data/Wei/02042020/piv_result/20-3 10 0 30 &
+python piv_imseq.py ~/Data/Wei/02042020/40-1 ~/Data/Wei/02042020/piv_result/40-1 10 0 30 &
+python piv_imseq.py ~/Data/Wei/02042020/40-2 ~/Data/Wei/02042020/piv_result/40-2 10 0 30 &
+python piv_imseq.py ~/Data/Wei/02042020/40-3 ~/Data/Wei/02042020/piv_result/40-3 10 0 30 &
 wait

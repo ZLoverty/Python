@@ -3,7 +3,7 @@
 #PBS -m abe
 #PBS -M liux3141@umn.edu
 
-cd ~/code/Python/Correlation/src/py_files
+cd ~/code/Python/PIV/src/py_files
 module load python3
 source activate pythonEnv
 python piv_imseq.py ~/Data/Wei/Dynamics_raw/20 ~/Data/Wei/Dynamics_raw/piv_result/20 10 0 30 &
