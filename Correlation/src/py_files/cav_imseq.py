@@ -7,6 +7,7 @@ import pandas as pd
 import os
 import time
 import sys
+import pdb
 
 def readdata(folder):
     dataDirs = dirrec(folder, '*.csv')
@@ -42,7 +43,7 @@ for num, i in l.iterrows():
     U = np.array(pivData.u).reshape((row, col))
     V = np.array(pivData.v).reshape((row, col))
     CA, CV = corrS(X, Y, U, V)        
-    data = pd.DataFrame().assign(CA=CA.flatten(), CV=CV.flatten())
+    data = pd.DataFrame().assign(X=X.flatten(), Y=Y.flatten(), CA=CA.flatten(), CV=CV.flatten())
     # Save data
     data.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
     # Write log
@@ -60,10 +61,8 @@ output_folder = I:\Github\Python\Correlation\test_images\CAV\cav_result
 """
 
 """ LOG
-Mon Jan 13 11:21:44 2020 // 100-2 calculated
-Mon Jan 13 11:22:05 2020 // 40-2 calculated
-Mon Jan 13 11:22:27 2020 // 60-2 calculated
-Mon Jan 13 11:22:50 2020 // 80-2 calculated
+Thu Feb 13 11:39:47 2020 // 900-901 calculated
+Thu Feb 13 11:40:35 2020 // 902-903 calculated
 """
 
 """ SPEED 51 s/frame
