@@ -1,0 +1,15 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=4gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python cav_imseq.py ~/Data/Wei/02042020/piv_result_50/60-1 ~/Data/Wei/02042020/cav_result/60-1 &
+python cav_imseq.py ~/Data/Wei/02042020/piv_result_50/60-2 ~/Data/Wei/02042020/cav_result/60-2 &
+python cav_imseq.py ~/Data/Wei/02042020/piv_result_50/60-3 ~/Data/Wei/02042020/cav_result/60-3 &
+python cav_imseq.py ~/Data/Wei/02042020/piv_result_50/60-1 ~/Data/Wei/02042020/cav_result/80-1 &
+python cav_imseq.py ~/Data/Wei/02042020/piv_result_50/60-2 ~/Data/Wei/02042020/cav_result/80-2 &
+python cav_imseq.py ~/Data/Wei/02042020/piv_result_50/60-3 ~/Data/Wei/02042020/cav_result/80-3 &
+wait
