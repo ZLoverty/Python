@@ -219,6 +219,34 @@ def dt_track(folder, target_number, min_dist=20, feature_size=7000, feature_numb
         traj = traj.append(coords)
     return traj   
 
+def distance_filter_frame(traj1, crit_dist=70, neighbors=2):
+    # traj1 is a trajectory data of one frame containing (x, y, particle, frame)
+    pL = []
+
+    for p in traj1.particle:
+        count = 0
+        for q in traj1.particle.loc[traj1.particle>p]:
+            dx = traj1.x.loc[traj1.particle==p].values[0] - traj1.x.loc[traj1.particle==q].values[0]
+            dy = traj1.y.loc[traj1.particle==p].values[0] - traj1.y.loc[traj1.particle==q].values[0]
+            dist = (dx**2 + dy**2)**0.5
+            if dist < crit_dist:
+                pL.append(p)
+                pL.append(q)
+    u, c = np.unique(pL, return_counts=True)
+    valid = u[c>=neighbors]
+    for p in traj1.particle:
+        if np.isin(p, valid) == False:
+            traj1 = traj1.drop(index=traj1.index[traj1.particle==p])
+    return traj1
+
+def dist_filt(traj, crit_dist=70, neighbors=2):
+    # filter out spurious trajectories in a colloidal chain, based on minimal number of neighbors criterion.
+    new_traj = pd.DataFrame()
+    for f in traj.frame.drop_duplicates():
+        traj1 = traj.loc[traj.frame==f]
+        traj1_filt = distance_filter_frame(traj1, crit_dist=crit_dist, neighbors=neighbors)
+        new_traj = new_traj.append(traj1_filt)
+    return new_traj
     
 if __name__ == '__main__':
     pass    
