@@ -204,6 +204,8 @@ def div_field(img, pivData, winsize, step):
     # winsize and step should be consistent with the parameters of pivData, be extra coutious!
     
     # preprocessing, bpass and match hist for raw image, convert intensity field to density field
+    
+    # return value: c field is log(I0/I), there are other possible ways to present c field, such as intensity field (subtracted from I0)
     bp = bpass(img, 3, 100)
     bp_mh = match_hist(bp, img)
     winsize = 10
@@ -232,6 +234,42 @@ def div_field(img, pivData, winsize, step):
             divcv[y, x] = cvx[y,x+1] - cvx[y,x] + cvy[y+1,x] - cvy[y,x]
     return c, v, divcn, divcv
 
+def div_field_2(img, pivData, winsize, step):
+    # A function that calculates the divergence field
+    # img is the image from microscopy, pivData is a DataFrame with columns (x, y, u, v)
+    # winsize and step should be consistent with the parameters of pivData, be extra coutious!
+    
+    # preprocessing, bpass and match hist for raw image, convert intensity field to density field
+    
+    # return value: c field is log(I0/I), there are other possible ways to present c field, such as intensity field (subtracted from I0)
+    bp = bpass(img, 3, 100)
+    bp_mh = match_hist(bp, img)
+    winsize = 10
+    step = 10
+    X, Y, I = divide_windows(bp_mh, windowsize=[winsize, winsize], step=step)
+    # concentration field
+    I0 = 255
+    c = I0 - I
+    
+    # calculation for divcn and divcv
+    row, col = I.shape
+    vx = np.array(pivData.u).reshape(I.shape)
+    vy = np.array(pivData.v).reshape(I.shape)
+    v = (vx**2 + vy**2)**.5
+    nx = np.array(pivData.u / (pivData.u**2 + pivData.v**2)**.5).reshape(I.shape)
+    ny = np.array(pivData.v / (pivData.u**2 + pivData.v**2)**.5).reshape(I.shape)
+    cnx = c * nx
+    cny = c * ny
+    cvx = c * vx
+    cvy = c * vy
+    divcn = np.zeros(I.shape)
+    divcv = np.zeros(I.shape)
+    for x in range(0, col-1):
+        for y in range(0, row-1):
+            divcn[y, x] = cnx[y,x+1] - cnx[y,x] + cny[y+1,x] - cny[y,x]
+            divcv[y, x] = cvx[y,x+1] - cvx[y,x] + cvy[y+1,x] - cvy[y,x]
+    return c, v, divcn, divcv
+    
 def readdata(folder):
     dataDirs = dirrec(folder, '*.csv')
     nameList = []
