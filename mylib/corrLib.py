@@ -241,7 +241,7 @@ def div_field_2(img, pivData, winsize, step):
     
     # preprocessing, bpass and match hist for raw image, convert intensity field to density field
     
-    # return value: c field is log(I0/I), there are other possible ways to present c field, such as intensity field (subtracted from I0)
+    # return value: intensity field (subtracted from I0)
     bp = bpass(img, 3, 100)
     bp_mh = match_hist(bp, img)
     winsize = 10
@@ -264,11 +264,13 @@ def div_field_2(img, pivData, winsize, step):
     cvy = c * vy
     divcn = np.zeros(I.shape)
     divcv = np.zeros(I.shape)
+    divv = np.zeros(I.shape)
     for x in range(0, col-1):
         for y in range(0, row-1):
             divcn[y, x] = cnx[y,x+1] - cnx[y,x] + cny[y+1,x] - cny[y,x]
             divcv[y, x] = cvx[y,x+1] - cvx[y,x] + cvy[y+1,x] - cvy[y,x]
-    return c, v, divcn, divcv
+            divv[y, x] = vx[y,x+1] - vx[y,x] + vy[y+1,x] - vy[y,x]
+    return c, v, divcn, divcv, divv
     
 def readdata(folder):
     dataDirs = dirrec(folder, '*.csv')
