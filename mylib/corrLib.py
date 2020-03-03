@@ -248,7 +248,7 @@ def div_field_2(img, pivData, winsize, step):
     X, Y, I = divide_windows(bp_mh, windowsize=[winsize, winsize], step=step)
     # concentration field
     I0 = 255
-    c = I0 - I
+    c = np.log(I0 / I)
     
     # calculation for divcn and divcv
     row, col = I.shape

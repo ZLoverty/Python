@@ -9,11 +9,17 @@ plt.switch_backend('agg')
 import pandas as pd
 import time
 
-piv_folder = sys.argv[1]
-img_folder = sys.argv[2]
-output_folder = sys.argv[3]
-winsize = int(sys.argv[4])
-step = int(sys.argv[5])
+# piv_folder = sys.argv[1]
+# img_folder = sys.argv[2]
+# output_folder = sys.argv[3]
+# winsize = int(sys.argv[4])
+# step = int(sys.argv[5])
+
+piv_folder = r'D:\Wei\Dynamics_raw\piv_result_10\20'
+img_folder = r'D:\Wei\Dynamics_raw\20'
+output_folder = r'D:\Wei\Dynamics_raw\divergence\divv\20'
+winsize = 10
+step = 10
 
 if os.path.exists(output_folder) == 0:
     os.makedirs(output_folder)
@@ -29,20 +35,20 @@ for num, i in ld.iterrows():
     name = file[0: name_ind]
     imgDir = os.path.join(img_folder, name + '.tif')
     img = io.imread(imgDir)
-    c, v, divcn, divcv = corrLib.div_field(img, pivData, 10, 10)
+    c, v, divcn, divcv, divv = corrLib.div_field_2(img, pivData, winsize, step)
     # Plot
-    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 10), dpi=200)
+    fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 10), dpi=100)
     ax[0, 0].imshow(c, cmap='seismic')
     ax[0, 0].set_title('$c$ field')
-    ax[0, 1].imshow(v, cmap='seismic')
-    ax[0, 1].set_title('$v$ field')
+    ax[0, 1].imshow(divv, cmap='seismic')
+    ax[0, 1].set_title('$\\nabla \cdot v$ field')
     ax[1, 0].imshow(divcn, cmap='seismic')
     ax[1, 0].set_title('$\\nabla\cdot(cn)$ field')
     ax[1, 1].imshow(divcv, cmap='seismic')
     ax[1, 1].set_title('$\\nabla\cdot(cv)$ field')
 
     normc = mpl.colors.Normalize(vmin=c.min(), vmax=c.max())
-    normv = mpl.colors.Normalize(vmin=v.min(), vmax=v.max())
+    normv = mpl.colors.Normalize(vmin=divv.min(), vmax=divv.max())
     normcv = mpl.colors.Normalize(vmin=divcv.min(), vmax=divcv.max())
     normcn = mpl.colors.Normalize(vmin=divcn.min(), vmax=divcn.max())
 
@@ -52,7 +58,7 @@ for num, i in ld.iterrows():
     plt.colorbar(mpl.cm.ScalarMappable(norm=normcv, cmap='seismic'), ax=ax[1, 1], shrink=0.8, drawedges=False)
     # save the figure
     outputDir = os.path.join(output_folder, name + '.png')
-    plt.savefig(outputDir, dpi=200)
+    plt.savefig(outputDir, dpi=72)
     # log 
     with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // ' + name + ' calculated\n')
