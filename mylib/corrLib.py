@@ -183,20 +183,19 @@ def density_fluctuation(img8):
     df_data = pd.DataFrame().assign(n=NList, d=dNList)
     return df_data
 
-def corrlength(corrData, fitting_range=1000):
-    # Extract correlation length from spatial correlation DataFrame.
+def corrlength(corrData, deg, fitting_range=1000):
     xx = np.array(corrData.R)
     yy = np.array(corrData.C)
     x = xx[xx<fitting_range]
     y = yy[xx<fitting_range]
-    p = np.polyfit(x, y, 8)
-    xsolve = np.array(range(0, fitting_range))
-    yfit = np.dot(polyvander(xsolve, 8), np.flip(p).transpose())
-    try:
-        corrlen = xsolve[yfit>1/np.e].max()
-    except:
-        corrlen = 0
-    return corrlen
+    p = np.polyfit(x, y, deg)
+    xsolve = np.linspace(0, x.max(), int(x.max()))
+    yfit = np.dot(polyvander(xsolve, deg), np.flip(p).transpose())
+    for xm, ym in zip(xsolve, yfit):
+        if ym > (1 / np.e):
+            continue
+        else:
+            return xm
 
 def div_field(img, pivData, winsize, step):
     # A function that calculates the divergence field
