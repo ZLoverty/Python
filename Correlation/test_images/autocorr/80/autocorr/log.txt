@@ -1,0 +1,2 @@
+Tue Mar  3 16:08:28 2020 // time series is saved!
+Tue Mar  3 16:08:28 2020 // autocorrelation is saved!

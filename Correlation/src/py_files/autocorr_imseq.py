@@ -9,51 +9,78 @@ import time
 
 input_folder = sys.argv[1]
 output_folder = sys.argv[2]
+boxsize = int(sys.argv[3])
 
-if os.path.exists(output_folder) == 0:
+if os.path.exists(output_folder) == False:
     os.makedirs(output_folder)
-
 with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
     pass
-    
-with open(os.path.join(output_folder, 'autocorr_data.csv'), 'w') as f:
-    f.write('Name,ac\n')
-    
-center = [500, 500]
-box = 40
-xcoor = range(center[1]-int(box/2), center[1]+int(box/2))
-ycoor = range(center[0]-int(box/2), center[0]+int(box/2))
 
-Iseq = []
+s = boxsize / 2
 l = readseq(input_folder)
 for num, i in l.iterrows():
     img = io.imread(i.Dir)
-    bp = bpass(img, 3, 100)
-    mh = match_hist(bp, img)
-    subbox = mh[xcoor, ycoor]
-    I = subbox.mean()
-    Iseq.append(I)
-    with open(os.path.join(output_folder, 'autocorr_data.csv'), 'a') as f:
-        f.write(i.Name + ',' + str(I) + '\n')    
-    with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
-        f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
-        
-data = l.assign(ac=Iseq)[['Name', 'ac']]
+    row, col = img.shape
+    break
+    
+xc1 = range(int(col/4-s), int(col/4+s))
+yc1 = range(int(row/4-s), int(row/4+s))
+xc2 = range(int(col*3/4-s), int(col*3/4+s))
+yc2 = range(int(row/4-s), int(row/4+s))
+xc3 = range(int(col/2-s), int(col/2+s))
+yc3 = range(int(row/2-s), int(row/2+s))
+xc4 = range(int(col/4-s), int(col/4+s))
+yc4 = range(int(row*3/4-s), int(row*3/4+s))
+xc5 = range(int(col*3/4-s), int(col*3/4+s))
+yc5 = range(int(row*3/4-s), int(row*3/4+s))
+xc = [xc1, xc2, xc3, xc4, xc5]
+yc = [yc1, yc2, yc3, yc4, yc5]
 
-data.to_csv(os.path.join(output_folder, 'autocorr.csv'), index=False)
+data = pd.DataFrame()
+for num, i in l.iterrows():
+    img = io.imread(i.Dir)
+    k = 0
+    Iframe = []
+    for x, y in zip(xc, yc):
+        I = img[x, y].mean()
+        Iframe.append(I)
+        k += 1
+    Iframe_array = np.array(Iframe)
+    frameData = pd.DataFrame(data=[Iframe_array],
+                columns=['spot1', 'spot2', 'spot3', 'spot4', 'spot5'])
+    frameData = frameData.assign(t=int(i.Name))
+    data = data.append(frameData)
+data.to_csv(os.path.join(output_folder, 'time_series.csv'), index=False)
+with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
+    f.write(time.asctime() + ' // time series is saved!\n')
+    
+corrMax = int(len(data)/2)
+# maximum autocorr lag, lag will be from 0 to corrMax
+# int(len(data)/2) is experimental and is subject to change
+ac_data = pd.DataFrame()
+for spot in data:
+    if spot == 't':
+        continue
+    ac_list = []
+    for lag in range(0, corrMax):
+        ac_list.append(data[spot].autocorr(lag=lag))
+    ac_data = ac_data.assign(**{spot: ac_list})
+ac_data.to_csv(os.path.join(output_folder, 'ac_result.csv'), index=False)
+with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
+    f.write(time.asctime() + ' // autocorrelation is saved!\n')
+    
 
 """ TEST COMMAND
-python autocorr_imseq.py input_folder output_folder 
+python autocorr_imseq.py input_folder output_folder boxsize
 """
         
 """  TEST PARAMS
-input_folder = I:\Github\Python\Correlation\test_images\cl
-output_folder = I:\Github\Python\Correlation\test_images\cl\ac_result
+input_folder = I:\Github\Python\Correlation\test_images\autocorr\80
+output_folder = I:\Github\Python\Correlation\test_images\autocorr\80\autocorr
+boxsize = 40
 """
 
 """ LOG
-Mon Jan 13 11:21:44 2020 // 100-2 calculated
-Mon Jan 13 11:22:05 2020 // 40-2 calculated
-Mon Jan 13 11:22:27 2020 // 60-2 calculated
-Mon Jan 13 11:22:50 2020 // 80-2 calculated
+Tue Mar  3 16:08:28 2020 // time series is saved!
+Tue Mar  3 16:08:28 2020 // autocorrelation is saved!
 """
