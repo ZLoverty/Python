@@ -31,6 +31,8 @@ with ND2Reader(nd2Dir) as images:
         
 """ DESCRIPTION
 Convert *.nd2 file to image sequence of 8-bit grayscale images. Save this image sequence in a subfolder under the same folder as the *.nd2 file with corresponding name as the *.nd2 file name.
+
+This script applies auto-contrast. 
 """ 
 
 """ SYNTAX

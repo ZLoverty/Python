@@ -1,0 +1,41 @@
+#!/bin/bash -l
+#PBS -l walltime=4:00:00,nodes=1:ppn=8,mem=2gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/generic_proc/py_files
+module load python3
+source activate pythonEnv
+python to_tif.py ~/Data/Wei/03032020/10.nd2 &
+python to_tif.py ~/Data/Wei/03032020/10-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/10-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/20.nd2 &
+python to_tif.py ~/Data/Wei/03032020/20-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/20-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/30.nd2 &
+python to_tif.py ~/Data/Wei/03032020/30-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/30-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/40.nd2 &
+python to_tif.py ~/Data/Wei/03032020/40-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/40-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/50.nd2 &
+python to_tif.py ~/Data/Wei/03032020/50-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/50-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/60.nd2 &
+python to_tif.py ~/Data/Wei/03032020/60-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/60-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/70.nd2 &
+python to_tif.py ~/Data/Wei/03032020/70-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/70-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/80.nd2 &
+python to_tif.py ~/Data/Wei/03032020/80-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/80-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/90.nd2 &
+python to_tif.py ~/Data/Wei/03032020/90-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/90-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/100.nd2 &
+python to_tif.py ~/Data/Wei/03032020/100-2.nd2 &
+python to_tif.py ~/Data/Wei/03032020/100-3.nd2 &
+python to_tif.py ~/Data/Wei/03032020/10n0.nd2 &
+python to_tif.py ~/Data/Wei/03032020/20n0.nd2 &
+wait
