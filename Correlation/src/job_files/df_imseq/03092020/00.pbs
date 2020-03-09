@@ -1,0 +1,13 @@
+#!/bin/bash -l
+#PBS -l walltime=4:00:00,nodes=1:ppn=8,mem=1gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python df_imseq.py ~/Data/Wei/03032020/10n0 ~/Data/Wei/03032020/df_result/10n0 &
+python df_imseq.py ~/Data/Wei/03032020/20n0 ~/Data/Wei/03032020/df_result/20n0 &
+python df_imseq.py ~/Data/Wei/02182020/vid/No.1P_dynamic/8-bit ~/Data/Wei/02182020/vid/df_result/dynamic &
+python df_imseq.py ~/Data/Wei/02182020/vid/No.1P_static/8-bit ~/Data/Wei/02182020/vid/df_result/static &
+wait

@@ -1,0 +1,29 @@
+#!/bin/bash -l
+#PBS -l walltime=2:00:00,nodes=3:ppn=8,mem=1gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/generic_proc/py_files
+module load python3
+source activate pythonEnv
+python to_tif.py ~/Data/Wei/02182020/img/No_1.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_10.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_10P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_1P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_2.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_2P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_3.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_3P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_4.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_4P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_5.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_5P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_6.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_6P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_7.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_7P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_8.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_8P.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_9.nd2  &
+python to_tif.py ~/Data/Wei/02182020/img/No_9P.nd2  &
+wait

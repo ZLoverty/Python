@@ -28,7 +28,7 @@ with open(os.path.join(saveDir, 'log.txt'), 'w') as f:
     
 with ND2Reader(nd2Dir) as images:
     for num, image in enumerate(images):
-        img8 = (image/2**11).astype('uint8')
+        img8 = (image/2**3).astype('uint8')
         io.imsave(os.path.join(saveDir16, '%04d.tif' % num), image)
         io.imsave(os.path.join(saveDir8, '%04d.tif' % num), img8)
         with open(os.path.join(saveDir, 'log.txt'), 'a') as f:
