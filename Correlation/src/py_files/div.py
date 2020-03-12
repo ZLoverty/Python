@@ -15,9 +15,9 @@ import time
 # winsize = int(sys.argv[4])
 # step = int(sys.argv[5])
 
-piv_folder = r'D:\Wei\Dynamics_raw\piv_result_10\20'
-img_folder = r'D:\Wei\Dynamics_raw\20'
-output_folder = r'D:\Wei\Dynamics_raw\divergence\divv\20'
+piv_folder = r'D:\Wei\02042020\piv_result\80-1'
+img_folder = r'D:\Wei\02042020\80-1\8-bit'
+output_folder = r'D:\Wei\02042020\divergence\80-1-8'
 winsize = 10
 step = 10
 
@@ -35,7 +35,7 @@ for num, i in ld.iterrows():
     name = file[0: name_ind]
     imgDir = os.path.join(img_folder, name + '.tif')
     img = io.imread(imgDir)
-    c, v, divcn, divcv, divv = corrLib.div_field_2(img, pivData, winsize, step)
+    c, v, divcn, divcv, divv = corrLib.div_field(img, pivData, winsize, step)
     # Plot
     fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 10), dpi=100)
     ax[0, 0].imshow(c, cmap='seismic')
