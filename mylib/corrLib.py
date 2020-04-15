@@ -208,8 +208,8 @@ def div_field(img, pivData, winsize, step):
     # return value: intensity field (subtracted from I0)
     bp = bpass(img, 3, 100)
     bp_mh = match_hist(bp, img)
-    winsize = 10
-    step = 10
+    # winsize = 10
+    # step = 10
     X, Y, I = divide_windows(bp_mh, windowsize=[winsize, winsize], step=step)
     # concentration field
     I0 = 255

@@ -15,9 +15,9 @@ import time
 # winsize = int(sys.argv[4])
 # step = int(sys.argv[5])
 
-piv_folder = r'D:\Wei\02042020\piv_result\80-1'
-img_folder = r'D:\Wei\02042020\80-1\8-bit'
-output_folder = r'D:\Wei\02042020\divergence\80-1-8'
+piv_folder = r'E:\Google Drive\data_share\Dynamics_raw\piv_result_10\80'
+img_folder = r'E:\Google Drive\data_share\Dynamics_raw\80'
+output_folder = r'E:\Google Drive\data_share\Dynamics_raw\fields\divv-bound'
 winsize = 10
 step = 10
 
@@ -48,7 +48,7 @@ for num, i in ld.iterrows():
     ax[1, 1].set_title('$\\nabla\cdot(cv)$ field')
 
     normc = mpl.colors.Normalize(vmin=c.min(), vmax=c.max())
-    normv = mpl.colors.Normalize(vmin=divv.min(), vmax=divv.max())
+    normv = mpl.colors.Normalize(vmin=-3, vmax=3)
     normcv = mpl.colors.Normalize(vmin=divcv.min(), vmax=divcv.max())
     normcn = mpl.colors.Normalize(vmin=divcn.min(), vmax=divcn.max())
 
