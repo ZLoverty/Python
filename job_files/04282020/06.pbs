@@ -1,0 +1,11 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=2gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python i_div_autocorr.py ~/Data/Wei/02042020/80-1/bp ~/Data/Wei/02042020/div_result_50/80-1 ~/Data/Wei/02042020/i_div_autocorr/80-1 &
+python i_div_autocorr.py ~/Data/Wei/02042020/80-3/bp ~/Data/Wei/02042020/div_result_50/80-3 ~/Data/Wei/02042020/i_div_autocorr/80-3 &
+wait

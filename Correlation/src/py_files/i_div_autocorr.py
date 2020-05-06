@@ -19,6 +19,7 @@ import matplotlib
 import pandas as pd
 from skimage import filters
 import time
+import sys
 
 
 """ DESCRIPTION
@@ -29,18 +30,26 @@ Calculate the autocorrelation between a velocity divergence field and an image i
 folder_den: images
 folder_div: divergence field data (DataFrame)
 folder_ixdiv: output folder, saving autocorrelation data (density/tau=xx/data.csv)
+options: "default", "raw"
 tauL: range of tau
 """
 
 folder_den = sys.argv[1]
 folder_div = sys.argv[2]
 folder_ixdiv = sys.argv[3]
+if len(sys.argv) > 4:
+    options = sys.argv[4]
+else:
+    options = 'default'
+
 tauL = range(-200, 200, 10)
 
 # folder_den = r'E:\Google Drive\data_share\Dynamics_raw\processed_image\60_bp'
 # folder_div = r'E:\Google Drive\data_share\Dynamics_raw\concentration_velocity_field\div_result_50\60'
 # folder_ixdiv = r'E:\Github\Python\Correlation\test_images\div\ixdiv_test\60'
 # tauL = range(-90, 90, 3)
+if os.path.exists(folder_ixdiv) == False:
+    os.makedirs(folder_ixdiv)
 with open(os.path.join(folder_ixdiv, 'log.txt'), 'w') as f:
     pass
 
@@ -51,14 +60,19 @@ CLL = []
 for tau in tauL:
     CL = []
     tL = []
-    for num, i in ldiv.iterrows():
-        print(i.Name)
+    for num, i in ldiv.iterrows():        
         div = pd.read_csv(i.Dir)
         name = i.Name.split('-')[0]
-        img_name = str(int(name) - tau)
+        # img_name = str(int(name) - tau)
+        img_name = str('{:04d}'.format(int(name) - tau))
         if os.path.exists(os.path.join(folder_den, img_name+'.tif')) == False:
+            print('no match image')
             continue
         img = io.imread(os.path.join(folder_den, img_name + '.tif'))
+        if options == 'raw':
+            print('performing bpass on ' + img_name)
+            img = cl.match_hist(mil.bpass(img, 3, 500), img)
+        print('tau={:d}'.format(tau) + ', div-' + name + ' x img-' + img_name)
         xlen = len(div.x.drop_duplicates())
         ylen = len(div.y.drop_duplicates())
         divfield = np.array(div['div']).reshape(ylen, xlen)

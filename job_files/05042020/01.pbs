@@ -1,0 +1,11 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=2gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python div2.py ~/Data/Wei/02042020/piv_result_50/40-3 ~/Data/Wei/02042020/80-3/8-bit/0000.tif ~/Data/Wei/02042020/div_result_50/40-3 50 25 &
+python div2.py ~/Data/Wei/02042020/piv_result_50/60-2 ~/Data/Wei/02042020/80-3/8-bit/0000.tif ~/Data/Wei/02042020/div_result_50/60-2 50 25 &
+wait

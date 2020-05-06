@@ -1,0 +1,15 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=2gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/generic_proc/py_files
+module load python3
+source activate pythonEnv
+python bpass_mh.py ~/Data/Wei/02042020/20-1/8-bit ~/Data/Wei/02042020/20-1/bp 3 500 &
+python bpass_mh.py ~/Data/Wei/02042020/20-2/8-bit ~/Data/Wei/02042020/20-2/bp 3 500 &
+python bpass_mh.py ~/Data/Wei/02042020/20-3/8-bit ~/Data/Wei/02042020/20-3/bp 3 500 &
+python bpass_mh.py ~/Data/Wei/02042020/40-1/8-bit ~/Data/Wei/02042020/40-1/bp 3 500 &
+python bpass_mh.py ~/Data/Wei/02042020/40-2/8-bit ~/Data/Wei/02042020/40-2/bp 3 500 &
+python bpass_mh.py ~/Data/Wei/02042020/40-3/8-bit ~/Data/Wei/02042020/40-3/bp 3 500 &
+wait
