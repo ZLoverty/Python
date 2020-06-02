@@ -19,6 +19,7 @@ from matplotlib_scalebar.scalebar import SI_LENGTH
 import matplotlib as mpl
 import sys
 import time
+import pdb
 
 folder = sys.argv[1]
 output_folder = sys.argv[2]
@@ -46,17 +47,17 @@ for num, i in l.iterrows():
                        number=range(0, len(I.flatten())))
         framedf = framedf.append(tempdf)
     df = df.append(framedf)
-    
+  
 df_out = pd.DataFrame()
 for number in df.number.drop_duplicates():
     subdata1 = df.loc[df.number==number]
     for s in subdata1['size'].drop_duplicates():
         subdata = subdata1.loc[subdata1['size']==s]
-        d = s**2 * np.log(np.array(subdata.I)).std()
+        d = s**2 * np.array(subdata.I).std()
         n = s**2 
         tempdf = pd.DataFrame().assign(n=[n], d=d, size=s, number=number)
         df_out = df_out.append(tempdf)
-        
+      
 average = pd.DataFrame()
 for s in df_out['size'].drop_duplicates():
     subdata = df_out.loc[df_out['size']==s]

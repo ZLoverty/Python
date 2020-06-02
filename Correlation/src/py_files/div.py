@@ -15,11 +15,11 @@ import time
 # winsize = int(sys.argv[4])
 # step = int(sys.argv[5])
 
-piv_folder = r'E:\Google Drive\data_share\Dynamics_raw\piv_result_10\80'
-img_folder = r'E:\Google Drive\data_share\Dynamics_raw\80'
-output_folder = r'E:\Google Drive\data_share\Dynamics_raw\fields\divv-bound'
-winsize = 10
-step = 10
+piv_folder = r'E:\moreData\02042020\piv_result_50\80-1'
+img_folder = r'E:\moreData\02042020\80-1\bp'
+output_folder = r'E:\moreData\02042020\fields\80-1'
+winsize = 50
+step = 25
 
 if os.path.exists(output_folder) == 0:
     os.makedirs(output_folder)
