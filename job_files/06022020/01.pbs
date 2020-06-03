@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=3:00:00,nodes=1:ppn=8,mem=2gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python dc_adv.py ~/Data/02042020/20-1/8-bit ~/Data/02042020/piv_result_50/20-1 ~/Data/02042020/dc+adv/20-1 10 &
+python dc_adv.py ~/Data/02042020/20-2/8-bit ~/Data/02042020/piv_result_50/20-2 ~/Data/02042020/dc+adv/20-2 10 &
+python dc_adv.py ~/Data/02042020/20-3/8-bit ~/Data/02042020/piv_result_50/20-3 ~/Data/02042020/dc+adv/20-3 10 &
+python dc_adv.py ~/Data/02042020/40-1/8-bit ~/Data/02042020/piv_result_50/40-1 ~/Data/02042020/dc+adv/40-1 10 &
+python dc_adv.py ~/Data/02042020/40-2/8-bit ~/Data/02042020/piv_result_50/40-2 ~/Data/02042020/dc+adv/40-2 10 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc+adv/40-3 10 &
+python dc_adv.py ~/Data/02042020/60-1/8-bit ~/Data/02042020/piv_result_50/60-1 ~/Data/02042020/dc+adv/60-1 10 &
+python dc_adv.py ~/Data/02042020/60-2/8-bit ~/Data/02042020/piv_result_50/60-2 ~/Data/02042020/dc+adv/60-2 10 &
+python dc_adv.py ~/Data/02042020/60-3/8-bit ~/Data/02042020/piv_result_50/60-3 ~/Data/02042020/dc+adv/60-3 10 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc+adv/80-1 10 &
+python dc_adv.py ~/Data/02042020/80-2/8-bit ~/Data/02042020/piv_result_50/80-2 ~/Data/02042020/dc+adv/80-2 10 &
+python dc_adv.py ~/Data/02042020/80-3/8-bit ~/Data/02042020/piv_result_50/80-3 ~/Data/02042020/dc+adv/80-3 10 &
+wait
