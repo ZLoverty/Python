@@ -17,16 +17,20 @@ fix windowsize=50 and step=25
 # folder_piv = r'E:\Github\Python\Correlation\test_images\dc+adv\piv'
 # folder_out = r'E:\Github\Python\Correlation\test_images\dc+adv\out'
 # interval = 1
+# fps = 30
+# step = 25
 
 folder_img = sys.argv[1]
 folder_piv = sys.argv[2]
 folder_out = sys.argv[3]
 interval = int(sys.argv[4])
+fps = int(sys.argv[5])
+step = int(sys.argv[6])
 
 if os.path.exists(folder_out) == False:
     os.makedirs(folder_out)
 with open(os.path.join(folder_out, 'log.txt'), 'w') as f:
-    f.write('adv = dc/interval + ux*dcx/25 + uy*dcy/25\n')
+    f.write('adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step\n')
     f.write('interval = {:d}\n'.format(interval))
 
 limg = cl.readseq(folder_img)
@@ -65,7 +69,7 @@ for num, i in l.iterrows():
     dcx = I0s - np.matmul(I0s, shiftx)
     dcy = I0s - np.matmul(shifty, I0s)
     dc = I1s - I0s
-    adv = dc/interval + ux*dcx/25 + uy*dcy/25
+    adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step
     data = pd.DataFrame().assign(x=pivData.x, y=pivData.y, dcx=dcx.flatten(), dcy=dcy.flatten(), dc=dc.flatten(), adv=adv.flatten())
     data.to_csv(os.path.join(folder_out, '{:04d}-{:04d}.csv'.format(n0, n1)), index=False)
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
@@ -73,7 +77,7 @@ for num, i in l.iterrows():
 
 
 """ TEST COMMAND
-python dc_adv.py folder_img folder_piv folder_out interval
+python dc_adv.py folder_img folder_piv folder_out interval fps step
 """
         
 """  TEST PARAMS
@@ -81,12 +85,14 @@ folder_img = r'E:\Github\Python\Correlation\test_images\dc+adv\img'
 folder_piv = r'E:\Github\Python\Correlation\test_images\dc+adv\piv'
 folder_out = r'E:\Github\Python\Correlation\test_images\dc+adv\out'
 interval = 1
+fps = 30
+step = 25
 """
 
 """ LOG
-adv = dc/interval + ux*dcx/25 + uy*dcy/25
+adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step
 interval = 1
-Tue Jun  2 18:50:11 2020 // 0000-0001 calculated
-Tue Jun  2 18:50:12 2020 // 0002-0003 calculated
+Mon Jun  8 16:51:36 2020 // 0000-0001 calculated
+Mon Jun  8 16:51:36 2020 // 0002-0003 calculated
 """ 
 
