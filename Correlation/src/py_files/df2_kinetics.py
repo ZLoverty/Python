@@ -11,7 +11,6 @@ import matplotlib as mpl
 from numpy.polynomial.polynomial import polyvander
 from scipy.optimize import curve_fit
 from miscLib import label_slope
-from corrLib import density_fluctuation
 from scipy import signal
 from scipy.interpolate import griddata
 from matplotlib_scalebar.scalebar import ScaleBar
