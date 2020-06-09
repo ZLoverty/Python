@@ -24,8 +24,6 @@ import pdb
 Using method II to (temporal variance -> spatial average) to calculate the kinetics of GNF during the onset of active turbulence.
 """
 
-# folder = r'E:\moreData\05282020\01\8-bit'
-# folder_out = r'E:\moreData\05282020\df2_kinetics\01'
 folder = sys.argv[1]
 folder_out = sys.argv[2]
 seg_length = int(sys.argv[3])
