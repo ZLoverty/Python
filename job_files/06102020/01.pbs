@@ -1,0 +1,17 @@
+#!/bin/bash -l
+#PBS -l walltime=12:00:00,nodes=1:ppn=8,mem=1gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=6 6 30 25 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=7 7 30 25 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=8 8 30 25 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=9 9 30 25 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=11 11 30 25 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=12 12 30 25 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=13 13 30 25 &
+python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=14 14 30 25 &
+wait

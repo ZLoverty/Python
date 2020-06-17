@@ -3,7 +3,7 @@
 #PBS -m abe
 #PBS -M liux3141@umn.edu
 
-cd ~/code/Python/Corrrelation/src/py_files
+cd ~/code/Python/Correlation/src/py_files
 module load python3
 source activate pythonEnv
 python dc_adv.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/dc_adv/80-1/dt=5 5 30 25 &

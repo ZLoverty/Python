@@ -16,10 +16,10 @@ folder, file = os.path.split(nd2Dir)
 
 name, ext = os.path.splitext(file)
 saveDir = os.path.join(folder, name)
-saveDir16 = os.path.join(folder, name, '16-bit')
+# saveDir16 = os.path.join(folder, name, '16-bit')
 saveDir8 = os.path.join(folder, name, '8-bit')
-if os.path.exists(saveDir16) == False:
-    os.makedirs(saveDir16)
+# if os.path.exists(saveDir16) == False:
+    # os.makedirs(saveDir16)
 if os.path.exists(saveDir8) == False:
     os.makedirs(saveDir8)
     
@@ -29,7 +29,7 @@ with open(os.path.join(saveDir, 'log.txt'), 'w') as f:
 with ND2Reader(nd2Dir) as images:
     for num, image in enumerate(images):
         img8 = (image/2**3).astype('uint8')
-        io.imsave(os.path.join(saveDir16, '%04d.tif' % num), image)
+        # io.imsave(os.path.join(saveDir16, '%04d.tif' % num), image)
         io.imsave(os.path.join(saveDir8, '%04d.tif' % num), img8)
         with open(os.path.join(saveDir, 'log.txt'), 'a') as f:
             f.write(time.asctime() + ' // Frame {0:04d} converted\n'.format(num))
@@ -38,6 +38,9 @@ with ND2Reader(nd2Dir) as images:
 Convert *.nd2 file to image sequence of 8-bit grayscale images. Save this image sequence in a subfolder under the same folder as the *.nd2 file with corresponding name as the *.nd2 file name.
 
 This script does not apply auto-contrast and save both 16-bit and 8-bit images.
+
+- Edit:
+06162020 - No longer export 16-bit images.
 """ 
 
 """ SYNTAX
