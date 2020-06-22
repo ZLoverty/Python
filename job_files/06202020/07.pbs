@@ -1,0 +1,30 @@
+#!/bin/bash -l
+#PBS -l walltime=12:00:00,nodes=1:ppn=8,mem=1gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=1 1 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=3 3 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=5 5 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=7 7 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=9 9 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=11 11 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=13 13 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=15 15 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=20 20 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=30 30 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=40 40 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=50 50 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=60 60 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=70 70 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=80 80 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=90 90 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=100 100 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=200 200 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=300 300 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=400 400 30 25 &
+python dc_adv.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/dc_adv/40-3/dt=500 500 30 25 &
+wait
