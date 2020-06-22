@@ -42,7 +42,7 @@ for num, i in ld.iterrows():
         f.write(time.asctime() + ' // ' + name + ' calculated\n')
 
 """ SYNTAX
-python div2.py piv_folder imgDir output_folder winsize step
+python div2.py piv_folder folder_img output_folder winsize step
 """
         
 """ TEST PARAMS
