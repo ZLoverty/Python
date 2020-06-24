@@ -1,0 +1,4 @@
+Tue Jun 23 20:45:52 2020 // image 100-2 computed
+Tue Jun 23 20:45:52 2020 // image 40-2 computed
+Tue Jun 23 20:45:52 2020 // image 60-2 computed
+Tue Jun 23 20:45:52 2020 // image 80-2 computed

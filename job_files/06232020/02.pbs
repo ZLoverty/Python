@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -l walltime=2:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python overall_intensity.py ~/Data/06232020/00 ~/Data/06232020/overall_intensity/00 &
+python overall_intensity.py ~/Data/06232020/01 ~/Data/06232020/overall_intensity/01 &
+python overall_intensity.py ~/Data/06232020/02 ~/Data/06232020/overall_intensity/02 &
+python overall_intensity.py ~/Data/06232020/03 ~/Data/06232020/overall_intensity/03 &
+python overall_intensity.py ~/Data/06232020/04 ~/Data/06232020/overall_intensity/04 &
+wait
