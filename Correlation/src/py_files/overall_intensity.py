@@ -31,7 +31,7 @@ for num, i in l.iterrows():
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // image {} computed\n'.format(i.Name))
 data = pd.DataFrame().assign(t=t, intensity=I)
-data.to_csv(os.path.join(folder_out, 'intensity.csv'))
+data.to_csv(os.path.join(folder_out, 'intensity.csv'), index=False)
 
 """ SYNTAX
 python overall_intensity.py folder folder_out
