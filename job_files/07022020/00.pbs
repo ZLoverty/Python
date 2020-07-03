@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -l walltime=4:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python energy_order.py ~/Data/06232020/piv_result/00 ~/Data/06232020/energy_order/00 0.33 10 &
+python energy_order.py ~/Data/06232020/piv_result/01 ~/Data/06232020/energy_order/01 0.33 10 &
+python energy_order.py ~/Data/06232020/piv_result/02 ~/Data/06232020/energy_order/02 0.33 10 &
+python energy_order.py ~/Data/06232020/piv_result/03 ~/Data/06232020/energy_order/03 0.33 10 &
+python energy_order.py ~/Data/06232020/piv_result/04 ~/Data/06232020/energy_order/04 0.33 10 &
+wait
