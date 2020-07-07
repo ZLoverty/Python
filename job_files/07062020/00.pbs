@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -l walltime=4:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python df2_kinetics.py ~/Data/06232020/00 ~/Data/06232020/df2_kinetics_norm/00 50 1 &
+python df2_kinetics.py ~/Data/06232020/01 ~/Data/06232020/df2_kinetics_norm/01 50 1 &
+python df2_kinetics.py ~/Data/06232020/02 ~/Data/06232020/df2_kinetics_norm/02 50 1 &
+python df2_kinetics.py ~/Data/06232020/03 ~/Data/06232020/df2_kinetics_norm/03 50 1 &
+python df2_kinetics.py ~/Data/06232020/04 ~/Data/06232020/df2_kinetics_norm/04 50 1 &
+wait

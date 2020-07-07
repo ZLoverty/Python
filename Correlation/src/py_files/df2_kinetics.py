@@ -12,9 +12,6 @@ from numpy.polynomial.polynomial import polyvander
 from scipy.optimize import curve_fit
 from miscLib import label_slope
 from scipy import signal
-from scipy.interpolate import griddata
-from matplotlib_scalebar.scalebar import ScaleBar
-from matplotlib_scalebar.scalebar import SI_LENGTH
 import matplotlib as mpl
 import sys
 import time
@@ -24,9 +21,14 @@ import pdb
 Using method II to (temporal variance -> spatial average) to calculate the kinetics of GNF during the onset of active turbulence.
 """
 
+# necessary
 folder = sys.argv[1]
 folder_out = sys.argv[2]
 seg_length = int(sys.argv[3])
+# optional
+normalize = 0 # default to no normalization
+if len(sys.argv) > 4:
+    normalize = int(sys.argv[4])
 
 if os.path.exists(folder_out) == False:
     os.makedirs(folder_out)
@@ -38,7 +40,7 @@ length = len(l)
 seg = range(0, length, seg_length)
 
 img = io.imread(l.Dir.loc[0])
-size_min = 20
+size_min = 5
 L = min(img.shape)
 boxsize = np.unique(np.floor(np.logspace(np.log10(size_min), np.log10((L-size_min)/2),50)))
 
@@ -51,6 +53,9 @@ for idx in range(1, len(seg)):
         framedf = pd.DataFrame()
         for bs in boxsize: 
             X, Y, I = cl.divide_windows(img, windowsize=[bs, bs], step=50*size_min)
+            if normalize == 1:
+                mean = I.mean()
+                I = I / mean
             tempdf = pd.DataFrame().assign(I=I.flatten(), t=int(i.Name), size=bs, 
                            number=range(0, len(I.flatten())))
             framedf = framedf.append(tempdf)

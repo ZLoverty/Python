@@ -1,40 +1,29 @@
 import numpy as np
-import matplotlib.pyplot as plt
-from myImageLib import dirrec, bestcolor, bpass, wowcolor
 from skimage import io, measure
 import pandas as pd
-from scipy.signal import savgol_filter, medfilt
 import os
 from corrLib import corrS, corrI, divide_windows, distance_corr, corrIseq, readseq, match_hist
-from scipy.signal import savgol_filter
-import matplotlib as mpl
-from numpy.polynomial.polynomial import polyvander
-from scipy.optimize import curve_fit
-from miscLib import label_slope
-from corrLib import density_fluctuation
-from scipy import signal
-from scipy.interpolate import griddata
-from matplotlib_scalebar.scalebar import ScaleBar
-from matplotlib_scalebar.scalebar import SI_LENGTH
-import matplotlib as mpl
 import sys
 import time
-import pdb
 
 folder = sys.argv[1]
 output_folder = sys.argv[2]
 
-if os.path.exists(output_folder) == False:
-    os.makedirs(output_folder)
-with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
-    pass
-
 l = readseq(folder)
 img = io.imread(l.Dir.loc[0])
-size_min = 20
+size_min = 5
+step = 50*size_min
 L = min(img.shape)
 boxsize = np.unique(np.floor(np.logspace(np.log10(size_min),
                     np.log10((L-size_min)/2),100)))
+                    
+if os.path.exists(output_folder) == False:
+    os.makedirs(output_folder)
+with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
+    f.write('size_min = {0:d}\n'.format(size_min))
+    f.write('step = {0:d}\n'.format(step))
+
+
 df = pd.DataFrame()
 for num, i in l.iterrows():
     with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
@@ -42,7 +31,7 @@ for num, i in l.iterrows():
     img = io.imread(i.Dir)
     framedf = pd.DataFrame()
     for bs in boxsize: 
-        X, Y, I = divide_windows(img, windowsize=[bs, bs], step=50*size_min)
+        X, Y, I = divide_windows(img, windowsize=[bs, bs], step=step)
         tempdf = pd.DataFrame().assign(I=I.flatten(), t=int(i.Name), size=bs, 
                        number=range(0, len(I.flatten())))
         framedf = framedf.append(tempdf)
@@ -80,7 +69,7 @@ output_folder = I:\Github\Python\Correlation\test_images\GNF\alternative\lowc\re
 """
 
 """ LOG
-Mon Mar  9 12:20:24 2020 // 922 calculated
-Mon Mar  9 12:20:25 2020 // 923 calculated
-Mon Mar  9 12:20:25 2020 // 924 calculated
+Tue Jul  7 12:58:00 2020 // 922 calculated
+Tue Jul  7 12:58:01 2020 // 923 calculated
+Tue Jul  7 12:58:02 2020 // 924 calculated
 """
