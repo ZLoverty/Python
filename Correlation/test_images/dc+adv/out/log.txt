@@ -1,4 +1,4 @@
 adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step
 interval = 1
-Mon Jun  8 16:51:36 2020 // 0000-0001 calculated
-Mon Jun  8 16:51:36 2020 // 0002-0003 calculated
+Tue Jul  7 14:44:21 2020 // 0000-0001 calculated
+Tue Jul  7 14:44:22 2020 // 0002-0003 calculated

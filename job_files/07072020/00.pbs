@@ -1,0 +1,27 @@
+#!/bin/bash -l
+#PBS -l walltime=8:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python df2_nobp.py ~/Data/02042020/20-1/8-bit ~/Data/02042020/df2_nobp/20-1
+python df2_nobp.py ~/Data/02042020/20-2/8-bit ~/Data/02042020/df2_nobp/20-2
+python df2_nobp.py ~/Data/02042020/20-3/8-bit ~/Data/02042020/df2_nobp/20-3
+python df2_nobp.py ~/Data/02042020/40-1/8-bit ~/Data/02042020/df2_nobp/40-1
+python df2_nobp.py ~/Data/02042020/40-2/8-bit ~/Data/02042020/df2_nobp/40-2
+python df2_nobp.py ~/Data/02042020/40-3/8-bit ~/Data/02042020/df2_nobp/40-3
+python df2_nobp.py ~/Data/02042020/60-1/8-bit ~/Data/02042020/df2_nobp/60-1
+python df2_nobp.py ~/Data/02042020/60-2/8-bit ~/Data/02042020/df2_nobp/60-2
+python df2_nobp.py ~/Data/02042020/60-3/8-bit ~/Data/02042020/df2_nobp/60-3
+python df2_nobp.py ~/Data/02042020/80-1/8-bit ~/Data/02042020/df2_nobp/80-1
+python df2_nobp.py ~/Data/02042020/80-2/8-bit ~/Data/02042020/df2_nobp/80-2
+python df2_nobp.py ~/Data/02042020/80-3/8-bit ~/Data/02042020/df2_nobp/80-3
+python df2_nobp.py ~/Data/Wei/Dynamics_raw/20 ~/Data/Wei/Dynamics_raw/df2_nobp/20
+python df2_nobp.py ~/Data/Wei/Dynamics_raw/40 ~/Data/Wei/Dynamics_raw/df2_nobp/40
+python df2_nobp.py ~/Data/Wei/Dynamics_raw/60 ~/Data/Wei/Dynamics_raw/df2_nobp/60
+python df2_nobp.py ~/Data/Wei/Dynamics_raw/80 ~/Data/Wei/Dynamics_raw/df2_nobp/80
+python df2_nobp.py ~/Data/Wei/Dynamics_raw/100 ~/Data/Wei/Dynamics_raw/df2_nobp/100
+python df2_nobp.py ~/Data/03032020/10n0/8-bit ~/Data/03032020/df2_nobp/10n0
+wait

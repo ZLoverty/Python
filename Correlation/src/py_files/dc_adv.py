@@ -31,7 +31,8 @@ if os.path.exists(folder_out) == False:
     os.makedirs(folder_out)
 with open(os.path.join(folder_out, 'log.txt'), 'w') as f:
     f.write('adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step\n')
-    f.write('interval = {:d}\n'.format(interval))
+    f.write('vdc = ux/fps*dcx/step + uy/fps*dcy/step\n')
+    f.write('interval = {:d} frames\n'.format(interval))
 
 limg = cl.readseq(folder_img)
 I0 = io.imread(limg.Dir[0])
@@ -69,8 +70,9 @@ for num, i in l.iterrows():
     dcx = I0s - np.matmul(I0s, shiftx)
     dcy = I0s - np.matmul(shifty, I0s)
     dc = I1s - I0s
-    adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step
-    data = pd.DataFrame().assign(x=pivData.x, y=pivData.y, dcx=dcx.flatten(), dcy=dcy.flatten(), dc=dc.flatten(), adv=adv.flatten())
+    adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step # unit: /frame
+    vdc = ux/fps*dcx/step + uy/fps*dcy/step # unit: /frame
+    data = pd.DataFrame().assign(x=pivData.x, y=pivData.y, dcx=dcx.flatten(), dcy=dcy.flatten(), dc=dc.flatten(), adv=adv.flatten(), vdc=vdc.flatten())
     data.to_csv(os.path.join(folder_out, '{:04d}-{:04d}.csv'.format(n0, n1)), index=False)
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // {:04d}-{:04d} calculated\n'.format(n0, n1))
