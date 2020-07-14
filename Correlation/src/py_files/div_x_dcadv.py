@@ -19,24 +19,25 @@ with open(os.path.join(folder_out, 'log.txt'), 'w') as f:
     pass
 
 folder_list_dt = next(os.walk(folder_dcadv))[1]
-adv_divvL = [] # dcadv X divv
-adv_divcvL = [] # dcadv X divcv
-dc_divvL = [] # dc X divv
-dc_divcvL = [] # dc X divcv
-vdc_divvL = [] # vdc X divv
-vdc_divcvL = [] # vdc X divcv
+
+entries = ['adv_divv', 'adv_divcv', 'dc_divv', 'dc_divcv', 'vdc_divv', 'vdc_divcv']
+
+corr_lists = {}
+corr_values = {}
+
+for entry in entries:
+    corr_lists[entry] = []
+    
+
 dtL = [] # Delta t
 for s in folder_list_dt:
     dt = int(s.split('=')[1])
     folder = os.path.join(folder_dcadv, s)
     l = cl.readdata(folder)
     count = 0
-    adv_divv = 0
-    adv_divcv = 0
-    dc_divv = 0
-    dc_divcv = 0
-    vdc_divv = 0
-    vdc_divcv = 0
+
+    for entry in entries:
+        corr_values[entry] = 0
     for num, i in l.iterrows():
         f, file = os.path.split(i.Dir)
         name = file.split('-')[0]
@@ -44,37 +45,23 @@ for s in folder_list_dt:
         n1 = n0 + 1
         divDir = os.path.join(folder_div, '{0:04d}-{1:04d}.csv'.format(n0, n1))
         divData = pd.read_csv(divDir)
-        divv = divData['divv']
-        divcv = divData['divcv']
         advData = pd.read_csv(i.Dir)
-        adv = advData['adv']
-        vdc = advData['vdc']
-        dc = advData['dc']
-        adv_divv += ((divv - divv.mean())*(adv - adv.mean())).mean() / divv.std() / adv.std()
-        adv_divcv += ((divcv - divv.mean())*(adv - adv.mean())).mean() / divcv.std() / adv.std()
-        dc_divv += ((divv - divv.mean())*(dc - dc.mean())).mean() / divv.std() / dc.std()
-        dc_divcv += ((divv - divcv.mean())*(dc - dc.mean())).mean() / divcv.std() / dc.std()
-        vdc_divv += ((divv - divv.mean())*(vdc - vdc.mean())).mean() / divv.std() / vdc.std()
-        vdc_divcv += ((divcv - divcv.mean())*(vdc - vdc.mean())).mean() / divcv.std() / vdc.std()
+
+        for entry in entries:
+            key1, key2 = entry.split('_')
+            mat1, mat2 = advData[key1], divData[key2]
+            corr_values[entry] += ((mat1 - mat1.mean())*(mat2 - mat2.mean())).mean() / mat1.std() / mat2.std()
+        
         count += 1
-    adv_divv /= count
-    adv_divcv /= count
-    dc_divv /= count
-    dc_divcv /= count
-    vdc_divv /= count
-    vdc_divcv /= count
-    adv_divvL.append(adv_divv)
-    adv_divcvL.append(adv_divcv)
-    dc_divvL.append(dc_divv)
-    dc_divcvL.append(dc_divcv)
-    vdc_divvL.append(vdc_divv)
-    vdc_divcvL.append(vdc_divcv)
+    for entry in entries:
+        corr_lists[entry].append(corr_values[entry] / count)
+
     dtL.append(dt)
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // ' + 'dt={0:d} calculated\n'.format(dt))
 
 # Save data
-data = pd.DataFrame().assign(dt=dtL, adv_divv=adv_divvL, adv_divcv=adv_divcvL, dc_divv=dc_divvL, dc_divcv=dc_divcvL, vdc_divv=vdc_divvL, vdc_divcv=vdc_divcvL)
+data = pd.DataFrame.from_dict(corr_lists).assign(dt=dtL)
 data.to_csv(os.path.join(folder_out, 'divvXdcadv.csv'), index=False)
 
 """ SYNTAX
@@ -84,9 +71,9 @@ Note that folder_dcadv should contain subfolders named "dt=N" (N is integer) to 
 """
 
 """ TEST PARAMETERS
-folder_div = r'I:\Github\Python\Correlation\test_images\divvXdcadv\div'
-folder_dcadv = r'I:\Github\Python\Correlation\test_images\divvXdcadv\dcadv'
-folder_out = r'I:\Github\Python\Correlation\test_images\divvXdcadv\result'
+folder_div = r'E:\Github\Python\Correlation\test_images\divvXdcadv\div'
+folder_dcadv = r'E:\Github\Python\Correlation\test_images\divvXdcadv\dcadv'
+folder_out = r'E:\Github\Python\Correlation\test_images\divvXdcadv\result'
 """
 
 """ LOG
