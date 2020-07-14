@@ -23,6 +23,8 @@ adv_divvL = [] # dcadv X divv
 adv_divcvL = [] # dcadv X divcv
 dc_divvL = [] # dc X divv
 dc_divcvL = [] # dc X divcv
+vdc_divvL = [] # vdc X divv
+vdc_divcvL = [] # vdc X divcv
 dtL = [] # Delta t
 for s in folder_list_dt:
     dt = int(s.split('=')[1])
@@ -33,6 +35,8 @@ for s in folder_list_dt:
     adv_divcv = 0
     dc_divv = 0
     dc_divcv = 0
+    vdc_divv = 0
+    vdc_divcv = 0
     for num, i in l.iterrows():
         f, file = os.path.split(i.Dir)
         name = file.split('-')[0]
@@ -44,32 +48,39 @@ for s in folder_list_dt:
         divcv = divData['divcv']
         advData = pd.read_csv(i.Dir)
         adv = advData['adv']
+        vdc = advData['vdc']
         dc = advData['dc']
         adv_divv += ((divv - divv.mean())*(adv - adv.mean())).mean() / divv.std() / adv.std()
         adv_divcv += ((divcv - divv.mean())*(adv - adv.mean())).mean() / divcv.std() / adv.std()
         dc_divv += ((divv - divv.mean())*(dc - dc.mean())).mean() / divv.std() / dc.std()
         dc_divcv += ((divv - divcv.mean())*(dc - dc.mean())).mean() / divcv.std() / dc.std()
+        vdc_divv += ((divv - divv.mean())*(vdc - vdc.mean())).mean() / divv.std() / vdc.std()
+        vdc_divcv += ((divcv - divcv.mean())*(vdc - vdc.mean())).mean() / divcv.std() / vdc.std()
         count += 1
     adv_divv /= count
     adv_divcv /= count
     dc_divv /= count
     dc_divcv /= count
+    vdc_divv /= count
+    vdc_divcv /= count
     adv_divvL.append(adv_divv)
     adv_divcvL.append(adv_divcv)
     dc_divvL.append(dc_divv)
     dc_divcvL.append(dc_divcv)
+    vdc_divvL.append(vdc_divv)
+    vdc_divcvL.append(vdc_divcv)
     dtL.append(dt)
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // ' + 'dt={0:d} calculated\n'.format(dt))
 
 # Save data
-data = pd.DataFrame().assign(dt=dtL, adv_divv=adv_divvL, adv_divcv=adv_divcvL, dc_divv=dc_divvL, dc_divcv=dc_divcvL)
+data = pd.DataFrame().assign(dt=dtL, adv_divv=adv_divvL, adv_divcv=adv_divcvL, dc_divv=dc_divvL, dc_divcv=dc_divcvL, vdc_divv=vdc_divvL, vdc_divcv=vdc_divcvL)
 data.to_csv(os.path.join(folder_out, 'divvXdcadv.csv'), index=False)
 
 """ SYNTAX
 python div_x_dcadv.py folder_div folder_dcadv folder_out
 
-Note that folder_dcadv should contain subfolders named "dt=N" (N is integer) to indicate the choice of \Delta t, even if there is only one dt. Otherwise, the code will not execute properly.
+Note that folder_dcadv should contain subfolders named "dt=N" (N is integer) to indicate the choice of \Delta t, even if there is only one dt. Otherwise, error may occur.
 """
 
 """ TEST PARAMETERS
