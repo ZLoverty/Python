@@ -1,0 +1,10 @@
+#!/bin/bash -l
+#PBS -l walltime=8:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+
+cd ~/code/Python/Correlation/src/py_files
+module load python3
+source activate pythonEnv
+python df2_nobp.py ~/Data/02182020/No.1P_static/8-bit ~/Data/02182020/No.1P_static
+wait
