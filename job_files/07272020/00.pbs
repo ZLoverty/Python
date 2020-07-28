@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=8:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python cav_imseq.py ~/Data/02042020/piv_result_50/20-1 ~/Data/02042020/cav_imseq/20-1
+python cav_imseq.py ~/Data/02042020/piv_result_50/20-2 ~/Data/02042020/cav_imseq/20-2
+python cav_imseq.py ~/Data/02042020/piv_result_50/20-3 ~/Data/02042020/cav_imseq/20-3
+python cav_imseq.py ~/Data/02042020/piv_result_50/40-1 ~/Data/02042020/cav_imseq/40-1
+python cav_imseq.py ~/Data/02042020/piv_result_50/40-2 ~/Data/02042020/cav_imseq/40-2
+python cav_imseq.py ~/Data/02042020/piv_result_50/40-3 ~/Data/02042020/cav_imseq/40-3
+python cav_imseq.py ~/Data/02042020/piv_result_50/60-1 ~/Data/02042020/cav_imseq/60-1
+python cav_imseq.py ~/Data/02042020/piv_result_50/60-2 ~/Data/02042020/cav_imseq/60-2
+python cav_imseq.py ~/Data/02042020/piv_result_50/60-3 ~/Data/02042020/cav_imseq/60-3
+python cav_imseq.py ~/Data/02042020/piv_result_50/80-1 ~/Data/02042020/cav_imseq/80-1
+python cav_imseq.py ~/Data/02042020/piv_result_50/80-2 ~/Data/02042020/cav_imseq/80-2
+python cav_imseq.py ~/Data/02042020/piv_result_50/80-3 ~/Data/02042020/cav_imseq/80-3
+wait

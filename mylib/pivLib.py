@@ -8,12 +8,15 @@ from corrLib import readseq
 from scipy.signal import medfilt2d
 import os
 
-def PIV1(I0, I1, winsize, overlap, dt):
+def PIV1(I0, I1, winsize, overlap, dt, smooth=True):
     u0, v0 = pyprocess.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), window_size=winsize, overlap=overlap, dt=dt, search_area_size=winsize)
-    x, y = pyprocess.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap) 
-    u1 = smoothn(u0)[0]
-    v1 = smoothn(v0)[0]
-    frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u1.flatten(), v1.flatten()]).T, columns=['x', 'y', 'u', 'v'])
+    x, y = pyprocess.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap)
+    if smooth == True:
+        u1 = smoothn(u0)[0]
+        v1 = smoothn(v0)[0]
+        frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u1.flatten(), v1.flatten()]).T, columns=['x', 'y', 'u', 'v'])
+    else:
+        frame_data = pd.DataFrame(data=np.array([x.flatten(), y.flatten(), u0.flatten(), v0.flatten()]).T, columns=['x', 'y', 'u', 'v'])
     return frame_data
     
 def imseqPIV(folder, winsize, overlap, dt):       

@@ -11,6 +11,9 @@ winsize = int(sys.argv[3])
 overlap = int(sys.argv[4])
 fps = int(sys.argv[5])
 
+if len(sys.argv) > 6:
+    smooth = bool(int(sys.argv[6]))
+
 if os.path.exists(output_folder) == 0:
     os.makedirs(output_folder)
 with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
@@ -36,7 +39,7 @@ for num, i in l.iterrows():
     else:
         I1 = io.imread(i.Dir)
         k += 1
-        frame_data = PIV1(I0, I1, winsize, overlap, (int(i.Name)-int(n0))*dt)
+        frame_data = PIV1(I0, I1, winsize, overlap, (int(i.Name)-int(n0))*dt, smooth=smooth)
         frame_data.to_csv(os.path.join(output_folder, n0 + '-' + i.Name+'.csv'), index=False)
         with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
             f.write(time.asctime() + ' // ' + n0 + '-' + i.Name + ' calculated\n')
