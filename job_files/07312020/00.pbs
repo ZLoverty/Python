@@ -1,0 +1,18 @@
+#!/bin/bash -l
+#PBS -l walltime=1:00:00,nodes=1:ppn=8,mem=1gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python illumination_noise.py 1 ~/numerics/illumination_noise & 
+python illumination_noise.py 2 ~/numerics/illumination_noise & 
+python illumination_noise.py 3 ~/numerics/illumination_noise & 
+python illumination_noise.py 4 ~/numerics/illumination_noise & 
+python illumination_noise.py 5 ~/numerics/illumination_noise & 
+python illumination_noise.py 6 ~/numerics/illumination_noise & 
+python illumination_noise.py 7 ~/numerics/illumination_noise & 
+python illumination_noise.py 8 ~/numerics/illumination_noise & 
+python illumination_noise.py 9 ~/numerics/illumination_noise & 
+python illumination_noise.py 10 ~/numerics/illumination_noise & 

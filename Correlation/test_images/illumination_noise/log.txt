@@ -1,0 +1,4 @@
+amp_n = 2
+folder_out = E:\Github\Python\Correlation\test_images\illumination_noise
+Fri Jul 31 18:00:37 2020\ amp_i = 1, amp_n = 2: alpha = 0.50
+Fri Jul 31 18:00:57 2020\ amp_i = 2, amp_n = 2: alpha = 0.50

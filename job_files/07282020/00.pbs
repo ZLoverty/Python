@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -l walltime=8:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/PIV/src/py_files
+
+module load python3
+source activate pythonEnv
+python piv_imseq.py ~/Data/06232020/00/8-bit ~/Data/06232020/piv_imseq_nosmooth/00 50 25 30 0 &
+python piv_imseq.py ~/Data/06232020/01/8-bit ~/Data/06232020/piv_imseq_nosmooth/01 50 25 30 0 &
+python piv_imseq.py ~/Data/06232020/02/8-bit ~/Data/06232020/piv_imseq_nosmooth/02 50 25 30 0 &
+python piv_imseq.py ~/Data/06232020/03/8-bit ~/Data/06232020/piv_imseq_nosmooth/03 50 25 30 0 &
+python piv_imseq.py ~/Data/06232020/04/8-bit ~/Data/06232020/piv_imseq_nosmooth/04 50 25 30 0 &
+wait
