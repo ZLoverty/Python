@@ -2,10 +2,11 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from myImageLib import bestcolor, wowcolor
+from myImageLib import dirrec, bestcolor, wowcolor
 from scipy.ndimage import gaussian_filter1d, uniform_filter1d
-
-
+from scipy.signal import savgol_filter, medfilt
+from scipy.optimize import curve_fit
+import corrLib
 
 
 
@@ -505,3 +506,132 @@ def kinetics_eo_smooth(data):
     ax = [ax1, ax2, ax3]
     
     return new_data, fig, ax
+
+# fig3_spatial-correlations
+def exp(x, a):
+    return np.exp(-a*x)
+
+def corr_length(data, fitting_range=None):
+    """
+    Args:
+    data -- dataframe with columns (R, C), where R has pixel as unit
+    fitting_range -- (optional) can be None, int or list of two int
+    
+    Returns:
+    cl -- correlation length of given data (pixel)
+    """
+    if fitting_range == None:
+        pass
+    elif isinstance(fitting_range, int):
+        data = data.loc[data['R'] < fitting_range]
+    elif isinstance(fitting_range, list) and len(fitting_range) == 2:
+        data = data.loc[(data['R'] < fitting_range[1])&(data['R'] >= fitting_range[0])]
+    else:
+        raise ValueError('fitting_range should be None, int or list of 2 int')
+        
+    fit = curve_fit(exp, data['R'], data['C'], p0=[0.01])
+    cl = 1 / fit[0][0]
+    return cl, fit
+
+def xy_to_r(corr_xy):
+    """
+    Note, this version of function converts the xy data where x, y start from (step, step) instead of (0, 0).
+    When the corr functions are changed, this function should not be used anymore. 
+    Check carefully before using.
+    
+    Args:
+    corr_xy -- DataFrame of (X, Y, ...)
+    
+    Returns:
+    corr_r -- DataFrame (R, ...)
+    """
+    step_x = corr_xy.X.iloc[0]
+    step_y = corr_xy.Y.iloc[0]
+    corr_r = corr_xy.assign(R = ((corr_xy.X-step_x)**2 + (corr_xy.Y-step_y)**2)**0.5)    
+    return corr_r
+
+def average_data(directory, columns=['CA', 'CV']):
+    """
+    Take the average of all data in given directory
+    
+    Args:
+    directory -- folder which contains *.csv data, with columns
+    columns -- (optional) list of column labels of columns to be averaged
+    
+    Returns:
+    averaged -- DataFrame with averaged data
+    """
+    k = 0
+    
+    l = corrLib.readdata(directory)
+    for num, i in l.iterrows():
+        data = pd.read_csv(i.Dir)
+        # check if given label exists in data
+        for label in columns:
+            if label not in data:
+                raise IndexError('Column \'{0}\' does not exist in given data'.format(label))
+        if k == 0:
+            temp = data[columns]
+        else:
+            temp += data[columns]
+        k += 1                   
+       
+    # finally, append all other columns (in data but not columns) to averaged
+    other_cols = []
+    for label in data.columns:
+        if label not in columns:
+            other_cols.append(label) 
+    
+    averaged = pd.concat([temp / k, data[other_cols]], axis=1)       
+    
+    return averaged
+
+def plot_correlation(data, plot_cols=['R', 'C'], xlim=None, mpp=0.33, lb=3, plot_raw=False):
+    """
+    Plot correlation data. Here we plot the exponential function fitting instead of raw data so that the curve look better.
+    
+    Args:
+    data -- DataFrame (R, C, conc)
+    plot_cols -- specify columns to plot. The first column should be distance and the second is correlation
+    xlim -- trim the xdata, only use those in the range of xlim
+    mpp -- microns per pixel 
+    lb -- bacteria size in um
+    
+    Returns:
+    ax -- the axis of plot, one can use this handle to add labels, title and other stuff   
+    """
+    
+    # Initialization
+    fig = plt.figure()
+    ax = fig.add_axes([0,0,1,1])
+    cl_data = {'conc': [], 'cl': []}
+    symbol_list = ['o', '^', 'x', 's', '+']
+    data = data.sort_values(by=[plot_cols[0], 'conc'])
+    
+    # process data, apply xlim
+    if xlim == None:
+        pass
+    elif isinstance(xlim, int):
+        data = data.loc[data[plot_cols[0]] < xlim]
+    elif isinstance(xlim, list) and len(xlim) == 2:
+        data = data.loc[(data[plot_cols[0]] < xlim[1])&(data[plot_cols[0]] >= xlim[0])]
+    else:
+        raise ValueError('xlim must be None, int or list of 2 ints')
+    
+    for num, nt in enumerate(data.conc.drop_duplicates()):
+        subdata = data.loc[data.conc==nt]
+        x = subdata[plot_cols[0]]
+        y = subdata[plot_cols[1]]
+        p, po = curve_fit(exp, x, y, p0=[0.01])
+        xfit = np.linspace(0, x.max(), num=50)
+        yfit = exp(xfit, *p)
+        if plot_raw:
+            ax.plot(x*mpp/lb, y, color=wowcolor(num), lw=1, ls='--')
+        ax.plot(xfit*mpp/lb, yfit, mec=wowcolor(num), label=str(nt), ls='',
+                marker=symbol_list[num], mfc=(0,0,0,0), markersize=4, markeredgewidth=0.5)
+        cl_data['conc'].append(int(nt))
+        cl_data['cl'].append(1/p[0])
+    
+    ax.legend()     
+    return ax, pd.DataFrame(cl_data).sort_values(by='conc')
+

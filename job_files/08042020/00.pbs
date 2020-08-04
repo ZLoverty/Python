@@ -1,0 +1,24 @@
+#!/bin/bash -l
+#PBS -l walltime=2:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/generic_proc/py_files
+
+module load python3
+source activate pythonEnv
+python to_tif.py ~/Data/08032020/00.nd2 &
+python to_tif.py ~/Data/08032020/01.nd2 &
+python to_tif.py ~/Data/08032020/02.nd2 &
+python to_tif.py ~/Data/08032020/03.nd2 &
+python to_tif.py ~/Data/08032020/04.nd2 &
+python to_tif.py ~/Data/08032020/05.nd2 &
+python to_tif.py ~/Data/08032020/06.nd2 &
+python to_tif.py ~/Data/08032020/07.nd2 &
+python to_tif.py ~/Data/08032020/08.nd2 &
+python to_tif.py ~/Data/08032020/09.nd2 &
+python to_tif.py ~/Data/08032020/10.nd2 &
+python to_tif.py ~/Data/08032020/11.nd2 &
+python to_tif.py ~/Data/08032020/12.nd2 &
+python to_tif.py ~/Data/08032020/13.nd2 &
+python to_tif.py ~/Data/08032020/14.nd2 &
+wait

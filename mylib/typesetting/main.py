@@ -40,5 +40,8 @@ def prl(preset='1-column-2-panel'):
     matplotlib.rcParams['legend.handletextpad'] = 0.2
     matplotlib.rcParams['legend.columnspacing'] = 0.5
     matplotlib.rcParams['legend.frameon'] = False
+    
+    # FONT
+#     matplotlib.rcParams['font.size'] = 'small'
     return None
     
