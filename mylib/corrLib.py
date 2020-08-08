@@ -10,56 +10,85 @@ import time
 import pdb
 from numpy.polynomial.polynomial import polyvander
 
+# def corrS(X, Y, U, V):
+    X, Y, U, V represent a vector field
+    Return value C is a matrix representing spatial correlation distribution of given vector field
+    # row, col = X.shape
+    # vsq = 0
+    # CA = np.zeros((row, col))
+    # CV = np.zeros((row, col))
+    # for i in range(0, row):
+        # for j in  range(0, col):
+            # vsq += U[i, j]**2 + V[i, j]**2
+    # for xin in range(0, col):
+        # for yin in range(0, row):
+            # count = 0
+            # CAt = 0
+            # CVt = 0
+            # for i in range(0, col-xin):
+                # for j in range(0, row-yin):
+                    # ua = U[j, i]
+                    # va = V[j, i]
+                    # ub = U[j+yin, i+xin]
+                    # vb = V[j+yin, i+xin]
+                    # CAt += (ua*ub+va*vb)/((ua**2+va**2)*(ub**2+vb**2))**.5
+                    # CVt += ua*ub + va*vb
+                    # count += 1
+            # CA[yin, xin] = CAt / count
+            # CV[yin, xin] = CVt / vsq     
+    # return CA, CV
+
 def corrS(X, Y, U, V):
-    # X, Y, U, V represent a vector field
-    # Return value C is a matrix representing spatial correlation distribution of given vector field
     row, col = X.shape
-    vsq = 0
-    CA = np.zeros((row, col))
-    CV = np.zeros((row, col))
-    for i in range(0, row):
-        for j in  range(0, col):
-            vsq += U[i, j]**2 + V[i, j]**2
+    vsqrt = (U ** 2 + V ** 2) ** 0.5
+    U = U - U.mean()
+    V = V - V.mean()
+    Ax = U / vsqrt
+    Ay = V / vsqrt
+    CA = np.ones(X.shape)
+    CV = np.ones(X.shape)
     for xin in range(0, col):
         for yin in range(0, row):
-            count = 0
-            CAt = 0
-            CVt = 0
-            for i in range(0, col-xin):
-                for j in range(0, row-yin):
-                    ua = U[j, i]
-                    va = V[j, i]
-                    ub = U[j+yin, i+xin]
-                    vb = V[j+yin, i+xin]
-                    CAt += (ua*ub+va*vb)/((ua**2+va**2)*(ub**2+vb**2))**.5
-                    CVt += ua*ub + va*vb
-                    count += 1
-            CA[yin, xin] = CAt / count
-            CV[yin, xin] = CVt / vsq     
+            if xin != 0 or yin != 0:
+                CA[yin, xin] = (Ax[0:row-yin, 0:col-xin] * Ax[yin:row, xin:col] + Ay[0:row-yin, 0:col-xin] * Ay[yin:row, xin:col]).mean()
+                CV[yin, xin] = (U[0:row-yin, 0:col-xin] * U[yin:row, xin:col] + V[0:row-yin, 0:col-xin] * V[yin:row, xin:col]).mean() / (U.std()**2+V.std()**2)
     return CA, CV
 
+# def corrI(X, Y, I):
+    # I = I - I.mean()
+    # row, col = I.shape
+    # Isq = 0
+    # for i in range(0, row):
+        # for j in range(0, col):
+            # Isq += I[i, j]**2
+    # Isq = Isq / row / col
+    # CI = np.zeros((row, col))
+    # for xin in range(0, col):
+        # for yin in range(0, row):
+            # count = 0
+            # CIt = 0
+            # for i in range(0, col-xin):
+                # for j in range(0, row-yin):
+                    # Ia = I[j, i]
+                    # Ib = I[j+yin, i+xin]
+                    # CIt += Ia * Ib
+                    # count += 1
+            # CI[yin, xin] = CIt / count / Isq
+    # return CI
+
 def corrI(X, Y, I):
-    I = I - I.mean()
     row, col = I.shape
-    Isq = 0
-    for i in range(0, row):
-        for j in range(0, col):
-            Isq += I[i, j]**2
-    Isq = Isq / row / col
-    CI = np.zeros((row, col))
+    I = I - I.mean()
+    CI = np.ones(I.shape)
+    normalizer = I.std() ** 2
     for xin in range(0, col):
         for yin in range(0, row):
-            count = 0
-            CIt = 0
-            for i in range(0, col-xin):
-                for j in range(0, row-yin):
-                    Ia = I[j, i]
-                    Ib = I[j+yin, i+xin]
-                    CIt += Ia * Ib
-                    count += 1
-            CI[yin, xin] = CIt / count / Isq
+            if xin != 0 or yin != 0:
+                I_shift_x = np.roll(I, xin, axis=1)
+                I_shift = np.roll(I_shift_x, yin, axis=0)
+                CI[yin, xin] = (I[yin:, xin:] * I_shift[yin:, xin:]).mean() / normalizer
     return CI
-
+    
 def divide_windows(img, windowsize=[20, 20], step=10):
     row, col = img.shape
     windowsize[0] = int(windowsize[0])
