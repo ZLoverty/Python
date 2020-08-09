@@ -1,0 +1,5 @@
+adv = dc/interval + ux/fps*dcx/step + uy/fps*dcy/step
+vdc = ux/fps*dcx/step + uy/fps*dcy/step
+interval = 1 frames
+Sun Aug  9 13:00:38 2020 // 0000-0001 calculated
+Sun Aug  9 13:00:38 2020 // 0002-0003 calculated

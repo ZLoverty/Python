@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from myImageLib import dirrec, bpass
 from miscLib import label_slope
-from skimage import io
+from skimage import io, util
 import os
 import pandas as pd
 import sys
@@ -11,8 +11,6 @@ import pdb
 from numpy.polynomial.polynomial import polyvander
 
 # def corrS(X, Y, U, V):
-    X, Y, U, V represent a vector field
-    Return value C is a matrix representing spatial correlation distribution of given vector field
     # row, col = X.shape
     # vsq = 0
     # CA = np.zeros((row, col))
@@ -89,33 +87,49 @@ def corrI(X, Y, I):
                 CI[yin, xin] = (I[yin:, xin:] * I_shift[yin:, xin:]).mean() / normalizer
     return CI
     
+# def divide_windows(img, windowsize=[20, 20], step=10):
+    # row, col = img.shape
+    # windowsize[0] = int(windowsize[0])
+    # windowsize[1] = int(windowsize[1])
+    # step = int(step)
+    # X = np.array(range(0, col-windowsize[0], step))# + int(windowsize[0]/2)
+    # Y = np.array(range(0, row-windowsize[1], step))# + int(windowsize[1]/2)
+    # I = np.zeros((len(Y), len(X)))
+    # for indx, x in enumerate(X):
+        # for indy, y in enumerate(Y):
+            # window = img[y:y+windowsize[1], x:x+windowsize[0]]
+            # I[indy, indx] = window.mean()
+    # X, Y = np.meshgrid(X, Y)
+    # return X, Y, I
+
 def divide_windows(img, windowsize=[20, 20], step=10):
     row, col = img.shape
     windowsize[0] = int(windowsize[0])
     windowsize[1] = int(windowsize[1])
     step = int(step)
-    X = np.array(range(0, col-windowsize[0], step))# + int(windowsize[0]/2)
-    Y = np.array(range(0, row-windowsize[1], step))# + int(windowsize[1]/2)
-#     X, Y = np.meshgrid(X, Y)
-    I = np.zeros((len(Y), len(X)))
-    for indx, x in enumerate(X):
-        for indy, y in enumerate(Y):
-            window = img[y:y+windowsize[1], x:x+windowsize[0]]
-            I[indy, indx] = window.mean()
+    if isinstance(windowsize, list):
+        windowsize = tuple(windowsize)
+    X = np.array(range(0, col-windowsize[0], step))
+    Y = np.array(range(0, row-windowsize[1], step))
     X, Y = np.meshgrid(X, Y)
+    I = util.view_as_windows(img, windowsize, step=step).mean(axis=(2, 3))
     return X, Y, I
-
+    
+# def distance_corr(X, Y, C):
+    # rList = []
+    # cList = []
+    # table = pd.DataFrame()
+    # for xr, yr, cr in zip(X, Y, C):
+        # for x, y, c in zip(xr, yr, cr):
+            # rList.append((x**2 + y**2)**.5)
+            # cList.append(c)
+    # table = table.assign(R=rList, C=cList)
+    # table.sort_values(by=['R'], inplace=True)
+    # return table
+    
 def distance_corr(X, Y, C):
-    rList = []
-    cList = []
-    table = pd.DataFrame()
-    for xr, yr, cr in zip(X, Y, C):
-        for x, y, c in zip(xr, yr, cr):
-            rList.append((x**2 + y**2)**.5)
-            cList.append(c)
-    table = table.assign(R=rList, C=cList)
-    table.sort_values(by=['R'], inplace=True)
-    return table
+    r_corr = pd.DataFrame({'R': (X.flatten()**2 + Y.flatten()**2) ** 0.5, 'C': C.flatten()}).sort_values(by='R')
+    return r_corr
 
 def corrIseq(folder, **kwargs):
     # Default window settings

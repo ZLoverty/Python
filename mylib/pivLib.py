@@ -10,7 +10,7 @@ import os
 
 def PIV1(I0, I1, winsize, overlap, dt, smooth=True):
     u0, v0 = pyprocess.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), window_size=winsize, overlap=overlap, dt=dt, search_area_size=winsize)
-    x, y = pyprocess.get_coordinates(image_size=I0.shape, window_size=winsize, overlap=overlap)
+    x, y = pyprocess.get_coordinates(image_size=I0.shape, search_area_size=winsize, window_size=winsize, overlap=overlap)
     if smooth == True:
         u1 = smoothn(u0)[0]
         v1 = smoothn(v0)[0]
