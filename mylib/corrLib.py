@@ -201,7 +201,7 @@ def match_hist(im1, im2):
 def density_fluctuation(img8):
     row, col = img8.shape
     l = min(row, col)
-    size_min = 20    
+    size_min = 5    
     boxsize = np.unique(np.floor(np.logspace(np.log10(size_min), np.log10((l-size_min)/2), 100)))
     # Gradually increase box size and calculate dN=std(I) and N=mean(I)    
     # choose maximal box size to be (l-size_min)/2
@@ -214,12 +214,12 @@ def density_fluctuation(img8):
     # Igor Aranson commented on the averaging methods saying that in a spatially
     # homogeneous system (small spatial temporal correlation) two methods should match.
     # This suggests that I need to test both methods.
-    bp = bpass(img8, 3, 100)
-    img8_mh = match_hist(bp, img8)
+    # bp = bpass(img8, 3, 100)
+    # img8_mh = match_hist(bp, img8)
     NList = []
     dNList = []
     for bs in boxsize:
-        X, Y, I = divide_windows(img8_mh, windowsize=[bs, bs], step=5*size_min)
+        X, Y, I = divide_windows(img8, windowsize=[bs, bs], step=5*size_min)
         N = bs*bs
         dN = np.log10(I).std()*bs*bs
         NList.append(N)

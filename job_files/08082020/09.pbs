@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python df2_nobp.py ~/Data/08042020/00/8-bit ~/Data/08042020/df2_nobp/00 &
+python df2_nobp.py ~/Data/08042020/01/8-bit ~/Data/08042020/df2_nobp/01 &
+python df2_nobp.py ~/Data/08042020/02/8-bit ~/Data/08042020/df2_nobp/02 &
+python df2_nobp.py ~/Data/08042020/03/8-bit ~/Data/08042020/df2_nobp/03 &
+python df2_nobp.py ~/Data/08042020/04/8-bit ~/Data/08042020/df2_nobp/04 &
+python df2_nobp.py ~/Data/08042020/05/8-bit ~/Data/08042020/df2_nobp/05 &
+python df2_nobp.py ~/Data/08042020/06/8-bit ~/Data/08042020/df2_nobp/06 &
+python df2_nobp.py ~/Data/08042020/07/8-bit ~/Data/08042020/df2_nobp/07 &
+python df2_nobp.py ~/Data/08042020/08/8-bit ~/Data/08042020/df2_nobp/08 &
+python df2_nobp.py ~/Data/08042020/09/8-bit ~/Data/08042020/df2_nobp/09 &
+python df2_nobp.py ~/Data/08042020/10/8-bit ~/Data/08042020/df2_nobp/10 &
+python df2_nobp.py ~/Data/08042020/11/8-bit ~/Data/08042020/df2_nobp/11 &
+wait

@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python div_x_dcadv.py ~/Data/08052020/div2/00 ~/Data/08052020/dc_adv/00/dt=60 ~/Data/08052020/div_x_dcadv/00 &
+python div_x_dcadv.py ~/Data/08052020/div2/01 ~/Data/08052020/dc_adv/01/dt=60 ~/Data/08052020/div_x_dcadv/01 &
+python div_x_dcadv.py ~/Data/08052020/div2/02 ~/Data/08052020/dc_adv/02/dt=60 ~/Data/08052020/div_x_dcadv/02 &
+python div_x_dcadv.py ~/Data/08052020/div2/03 ~/Data/08052020/dc_adv/03/dt=60 ~/Data/08052020/div_x_dcadv/03 &
+python div_x_dcadv.py ~/Data/08052020/div2/04 ~/Data/08052020/dc_adv/04/dt=60 ~/Data/08052020/div_x_dcadv/04 &
+python div_x_dcadv.py ~/Data/08052020/div2/05 ~/Data/08052020/dc_adv/05/dt=60 ~/Data/08052020/div_x_dcadv/05 &
+python div_x_dcadv.py ~/Data/08052020/div2/06 ~/Data/08052020/dc_adv/06/dt=60 ~/Data/08052020/div_x_dcadv/06 &
+python div_x_dcadv.py ~/Data/08052020/div2/07 ~/Data/08052020/dc_adv/07/dt=60 ~/Data/08052020/div_x_dcadv/07 &
+python div_x_dcadv.py ~/Data/08052020/div2/08 ~/Data/08052020/dc_adv/08/dt=60 ~/Data/08052020/div_x_dcadv/08 &
+python div_x_dcadv.py ~/Data/08052020/div2/09 ~/Data/08052020/dc_adv/09/dt=20 ~/Data/08052020/div_x_dcadv/09 &
+python div_x_dcadv.py ~/Data/08052020/div2/10 ~/Data/08052020/dc_adv/10/dt=20 ~/Data/08052020/div_x_dcadv/10 &
+python div_x_dcadv.py ~/Data/08052020/div2/11 ~/Data/08052020/dc_adv/11/dt=20 ~/Data/08052020/div_x_dcadv/11 &
+wait
