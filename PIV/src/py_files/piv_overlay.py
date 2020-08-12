@@ -1,11 +1,13 @@
 import pandas as pd
 import os
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import sys
 import numpy as np
 from myImageLib import bpass, dirrec
 from skimage import io
 import time
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 pivDataFolder = sys.argv[1]
 imgFolder = sys.argv[2]
@@ -14,6 +16,8 @@ if len(sys.argv) == 5:
     sparcity = int(sys.argv[4])
 else:
     sparcity = 1
+if os.path.exists(output_folder) == False:
+    os.makedirs(output_folder)
 with open(os.path.join(output_folder, 'log.txt'), 'w') as f: 
     f.write('piv_folder: ' + pivDataFolder + '\n')
     f.write('img_folder: ' + imgFolder + '\n')
@@ -40,9 +44,10 @@ for pivDir in pivDataDir:
     imgDir = os.path.join(folder.replace(pivDataFolder, imgFolder), imgname + '.tif')
     img = io.imread(imgDir)
     bp = bpass(img, 2, 100)
-    fig = plt.figure(figsize=(3, 3*row/col))
+    # fig = plt.figure(figsize=(3, 3*row/col))
+    fig = Figure(figsize=(3, 3*row/col))
+    canvas = FigureCanvas(fig)
     ax = fig.add_axes([0, 0, 1, 1])
-    # fig, ax = plt.subplots(figsize=(10,10))
     ax.imshow(bp, cmap='gray')
     ax.quiver(xs, ys, us, vs, color='yellow', width=0.003)
     ax.axis('off')
