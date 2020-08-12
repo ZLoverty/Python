@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/PIV/src/py_files
+
+module load python3
+source activate pythonEnv
+python piv_overlay.py ~/Data/08052020/piv_imseq/00 ~/Data/08052020/00/8-bit ~/Data/08052020/piv_overlay/00 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/01 ~/Data/08052020/01/8-bit ~/Data/08052020/piv_overlay/01 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/02 ~/Data/08052020/02/8-bit ~/Data/08052020/piv_overlay/02 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/03 ~/Data/08052020/03/8-bit ~/Data/08052020/piv_overlay/03 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/04 ~/Data/08052020/04/8-bit ~/Data/08052020/piv_overlay/04 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/05 ~/Data/08052020/05/8-bit ~/Data/08052020/piv_overlay/05 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/06 ~/Data/08052020/06/8-bit ~/Data/08052020/piv_overlay/06 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/07 ~/Data/08052020/07/8-bit ~/Data/08052020/piv_overlay/07 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/08 ~/Data/08052020/08/8-bit ~/Data/08052020/piv_overlay/08 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/09 ~/Data/08052020/09/8-bit ~/Data/08052020/piv_overlay/09 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/10 ~/Data/08052020/10/8-bit ~/Data/08052020/piv_overlay/10 2 &
+python piv_overlay.py ~/Data/08052020/piv_imseq/11 ~/Data/08052020/11/8-bit ~/Data/08052020/piv_overlay/11 2 &
+wait
