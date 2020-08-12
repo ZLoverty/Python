@@ -35,22 +35,6 @@ with open(os.path.join(folder_out, 'log.txt'), 'w') as f:
     f.write('interval = {:d} frames\n'.format(interval))
 
 limg = cl.readseq(folder_img)
-I0 = io.imread(limg.Dir[0])
-X, Y, I0s = cl.divide_windows(I0, windowsize=[50, 50], step=25)
-
-# generate shift matrices
-# shiftx = np.zeros(I0s.shape)
-# shifty = np.zeros(I0s.shape)
-# for x in range(0, I0s.shape[0]):
-    # for y in range(0, I0s.shape[1]):
-        # if x == y - 1:
-            # shiftx[x, y] = 1
-# for x in range(0, I0s.shape[0]):
-    # for y in range(0, I0s.shape[1]):
-        # if x == y + 1:
-            # shifty[x, y] = 1
-# shiftx[0, 0] = 1
-# shifty[0, 0] = 1
 
 # load piv and corresponding images
 l = cl.readdata(folder_piv)
@@ -67,8 +51,6 @@ for num, i in l.iterrows():
     pivData = pd.read_csv(i.Dir)
     ux = np.array(pivData.u).reshape(I0s.shape)
     uy = np.array(pivData.v).reshape(I0s.shape)
-    # dcx = I0s - np.matmul(I0s, shiftx)
-    # dcy = I0s - np.matmul(shifty, I0s)
     dcx = I0s - np.roll(I0s, 1, axis=1)
     dcy = I0s - np.roll(I0s, 1, axis=0)
     dc = I1s - I0s

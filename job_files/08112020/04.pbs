@@ -1,0 +1,22 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python corr_imseq.py ~/Data/08062020/00/8-bit ~/Data/08062020/corr_imseq/00 25 25 &
+python corr_imseq.py ~/Data/08062020/01/8-bit ~/Data/08062020/corr_imseq/01 25 25 &
+python corr_imseq.py ~/Data/08062020/02/8-bit ~/Data/08062020/corr_imseq/02 25 25 &
+python corr_imseq.py ~/Data/08062020/03/8-bit ~/Data/08062020/corr_imseq/03 25 25 &
+python corr_imseq.py ~/Data/08062020/04/8-bit ~/Data/08062020/corr_imseq/04 25 25 &
+python corr_imseq.py ~/Data/08062020/05/8-bit ~/Data/08062020/corr_imseq/05 25 25 &
+python corr_imseq.py ~/Data/08062020/06/8-bit ~/Data/08062020/corr_imseq/06 25 25 &
+python corr_imseq.py ~/Data/08062020/07/8-bit ~/Data/08062020/corr_imseq/07 25 25 &
+python corr_imseq.py ~/Data/08062020/08/8-bit ~/Data/08062020/corr_imseq/08 25 25 &
+python corr_imseq.py ~/Data/08062020/09/8-bit ~/Data/08062020/corr_imseq/09 25 25 &
+python corr_imseq.py ~/Data/08062020/10/8-bit ~/Data/08062020/corr_imseq/10 25 25 &
+python corr_imseq.py ~/Data/08062020/11/8-bit ~/Data/08062020/corr_imseq/11 25 25 &
+python corr_imseq.py ~/Data/08062020/12/8-bit ~/Data/08062020/corr_imseq/12 25 25 &
+wait

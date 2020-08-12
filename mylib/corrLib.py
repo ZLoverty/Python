@@ -79,8 +79,8 @@ def corrI(X, Y, I):
     I = I - I.mean()
     CI = np.ones(I.shape)
     normalizer = I.std() ** 2
-    for xin in range(0, col):
-        for yin in range(0, row):
+    for xin in range(0, int(col/2)):
+        for yin in range(0, int(row/2)):
             if xin != 0 or yin != 0:
                 I_shift_x = np.roll(I, xin, axis=1)
                 I_shift = np.roll(I_shift_x, yin, axis=0)

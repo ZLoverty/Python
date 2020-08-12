@@ -7,6 +7,7 @@ from scipy.ndimage import gaussian_filter1d, uniform_filter1d
 from scipy.signal import savgol_filter, medfilt
 from scipy.optimize import curve_fit
 import corrLib
+import os
 
 
 
@@ -481,7 +482,7 @@ def kinetics_eo_smooth(data):
             
     # plot new_data
     fig = plt.figure()
-    ax1 = fig.add_axes([0, 0, 1, 1])
+    ax1 = fig.add_axes([0.2, 0.25, 0.5, 0.7])
     
     color = 'black'
     ax1.set_xlabel('$t$ [s]')
@@ -501,11 +502,50 @@ def kinetics_eo_smooth(data):
     ax3.set_ylabel('$OP$', color=color)
     ax3.plot(new_data['t2'], new_data['OP'], color=color)
     ax3.tick_params(axis='y', labelcolor=color)
-    ax3.spines["right"].set_position(("axes", 1.1))
+    ax3.spines["right"].set_position(("axes", 1.2))
     
     ax = [ax1, ax2, ax3]
     
     return new_data, fig, ax
+
+def df2(folder):
+    l = readseq(folder)
+    img = io.imread(l.Dir.loc[0])
+    size_min = 5
+    step = 50*size_min
+    L = min(img.shape)
+    boxsize = np.unique(np.floor(np.logspace(np.log10(size_min),
+                        np.log10((L-size_min)/2),100)))
+    
+    df = pd.DataFrame()
+    for num, i in l.iterrows():
+        img = io.imread(i.Dir)
+        framedf = pd.DataFrame()
+        for bs in boxsize: 
+            X, Y, I = divide_windows(img, windowsize=[bs, bs], step=step)
+            tempdf = pd.DataFrame().assign(I=I.flatten(), t=int(i.Name), size=bs, 
+                           number=range(0, len(I.flatten())))
+            framedf = framedf.append(tempdf)
+        df = df.append(framedf)
+
+    df_out = pd.DataFrame()
+    for number in df.number.drop_duplicates():
+        subdata1 = df.loc[df.number==number]
+        for s in subdata1['size'].drop_duplicates():
+            subdata = subdata1.loc[subdata1['size']==s]
+            d = s**2 * np.array(subdata.I).std()
+            n = s**2 
+            tempdf = pd.DataFrame().assign(n=[n], d=d, size=s, number=number)
+            df_out = df_out.append(tempdf)
+
+    average = pd.DataFrame()
+    for s in df_out['size'].drop_duplicates():
+        subdata = df_out.loc[df_out['size']==s]
+        avg = subdata.drop(columns=['size', 'number']).mean().to_frame().T
+        average = average.append(avg)
+        
+    return average
+
 
 # fig3_spatial-correlations
 def exp(x, a):
@@ -635,3 +675,26 @@ def plot_correlation(data, plot_cols=['R', 'C'], xlim=None, mpp=0.33, lb=3, plot
     ax.legend()     
     return ax, pd.DataFrame(cl_data).sort_values(by='conc')
 
+
+# fig-5 velocity and concentration
+def retrieve_dxd_data(folder, log_list):
+    """
+    Args:
+    folder -- folder containing dxd data
+    log_list -- experiment log as a list object, format is ['date-num', ...]
+    
+    Returns:
+    avg -- DataFrame with columns avg of given entry, adv_divv ... will be indices instead
+    std -- DataFrame with columns std of given entry, adv_divv ... will be indices instead
+    """
+    for n, entry in enumerate(log_list):
+        date, num = entry.split('-')
+        temp = pd.read_csv(os.path.join(folder, date, 'div_x_dcadv', 'summary.csv'), index_col='sample').loc[[int(num)]]
+        if n == 0:
+            data = temp
+        else:
+            data = data.append(temp)
+    data = data.transpose()
+    avg = pd.DataFrame({'avg': data.mean(axis=1)})
+    std = pd.DataFrame({'std': data.std(axis=1)})
+    return avg, std

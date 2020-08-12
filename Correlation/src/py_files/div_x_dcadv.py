@@ -55,7 +55,7 @@ for s in folder_list_dt:
         count += 1
     for entry in entries:
         corr_lists[entry].append(corr_values[entry] / count)
-
+    print(corr_lists)
     dtL.append(dt)
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // ' + 'dt={0:d} calculated\n'.format(dt))

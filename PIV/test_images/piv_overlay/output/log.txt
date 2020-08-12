@@ -1,2 +1,6 @@
-Mon Feb 17 15:34:54 2020 // 900 calculated
-Mon Feb 17 15:34:55 2020 // 902 calculated
+piv_folder: E:\Github\Python\PIV\test_images\piv_overlay\pivdata
+img_folder: E:\Github\Python\PIV\test_images\piv_overlay\img
+output_folder: E:\Github\Python\PIV\test_images\piv_overlay\output
+sparcity: 2
+Wed Aug 12 12:39:41 2020 // 900 calculated
+Wed Aug 12 12:39:42 2020 // 902 calculated

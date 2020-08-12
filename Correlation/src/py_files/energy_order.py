@@ -55,14 +55,24 @@ for num, i in l.iterrows():
     u = np.array(pivData.u).reshape((row, col))
     v = np.array(pivData.v).reshape((row, col))
     # calculate shifted matrices
-    u1 = np.matmul(shift, u) # up
-    v1 = np.matmul(shift, v) # up
-    u2 = np.matmul(shift.transpose(), u) # down
-    v2 = np.matmul(shift.transpose(), v) # down
-    u3 = np.matmul(u, shift) # right
-    v3 = np.matmul(v, shift) # right
-    u4 = np.matmul(u, shift.transpose()) # left
-    v4 = np.matmul(v, shift.transpose()) # left
+    # u1 = np.matmul(shift, u) # up
+    # v1 = np.matmul(shift, v) # up
+    # u2 = np.matmul(shift.transpose(), u) # down
+    # v2 = np.matmul(shift.transpose(), v) # down
+    # u3 = np.matmul(u, shift) # right
+    # v3 = np.matmul(v, shift) # right
+    # u4 = np.matmul(u, shift.transpose()) # left
+    # v4 = np.matmul(v, shift.transpose()) # left
+    
+    u1 = np.roll(u, -1, axis=0) # up
+    v1 = np.roll(v, -1, axis=0) # up
+    u2 = np.roll(u, 1, axis=0) # down
+    v2 = np.roll(v, 1, axis=0) # down
+    u3 = np.roll(u, 1, axis=1) # right
+    v3 = np.roll(v, 1, axis=1) # right
+    u4 = np.roll(u, -1, axis=1) # left
+    v4 = np.roll(v, -1, axis=1) # left
+    
     # do inner products with original matrix
     I1 = inner(u, v, u1, v1)
     I2 = inner(u, v, u2, v2)
