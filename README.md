@@ -1,5 +1,4 @@
-# Python-GUI
-Practice code for python specific purpose GUI.
+# Python
 
 Data aquisition, image analysis, constructing database (data management) and visualizing data make up the major part. While working with huge video files which on average eat up 3 external hard drives for each student, the details (e.g. imaging parameters, experiment parameters) in these videos are also crucial and easy to cause errors in the subsequent analysis. These facts make my workflows not as robust in the early days, and could be distracting for other students that have similar workflows. 
 
