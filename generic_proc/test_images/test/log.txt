@@ -1,1 +1,2 @@
-Thu Mar  5 15:21:02 2020 // Frame 0000 converted
+nd2Dir = E:\Github\Python\generic_proc\test_images\test.nd2
+Sun Aug 16 15:32:58 2020 // Frame 0000 converted
