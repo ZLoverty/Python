@@ -1,2 +1,3 @@
-Thu Feb 13 11:39:47 2020 // 900-901 calculated
-Thu Feb 13 11:40:35 2020 // 902-903 calculated
+Input folder: E:\Github\Python\Correlation\test_images\CAV
+Ouput folder: E:\Github\Python\Correlation\test_images\CAV\cav_result
+Sun Aug 16 17:01:26 2020 // 902-903 calculated

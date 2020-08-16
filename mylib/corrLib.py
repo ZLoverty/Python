@@ -38,19 +38,21 @@ from numpy.polynomial.polynomial import polyvander
 
 def corrS(X, Y, U, V):
     row, col = X.shape
+    r = int(row/2)
+    c = int(col/2)
     vsqrt = (U ** 2 + V ** 2) ** 0.5
     U = U - U.mean()
     V = V - V.mean()
     Ax = U / vsqrt
     Ay = V / vsqrt
-    CA = np.ones(X.shape)
-    CV = np.ones(X.shape)
-    for xin in range(0, col):
-        for yin in range(0, row):
+    CA = np.ones((r, c))
+    CV = np.ones((r, c))
+    for xin in range(0, c):
+        for yin in range(0, r):
             if xin != 0 or yin != 0:
                 CA[yin, xin] = (Ax[0:row-yin, 0:col-xin] * Ax[yin:row, xin:col] + Ay[0:row-yin, 0:col-xin] * Ay[yin:row, xin:col]).mean()
                 CV[yin, xin] = (U[0:row-yin, 0:col-xin] * U[yin:row, xin:col] + V[0:row-yin, 0:col-xin] * V[yin:row, xin:col]).mean() / (U.std()**2+V.std()**2)
-    return CA, CV
+    return X[0:r, 0:c], Y[0:r, 0:c], CA, CV
 
 # def corrI(X, Y, I):
     # I = I - I.mean()

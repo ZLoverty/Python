@@ -16,7 +16,11 @@ step = int(sys.argv[4])
 if os.path.exists(output_folder) == 0:
     os.makedirs(output_folder)
 with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
-    pass
+    f.write('Input folder: ' + str(input_folder) + '\n')
+    f.write('Output folder: ' + str(output_folder) + '\n')
+    f.write('wsize: ' + str(wsize) + '\n')
+    f.write('step: ' + str(step) + '\n')
+    
 l = readseq(input_folder)
 num_frames = len(l)
 num_sample = 100 # can modify in the future

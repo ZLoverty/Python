@@ -30,34 +30,62 @@ output_folder = sys.argv[2]
 if os.path.exists(output_folder) == 0:
     os.makedirs(output_folder)
 with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
-    pass
+    f.write('Input folder: ' + str(input_folder) + '\n')
+    f.write('Ouput folder: ' + str(output_folder) + '\n')
+    
 
 l = readdata(input_folder)
-for num, i in l.iterrows():
-    print('Frame ' + i.Name)
-    pivData = pd.read_csv(i.Dir)
-    col = len(pivData.x.drop_duplicates())
-    row = len(pivData.y.drop_duplicates())
-    X = np.array(pivData.x).reshape((row, col))
-    Y = np.array(pivData.y).reshape((row, col))
-    U = np.array(pivData.u).reshape((row, col))
-    V = np.array(pivData.v).reshape((row, col))
-    CA, CV = corrS(X, Y, U, V)        
-    data = pd.DataFrame().assign(X=X.flatten(), Y=Y.flatten(), CA=CA.flatten(), CV=CV.flatten())
-    # Save data
-    data.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
-    # Write log
-    with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
-        f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
+num_frames = len(l)
+num_sample = 100 # can modify in the future
+if num_sample <= num_frames:
+    for num, i in l.iterrows():
+        if num % int(num_frames / num_sample):
+            pivData = pd.read_csv(i.Dir)
+            col = len(pivData.x.drop_duplicates())
+            row = len(pivData.y.drop_duplicates())
+            X = np.array(pivData.x).reshape((row, col))
+            Y = np.array(pivData.y).reshape((row, col))
+            U = np.array(pivData.u).reshape((row, col))
+            V = np.array(pivData.v).reshape((row, col))
+            X, Y, CA, CV = corrS(X, Y, U, V)        
+            data = pd.DataFrame().assign(X=X.flatten(), Y=Y.flatten(), CA=CA.flatten(), CV=CV.flatten())
+            # Save data
+            data.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
+            # Write log
+            with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
+                f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
+else:
+    for num, i in l.iterrows():
+        pivData = pd.read_csv(i.Dir)
+        col = len(pivData.x.drop_duplicates())
+        row = len(pivData.y.drop_duplicates())
+        X = np.array(pivData.x).reshape((row, col))
+        Y = np.array(pivData.y).reshape((row, col))
+        U = np.array(pivData.u).reshape((row, col))
+        V = np.array(pivData.v).reshape((row, col))
+        X, Y, CA, CV = corrS(X, Y, U, V)        
+        data = pd.DataFrame().assign(X=X.flatten(), Y=Y.flatten(), CA=CA.flatten(), CV=CV.flatten())
+        # Save data
+        data.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
+        # Write log
+        with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
+            f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
 
+
+""" Edit
+08162020 - change corrI return value according to the change of corrI(), to speed up the code
+           write parameters in log
+           down sampling: instead of computing correlations for all frames, now only take 100 frames
+                          if the video is shorter than 100 frames, do the whole video
+"""
 
 """ TEST COMMAND
 python cav_imseq.py input_folder output_folder
 """
         
 """  TEST PARAMS
-input_folder = I:\Github\Python\Correlation\test_images\CAV
-output_folder = I:\Github\Python\Correlation\test_images\CAV\cav_result
+input_folder = E:\Github\Python\Correlation\test_images\CAV
+output_folder = E:\Github\Python\Correlation\test_images\CAV\cav_result
 """
 
 """ LOG
