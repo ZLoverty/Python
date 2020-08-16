@@ -77,7 +77,12 @@ def corrS(X, Y, U, V):
 def corrI(X, Y, I):
     row, col = I.shape
     I = I - I.mean()
-    CI = np.ones(I.shape)
+    # CI = np.ones(I.shape)
+    r = int(row/2)
+    c = int(col/2)
+    CI = np.ones((r, c))
+    XI = X[0: r, 0: c]
+    YI = Y[0: r, 0: c]
     normalizer = I.std() ** 2
     for xin in range(0, int(col/2)):
         for yin in range(0, int(row/2)):
@@ -85,7 +90,7 @@ def corrI(X, Y, I):
                 I_shift_x = np.roll(I, xin, axis=1)
                 I_shift = np.roll(I_shift_x, yin, axis=0)
                 CI[yin, xin] = (I[yin:, xin:] * I_shift[yin:, xin:]).mean() / normalizer
-    return CI
+    return XI, YI, CI
     
 # def divide_windows(img, windowsize=[20, 20], step=10):
     # row, col = img.shape
