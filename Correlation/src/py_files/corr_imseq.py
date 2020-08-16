@@ -18,27 +18,46 @@ if os.path.exists(output_folder) == 0:
 with open(os.path.join(output_folder, 'log.txt'), 'w') as f:
     pass
 l = readseq(input_folder)
-for num, i in l.iterrows():
-    print('Frame ' + i.Name)
-    img = io.imread(i.Dir)
-    bp = bpass(img, 3, 100)
-    X, Y, I = divide_windows(bp, windowsize=[wsize, wsize], step=step)
-    CI = corrI(X, Y, I)
-    dc = distance_corr(X, Y, CI)
-    # Save data
-    dc.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
-    # Write log
-    with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
-        f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
+num_frames = len(l)
+num_sample = 100 # can modify in the future
+if num_sample <= num_frames:
+    for num, i in l.iterrows():
+        if num % int(num_frames / num_sample):
+            img = io.imread(i.Dir)
+            # bp = bpass(img, 3, 100)
+            X, Y, I = divide_windows(img, windowsize=[wsize, wsize], step=step)
+            XI, YI, CI = corrI(X, Y, I)
+            dc = distance_corr(XI, YI, CI)
+            # Save data
+            dc.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
+            # Write log
+            with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
+                f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
+else:
+    for num, i in l.iterrows():
+        img = io.imread(i.Dir)
+        X, Y, I = divide_windows(img, windowsize=[wsize, wsize], step=step)
+        XI, YI, CI = corrI(X, Y, I)
+        dc = distance_corr(XI, YI, CI)
+        dc.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
+        with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
+            f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
 
+""" Edit
+08162020 - remove bpass step
+           change corrI return value according to the change of corrI(), to speed up the code
+           write parameters in log
+           down sampling: instead of computing correlations for all frames, now only take 100 frames
+                          if the video is shorter than 100 frames, do the whole video
+"""
 
 """ TEST COMMAND
 python corr_imseq.py input_folder output_folder wsize step
 """
         
 """  TEST PARAMS
-input_folder = I:\Github\Python\Correlation\test_images\cl
-output_folder = I:\Github\Python\Correlation\test_images\cl\result_test
+input_folder = E:\Github\Python\Correlation\test_images\cl
+output_folder = E:\Github\Python\Correlation\test_images\cl\result_test
 wsize = 20
 step = 20
 """
