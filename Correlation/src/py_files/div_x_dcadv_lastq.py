@@ -43,6 +43,7 @@ for s in folder_list_dt:
     for entry in entries:
         corr_values[entry] = 0
     for num, i in l.iterrows():
+        print(i.Name)
         f, file = os.path.split(i.Dir)
         name = file.split('-')[0]
         n0 = int(name)
@@ -59,7 +60,6 @@ for s in folder_list_dt:
         count += 1
     for entry in entries:
         corr_lists[entry].append(corr_values[entry] / count)
-    print(corr_lists)
     dtL.append(dt)
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // ' + 'dt={0:d} calculated\n'.format(dt))

@@ -9,6 +9,38 @@ from scipy.optimize import curve_fit
 import corrLib
 import os
 
+# general
+def data_log_mapping(kw='aug'):
+    """
+    Returns the data log mapping. 
+    My experiments are recorded in date/number fashion, without detailed parameters.
+    All the parameters are logged in separated log files. 
+    This function maps the parameters to date/number. 
+    
+    Args:
+    kw -- keyword of data. Since I have done a new set of experiment in August, I have set 'aug' as one valid value. The old data may still be useful in the future. When needed, I will implement the mappings for the old data.
+    
+    Returns:
+    dirs -- the data-log mapping.
+    
+    IMPORTANT: Whenever new experiments are added, this function needs to be updated.
+    """
+    if kw == 'aug':
+        dirs = {}
+        dirs['120'] = ['08062020-3', '08062020-4', '08062020-5']
+        dirs['100'] = ['08062020-0', '08062020-1', '08062020-2']
+        dirs['85'] = ['08052020-3', '08052020-4', '08052020-5']
+        dirs['80'] = ['08032020-0', '08032020-1', '08032020-2']
+        dirs['70'] = ['08042020-0', '08042020-1', '08042020-2']
+        dirs['60'] = ['08032020-3', '08032020-4', '08032020-5']
+        dirs['50'] = ['08042020-3', '08042020-4', '08042020-5']
+        dirs['40'] = ['08032020-6', '08032020-7', '08032020-8']
+        dirs['30'] = ['08042020-6', '08042020-7', '08042020-8']
+        dirs['20'] = ['08032020-9', '08032020-10', '08032020-11']
+        dirs['10'] = ['08042020-9', '08042020-10', '08042020-11']
+        dirs['00'] = ['08032020-12', '08032020-13', '08032020-14']
+    
+    return dirs
 
 
 
