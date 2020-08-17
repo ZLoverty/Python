@@ -42,6 +42,20 @@ def data_log_mapping(kw='aug'):
     
     return dirs
 
+def illumination_correction(img, avg):
+    """
+    Correct the illumination inhomogeneity in microscope images.
+    
+    Args:
+    img -- input image with illumination inhomogeneity
+    avg -- average of (a large number of) raw images
+    
+    Returns:
+    corrected -- corrected image
+    """
+    corrected = (img / avg * img.mean() / (img / avg).mean()).astype('uint8')
+    return corrected
+
 
 
 # fig-2_GNF

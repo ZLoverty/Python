@@ -26,15 +26,12 @@ num_frames = len(l)
 num_sample = 100 # can modify in the future
 if num_sample <= num_frames:
     for num, i in l.iterrows():
-        if num % int(num_frames / num_sample):
+        if num % int(num_frames / num_sample) == 0:
             img = io.imread(i.Dir)
-            # bp = bpass(img, 3, 100)
             X, Y, I = divide_windows(img, windowsize=[wsize, wsize], step=step)
             XI, YI, CI = corrI(X, Y, I)
             dc = distance_corr(XI, YI, CI)
-            # Save data
             dc.to_csv(os.path.join(output_folder, i.Name+'.csv'), index=False)
-            # Write log
             with open(os.path.join(output_folder, 'log.txt'), 'a') as f:
                 f.write(time.asctime() + ' // ' + i.Name + ' calculated\n')
 else:

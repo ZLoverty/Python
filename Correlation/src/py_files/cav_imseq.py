@@ -39,7 +39,7 @@ num_frames = len(l)
 num_sample = 100 # can modify in the future
 if num_sample <= num_frames:
     for num, i in l.iterrows():
-        if num % int(num_frames / num_sample):
+        if num % int(num_frames / num_sample) == 0:
             pivData = pd.read_csv(i.Dir)
             col = len(pivData.x.drop_duplicates())
             row = len(pivData.y.drop_duplicates())
