@@ -226,9 +226,10 @@ def density_fluctuation(img8):
     NList = []
     dNList = []
     for bs in boxsize:
-        X, Y, I = divide_windows(img8, windowsize=[bs, bs], step=5*size_min)
+        X, Y, I = divide_windows(img8, windowsize=[bs, bs], step=bs)
         N = bs*bs
-        dN = np.log10(I).std()*bs*bs
+        # dN = np.log10(I).std()*bs*bs
+        dN = I.std()*bs*bs
         NList.append(N)
         dNList.append(dN)
     df_data = pd.DataFrame().assign(n=NList, d=dNList)

@@ -56,7 +56,24 @@ def illumination_correction(img, avg):
     corrected = (img / avg * img.mean() / (img / avg).mean()).astype('uint8')
     return corrected
 
-
+def data_log():
+    """
+    Return the data log: log[date][num, fps]    
+    """
+    log = {}
+    log['08032020'] = {}
+    log['08032020']['num'] = list(range(0, 15))
+    log['08032020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 10, 10, 10, 10, 10, 10, 10, 10]
+    log['08042020'] = {}
+    log['08042020']['num'] = list(range(0, 12))
+    log['08042020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 10, 10, 10]
+    log['08052020'] = {}
+    log['08052020']['num'] = list(range(0, 12))
+    log['08052020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 10, 10, 10]
+    log['08062020'] = {}
+    log['08062020']['num'] = list(range(0, 13))
+    log['08062020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 10]
+    return log
 
 # fig-2_GNF
 
@@ -744,3 +761,16 @@ def retrieve_dxd_data(folder, log_list):
     avg = pd.DataFrame({'avg': data.mean(axis=1)})
     std = pd.DataFrame({'std': data.std(axis=1)})
     return avg, std
+
+def corr2d(A, B):
+    """
+    Calculate the correlation between two matrices. 1 for perfect correlation and -1 for perfect anti-correlation. 
+    
+    Args:
+    A, B -- Matrices of same shape
+    
+    Returns:
+    correlation -- real number in [-1, 1]
+    """
+    assert(A.shape==B.shape)
+    return ((A - A.mean())/A.std() * (B - B.mean())/B.std()).mean()
