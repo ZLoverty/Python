@@ -8,6 +8,7 @@ from scipy.signal import savgol_filter, medfilt
 from scipy.optimize import curve_fit
 import corrLib
 import os
+from skimage import io
 
 # general
 def data_log_mapping(kw='aug'):
@@ -41,6 +42,22 @@ def data_log_mapping(kw='aug'):
         dirs['00'] = ['08032020-12', '08032020-13', '08032020-14']
     
     return dirs
+
+def data_log():
+    log = {}
+    log['08032020'] = {}
+    log['08032020']['num'] = list(range(0, 15))
+    log['08032020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 10, 10, 10, 10, 10, 10, 10, 10]
+    log['08042020'] = {}
+    log['08042020']['num'] = list(range(0, 12))
+    log['08042020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 10, 10, 10]
+    log['08052020'] = {}
+    log['08052020']['num'] = list(range(0, 12))
+    log['08052020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 10, 10, 10]
+    log['08062020'] = {}
+    log['08062020']['num'] = list(range(0, 13))
+    log['08062020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 10]
+    return log
 
 def illumination_correction(img, avg):
     """
@@ -249,7 +266,7 @@ def plot_std(k_data, seg_length, tlim=None, xlim=None, lb=10, mpp=0.33, fps=10, 
     
     return plot_data, fig, ax
 
-def plot_kinetics(k_data, i_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_length=100, fps=10):
+def plot_kinetics(k_data, i_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_length=100, fps=10, plot=True):
     """
     Plot evolution of number fluctuation exponents and light intensity on a same yyplot
     refer to https://matplotlib.org/gallery/api/two_scales.html
@@ -265,6 +282,11 @@ def plot_kinetics(k_data, i_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_len
     Returns:
     fig -- figure object
     ax1 -- the axis of kinetics
+    
+    Edit:
+    08222020 -- add optional argument plot, to turn on and off the automatic plotting 
+                (sometimes only the calculation part is needed, for example batch processing,
+                the autoplotting should be turned off)
     """
     
     t = [] 
@@ -301,28 +323,34 @@ def plot_kinetics(k_data, i_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_len
     t1 = i_data.t / fps
     i = i_data.intensity - i_data.intensity.min()
     i = i / i.max()
-
-    # set up fig and ax
-    fig = plt.figure()
-    ax1 = fig.add_axes([0,0,1,1])
-    ax2 = ax1.twinx()
-
-    # plot t, power
-    color = wowcolor(0)
-    ax1.set_xlabel('$t$ [s]')
-    ax1.set_ylabel('$\\alpha$', color=color)
-    ax1.plot(t, power, color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
-
-    # plot t1, intensity
-    color = wowcolor(4)
-    ax2.set_ylabel('$I$', color=color)
-    ax2.plot(t1, i, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
     
     data = {'t0': t, 'alpha': power, 't1': t1, 'i': i}
     
-    return data, fig, ax1
+    if plot == True:
+        # set up fig and ax
+        fig = plt.figure()
+        ax1 = fig.add_axes([0,0,1,1])
+        ax2 = ax1.twinx()
+
+        # plot t, power
+        color = wowcolor(0)
+        ax1.set_xlabel('$t$ [s]')
+        ax1.set_ylabel('$\\alpha$', color=color)
+        ax1.plot(t, power, color=color)
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        # plot t1, intensity
+        color = wowcolor(4)
+        ax2.set_ylabel('$I$', color=color)
+        ax2.plot(t1, i, color=color)
+        ax2.tick_params(axis='y', labelcolor=color)
+        return data, fig, ax1
+    else:
+        return data
+    
+    
+    
+    
 
 def kinetics_from_light_on(data):
     """
@@ -774,3 +802,148 @@ def corr2d(A, B):
     """
     assert(A.shape==B.shape)
     return ((A - A.mean())/A.std() * (B - B.mean())/B.std()).mean()
+
+def vorticity(pivData, step=None, shape=None):
+    """
+    Compute vorticity field based on piv data (x, y, u, v)
+    
+    Args:
+    pivData -- DataFrame of (x, y, u, v)
+    step -- distance (pixel) between adjacent PIV vectors
+    
+    Returns:
+    vort -- vorticity field of the velocity field. unit: [u]/pixel, [u] is the unit of u, usually px/s
+    """
+    x = pivData.sort_values(by=['x']).x.drop_duplicates()
+    if step == None:
+        # Need to infer the step size from pivData
+        step = x.iat[1] - x.iat[0]
+    
+    if shape == None:
+        # Need to infer shape from pivData
+        y = pivData.y.drop_duplicates()
+        shape = (len(y), len(x))
+        
+    X = np.array(pivData.x).reshape(shape)
+    Y = np.array(pivData.y).reshape(shape)
+    U = np.array(pivData.u).reshape(shape)
+    V = np.array(pivData.v).reshape(shape)
+    
+    dudy = np.gradient(U, step, axis=0)
+    dvdx = np.gradient(V, step, axis=1)
+    vort = dvdx - dudy
+    
+    return vort
+
+def local_df(img_folder, seg_length=50, winsize=50, step=25):
+    """
+    Compute local density fluctuations of given image sequence in img_folder
+    
+    Args:
+    img_folder -- folder containing .tif image sequence
+    seg_length -- number of frames of each segment of video, for evaluating standard deviations
+    winsize --
+    step --
+    
+    Returns:
+    df -- dict containing 't' and 'local_df', 't' is a list of time (frame), 'std' is a list of 2d array 
+          with local standard deviations corresponding to 't'
+    """
+    
+    l = corrLib.readseq(img_folder)
+    num_frames = len(l)
+    assert(num_frames>seg_length)
+    
+    stdL = []
+    tL = range(0, num_frames, seg_length)
+    for n in tL:
+        img_nums = range(n, min(n+seg_length, num_frames))
+        l_sub = l.loc[img_nums]
+        img_seq = []
+        for num, i in l_sub.iterrows():
+            img = io.imread(i.Dir)
+            X, Y, I = corrLib.divide_windows(img, windowsize=[50, 50], step=25)
+            img_seq.append(I)
+        img_stack = np.stack([img_seq], axis=0)
+        img_stack = np.squeeze(img_stack)
+        std = np.std(img_stack, axis=0)
+        stdL.append(std)
+        
+    return {'t': tL, 'std': stdL}
+
+def convection(pivData, image, winsize, step=None, shape=None):
+    """
+    Compute convection term u.grad(c) based on piv data (x, y, u, v) and image.
+    
+    Args:
+    pivData -- DataFrame of (x, y, u, v)
+    image -- the image corresponding to pivData
+    winsize -- coarse-graining scheme of image
+    step -- (optional) distance (pixel) between adjacent PIV vectors
+    shape -- (optional) shape of piv matrices
+    
+    Returns:
+    udc -- convection term u.grad(c). unit: [u][c]/pixel, [u] is the unit of u, usually px/s, [c] is the unit of concentration 
+           measured from image intensity, arbitrary.
+    """
+    x = pivData.sort_values(by=['x']).x.drop_duplicates()
+    if step == None:
+        # Need to infer the step size from pivData
+        step = x.iat[1] - x.iat[0]
+    
+    if shape == None:
+        # Need to infer shape from pivData
+        y = pivData.y.drop_duplicates()
+        shape = (len(y), len(x))
+    
+    # check coarse-grained image shape
+    X, Y, I = corrLib.divide_windows(image, windowsize=[winsize, winsize], step=step)
+    assert(I.shape==shape)
+    
+    X = np.array(pivData.x).reshape(shape)
+    Y = np.array(pivData.y).reshape(shape)
+    U = np.array(pivData.u).reshape(shape)
+    V = np.array(pivData.v).reshape(shape)
+    
+    # compute gradient of concentration
+    # NOTE: concentration is negatively correlated with intensity. 
+    # When computing gradient of concentration, the shifting direction should reverse.
+    
+    dcx = np.gradient(I, -step, axis=1)
+    dcy = np.gradient(I, -step, axis=0)
+    
+    udc = U * dcx + V * dcy
+    
+    return udc
+
+def divergence(pivData, step=None, shape=None):
+    """
+    Compute divergence field based on piv data (x, y, u, v)
+    
+    Args:
+    pivData -- DataFrame of (x, y, u, v)
+    step -- distance (pixel) between adjacent PIV vectors
+    
+    Returns:
+    vort -- vorticity field of the velocity field. unit: [u]/pixel, [u] is the unit of u, usually px/s
+    """
+    x = pivData.sort_values(by=['x']).x.drop_duplicates()
+    if step == None:
+        # Need to infer the step size from pivData
+        step = x.iat[1] - x.iat[0]
+    
+    if shape == None:
+        # Need to infer shape from pivData
+        y = pivData.y.drop_duplicates()
+        shape = (len(y), len(x))
+        
+    X = np.array(pivData.x).reshape(shape)
+    Y = np.array(pivData.y).reshape(shape)
+    U = np.array(pivData.u).reshape(shape)
+    V = np.array(pivData.v).reshape(shape)
+    
+    dudx = np.gradient(U, step, axis=1)
+    dvdy = np.gradient(V, step, axis=0)
+    div = dudx + dvdy
+    
+    return div
