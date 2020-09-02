@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=8:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python local_df.py ~/Data/08052020/00/8-bit ~/Data/08052020/local_df/00 50 50 25 &
+python local_df.py ~/Data/08052020/01/8-bit ~/Data/08052020/local_df/01 50 50 25 &
+python local_df.py ~/Data/08052020/02/8-bit ~/Data/08052020/local_df/02 50 50 25 &
+python local_df.py ~/Data/08052020/03/8-bit ~/Data/08052020/local_df/03 50 50 25 &
+python local_df.py ~/Data/08052020/04/8-bit ~/Data/08052020/local_df/04 50 50 25 &
+python local_df.py ~/Data/08052020/05/8-bit ~/Data/08052020/local_df/05 50 50 25 &
+python local_df.py ~/Data/08052020/06/8-bit ~/Data/08052020/local_df/06 50 50 25 &
+python local_df.py ~/Data/08052020/07/8-bit ~/Data/08052020/local_df/07 50 50 25 &
+python local_df.py ~/Data/08052020/08/8-bit ~/Data/08052020/local_df/08 50 50 25 &
+python local_df.py ~/Data/08052020/09/8-bit ~/Data/08052020/local_df/09 50 50 25 &
+python local_df.py ~/Data/08052020/10/8-bit ~/Data/08052020/local_df/10 50 50 25 &
+python local_df.py ~/Data/08052020/11/8-bit ~/Data/08052020/local_df/11 50 50 25 &
+wait

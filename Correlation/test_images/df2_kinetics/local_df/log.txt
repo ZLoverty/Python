@@ -1,0 +1,7 @@
+img_folder: E:\Github\Python\Correlation\test_images\df2_kinetics\img
+save_folder: E:\Github\Python\Correlation\test_images\df2_kinetics\local_df
+seg_length: 2
+winsize: 50
+step: 25
+Tue Sep  1 15:59:22 2020 // computation starts!
+Tue Sep  1 15:59:23 2020 // computation ends!

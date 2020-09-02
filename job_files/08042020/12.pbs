@@ -1,0 +1,24 @@
+#!/bin/bash -l
+#PBS -l walltime=8:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python flow_derivs.py ~/Data/08032020/piv_imseq/00 ~/Data/08032020/00/8-bit ~/Data/08032020/flow_derivs/00 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/01 ~/Data/08032020/01/8-bit ~/Data/08032020/flow_derivs/01 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/02 ~/Data/08032020/02/8-bit ~/Data/08032020/flow_derivs/02 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/03 ~/Data/08032020/03/8-bit ~/Data/08032020/flow_derivs/03 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/04 ~/Data/08032020/04/8-bit ~/Data/08032020/flow_derivs/04 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/05 ~/Data/08032020/05/8-bit ~/Data/08032020/flow_derivs/05 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/06 ~/Data/08032020/06/8-bit ~/Data/08032020/flow_derivs/06 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/07 ~/Data/08032020/07/8-bit ~/Data/08032020/flow_derivs/07 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/08 ~/Data/08032020/08/8-bit ~/Data/08032020/flow_derivs/08 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/09 ~/Data/08032020/09/8-bit ~/Data/08032020/flow_derivs/09 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/10 ~/Data/08032020/10/8-bit ~/Data/08032020/flow_derivs/10 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/11 ~/Data/08032020/11/8-bit ~/Data/08032020/flow_derivs/11 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/12 ~/Data/08032020/12/8-bit ~/Data/08032020/flow_derivs/12 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/13 ~/Data/08032020/13/8-bit ~/Data/08032020/flow_derivs/13 50 25  &
+python flow_derivs.py ~/Data/08032020/piv_imseq/14 ~/Data/08032020/14/8-bit ~/Data/08032020/flow_derivs/14 50 25  &
+wait

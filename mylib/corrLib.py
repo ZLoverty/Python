@@ -366,6 +366,152 @@ def plot_gnf(gnf_data):
     ax.set_ylabel('$\Delta N/\sqrt{N}$')
     return ax, slope 
     
+def vorticity(pivData, step=None, shape=None):
+    """
+    Compute vorticity field based on piv data (x, y, u, v)
+    
+    Args:
+    pivData -- DataFrame of (x, y, u, v)
+    step -- distance (pixel) between adjacent PIV vectors
+    
+    Returns:
+    vort -- vorticity field of the velocity field. unit: [u]/pixel, [u] is the unit of u, usually px/s
+    """
+    x = pivData.sort_values(by=['x']).x.drop_duplicates()
+    if step == None:
+        # Need to infer the step size from pivData
+        step = x.iat[1] - x.iat[0]
+    
+    if shape == None:
+        # Need to infer shape from pivData
+        y = pivData.y.drop_duplicates()
+        shape = (len(y), len(x))
+        
+    X = np.array(pivData.x).reshape(shape)
+    Y = np.array(pivData.y).reshape(shape)
+    U = np.array(pivData.u).reshape(shape)
+    V = np.array(pivData.v).reshape(shape)
+    
+    dudy = np.gradient(U, step, axis=0)
+    dvdx = np.gradient(V, step, axis=1)
+    vort = dvdx - dudy
+    
+    return vort
+
+def convection(pivData, image, winsize, step=None, shape=None):
+    """
+    Compute convection term u.grad(c) based on piv data (x, y, u, v) and image.
+    
+    Args:
+    pivData -- DataFrame of (x, y, u, v)
+    image -- the image corresponding to pivData
+    winsize -- coarse-graining scheme of image
+    step -- (optional) distance (pixel) between adjacent PIV vectors
+    shape -- (optional) shape of piv matrices
+    
+    Returns:
+    udc -- convection term u.grad(c). unit: [u][c]/pixel, [u] is the unit of u, usually px/s, [c] is the unit of concentration 
+           measured from image intensity, arbitrary.
+    """
+    x = pivData.sort_values(by=['x']).x.drop_duplicates()
+    if step == None:
+        # Need to infer the step size from pivData
+        step = x.iat[1] - x.iat[0]
+    
+    if shape == None:
+        # Need to infer shape from pivData
+        y = pivData.y.drop_duplicates()
+        shape = (len(y), len(x))
+    
+    # check coarse-grained image shape
+    X, Y, I = divide_windows(image, windowsize=[winsize, winsize], step=step)
+    assert(I.shape==shape)
+    
+    X = np.array(pivData.x).reshape(shape)
+    Y = np.array(pivData.y).reshape(shape)
+    U = np.array(pivData.u).reshape(shape)
+    V = np.array(pivData.v).reshape(shape)
+    
+    # compute gradient of concentration
+    # NOTE: concentration is negatively correlated with intensity. 
+    # When computing gradient of concentration, the shifting direction should reverse.
+    
+    dcx = np.gradient(I, -step, axis=1)
+    dcy = np.gradient(I, -step, axis=0)
+    
+    udc = U * dcx + V * dcy
+    
+    return udc
+
+def divergence(pivData, step=None, shape=None):
+    """
+    Compute divergence field based on piv data (x, y, u, v)
+    
+    Args:
+    pivData -- DataFrame of (x, y, u, v)
+    step -- distance (pixel) between adjacent PIV vectors
+    
+    Returns:
+    vort -- vorticity field of the velocity field. unit: [u]/pixel, [u] is the unit of u, usually px/s
+    """
+    x = pivData.sort_values(by=['x']).x.drop_duplicates()
+    if step == None:
+        # Need to infer the step size from pivData
+        step = x.iat[1] - x.iat[0]
+    
+    if shape == None:
+        # Need to infer shape from pivData
+        y = pivData.y.drop_duplicates()
+        shape = (len(y), len(x))
+        
+    X = np.array(pivData.x).reshape(shape)
+    Y = np.array(pivData.y).reshape(shape)
+    U = np.array(pivData.u).reshape(shape)
+    V = np.array(pivData.v).reshape(shape)
+    
+    dudx = np.gradient(U, step, axis=1)
+    dvdy = np.gradient(V, step, axis=0)
+    div = dudx + dvdy
+    
+    return div
+
+def local_df(img_folder, seg_length=50, winsize=50, step=25):
+    """
+    Compute local density fluctuations of given image sequence in img_folder
+    
+    Args:
+    img_folder -- folder containing .tif image sequence
+    seg_length -- number of frames of each segment of video, for evaluating standard deviations
+    winsize --
+    step --
+    
+    Returns:
+    df -- dict containing 't' and 'local_df', 't' is a list of time (frame), 'std' is a list of 2d array 
+          with local standard deviations corresponding to 't'
+    """
+    
+    l = readseq(img_folder)
+    num_frames = len(l)
+    assert(num_frames>seg_length)
+    
+    stdL = []
+    tL = range(0, num_frames, seg_length)
+    for n in tL:
+        img_nums = range(n, min(n+seg_length, num_frames))
+        l_sub = l.loc[img_nums]
+        img_seq = []
+        for num, i in l_sub.iterrows():
+            img = io.imread(i.Dir)
+            X, Y, I = divide_windows(img, windowsize=[50, 50], step=25)
+            img_seq.append(I)
+        img_stack = np.stack([img_seq], axis=0)
+        img_stack = np.squeeze(img_stack)
+        std = np.std(img_stack, axis=0)
+        stdL.append(std)
+        
+    return {'t': tL, 'std': stdL}
+
+    
 if __name__ == '__main__':
     img = io.imread(r'I:\Github\Python\Correlation\test_images\GNF\stat\40-1.tif')
     df_data = density_fluctuation(img)

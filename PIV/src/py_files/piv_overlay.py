@@ -60,6 +60,11 @@ for pivDir in pivDataDir:
 
 """ TEST COMMAND
 python piv_overlay.py pivDataFolder imgFolder output_folder sparcity
+
+pivDataFolder -- folder containing PIV data in the form of .csv files
+imgFolder -- folder containing .tif images
+output_folder -- folder to save the PIV overlay images in .jpg files (rescaled to 360 pixels in width)
+sparcity -- density of PIV arrows, higher value corresponds to sparcer arrows
 """
         
 """  TEST PARAMS

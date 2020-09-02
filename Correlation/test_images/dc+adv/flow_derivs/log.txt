@@ -1,0 +1,7 @@
+piv_folder: E:\Github\Python\Correlation\test_images\dc+adv\piv
+img_folder: E:\Github\Python\Correlation\test_images\dc+adv\img
+flow_folder: E:\Github\Python\Correlation\test_images\dc+adv\flow_derivs
+winsize: 50
+step: 25
+Tue Sep  1 15:37:13 2020 // 0000-0001 done
+Tue Sep  1 15:37:13 2020 // 0002-0003 done

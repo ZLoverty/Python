@@ -803,37 +803,7 @@ def corr2d(A, B):
     assert(A.shape==B.shape)
     return ((A - A.mean())/A.std() * (B - B.mean())/B.std()).mean()
 
-def vorticity(pivData, step=None, shape=None):
-    """
-    Compute vorticity field based on piv data (x, y, u, v)
-    
-    Args:
-    pivData -- DataFrame of (x, y, u, v)
-    step -- distance (pixel) between adjacent PIV vectors
-    
-    Returns:
-    vort -- vorticity field of the velocity field. unit: [u]/pixel, [u] is the unit of u, usually px/s
-    """
-    x = pivData.sort_values(by=['x']).x.drop_duplicates()
-    if step == None:
-        # Need to infer the step size from pivData
-        step = x.iat[1] - x.iat[0]
-    
-    if shape == None:
-        # Need to infer shape from pivData
-        y = pivData.y.drop_duplicates()
-        shape = (len(y), len(x))
-        
-    X = np.array(pivData.x).reshape(shape)
-    Y = np.array(pivData.y).reshape(shape)
-    U = np.array(pivData.u).reshape(shape)
-    V = np.array(pivData.v).reshape(shape)
-    
-    dudy = np.gradient(U, step, axis=0)
-    dvdx = np.gradient(V, step, axis=1)
-    vort = dvdx - dudy
-    
-    return vort
+
 
 def local_df(img_folder, seg_length=50, winsize=50, step=25):
     """
@@ -870,6 +840,38 @@ def local_df(img_folder, seg_length=50, winsize=50, step=25):
         stdL.append(std)
         
     return {'t': tL, 'std': stdL}
+
+def vorticity(pivData, step=None, shape=None):
+    """
+    Compute vorticity field based on piv data (x, y, u, v)
+    
+    Args:
+    pivData -- DataFrame of (x, y, u, v)
+    step -- distance (pixel) between adjacent PIV vectors
+    
+    Returns:
+    vort -- vorticity field of the velocity field. unit: [u]/pixel, [u] is the unit of u, usually px/s
+    """
+    x = pivData.sort_values(by=['x']).x.drop_duplicates()
+    if step == None:
+        # Need to infer the step size from pivData
+        step = x.iat[1] - x.iat[0]
+    
+    if shape == None:
+        # Need to infer shape from pivData
+        y = pivData.y.drop_duplicates()
+        shape = (len(y), len(x))
+        
+    X = np.array(pivData.x).reshape(shape)
+    Y = np.array(pivData.y).reshape(shape)
+    U = np.array(pivData.u).reshape(shape)
+    V = np.array(pivData.v).reshape(shape)
+    
+    dudy = np.gradient(U, step, axis=0)
+    dvdx = np.gradient(V, step, axis=1)
+    vort = dvdx - dudy
+    
+    return vort
 
 def convection(pivData, image, winsize, step=None, shape=None):
     """
