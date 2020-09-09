@@ -1,0 +1,304 @@
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)
+Traceback (most recent call last):
+  File "local_df.py", line 34, in <module>
+    df = corrLib.local_df(img_folder, seg_length=seg_length, winsize=winsize, step=step)
+  File "/home/xcheng/liux3141/code/Python/mylib/corrLib.py", line 504, in local_df
+    img = io.imread(i.Dir)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_io.py", line 61, in imread
+    img = call_plugin('imread', fname, plugin=plugin, **plugin_args)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/manage_plugins.py", line 211, in call_plugin
+    return func(*args, **kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/io/_plugins/tifffile_plugin.py", line 31, in imread
+    return tif.asarray(**kwargs)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 1502, in asarray
+    result = pages[0].asarray(memmap=memmap)
+  File "/home/xcheng/liux3141/.conda/envs/pythonEnv/lib/python3.6/site-packages/skimage/external/tifffile/tifffile.py", line 2619, in asarray
+    result.shape = self._shape
+ValueError: cannot reshape array of size 0 into shape (1,1,1,1080,1282,1)

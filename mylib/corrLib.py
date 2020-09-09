@@ -274,8 +274,18 @@ def div_field(img, pivData, winsize, step):
             divv[y, x] = vx[y,x+1] - vx[y,x] + vy[y+1,x] - vy[y,x]
     return c, v, divcn, divcv, divv
     
-def readdata(folder):
-    dataDirs = dirrec(folder, '*.csv')
+def readdata(folder, ext='csv'):
+    """
+    Read data files with given extensions in a folder.
+    
+    Args:
+    folder -- the folder to search in
+    ext -- (optional) file extension of data files looked for, default to 'csv'
+    
+    Returns:
+    fileList -- a DataFrame with columns 'Name' and 'Dir'
+    """
+    dataDirs = dirrec(folder, '*.' + ext)
     nameList = []
     dirList = []
     for dataDir in dataDirs:
