@@ -593,7 +593,7 @@ def kinetics_eo_smooth(data):
     ax3.set_ylabel('$OP$', color=color)
     ax3.plot(new_data['t2'], new_data['OP'], color=color)
     ax3.tick_params(axis='y', labelcolor=color)
-    ax3.spines["right"].set_position(("axes", 1.2))
+    ax3.spines["right"].set_position(("axes", 1.3))
     
     ax = [ax1, ax2, ax3]
     
