@@ -1,0 +1,8 @@
+small_img_folder E:\Github\Python\Correlation\test_images\test_corr\small_folder
+piv_folder: E:\Github\Python\Correlation\test_images\test_corr\piv_folder
+out_folder: E:\Github\Python\Correlation\test_images\test_corr\out_folder
+Sun Sep 20 15:42:52 2020 // Computation starts!
+Sun Sep 20 15:42:52 2020 // computing frame 3000
+Sun Sep 20 15:42:52 2020 // computing frame 3002
+Sun Sep 20 15:42:52 2020 // computing frame 3004
+Sun Sep 20 15:42:52 2020 // computing finishes!

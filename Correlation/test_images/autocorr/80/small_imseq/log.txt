@@ -1,0 +1,6 @@
+img_folder: E:\Github\Python\Correlation\test_images\autocorr\80
+out_folder: E:\Github\Python\Correlation\test_images\autocorr\80\small_imseq
+wsize: 50
+step: 25
+Sun Sep 20 13:41:29 2020 // Computation starts!
+Sun Sep 20 13:41:29 2020 // Computation finishes!
