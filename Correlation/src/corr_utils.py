@@ -352,7 +352,7 @@ def plot_kinetics(k_data, i_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_len
     
     
 
-def kinetics_from_light_on(data):
+def kinetics_from_light_on(data, plot=True):
     """
     Args:
     data -- dict of ('t0', 'alpha', 't1', 'i'), return value of plot_kinetics()
@@ -379,15 +379,18 @@ def kinetics_from_light_on(data):
         else:
             new_data[kw] = np.array(data[kw])[data['t1']>=light_on_time]
     
-    # plot new_data
-    fig = plt.figure()
-    ax1 = fig.add_axes([0, 0, 1, 1])
-    
-    ax1.set_xlabel('$t$ [s]')
-    ax1.set_ylabel('$\\alpha$')
-    ax1.plot(new_data['t0'], new_data['alpha'])
-    
-    return new_data, fig, ax1
+    if plot == True:
+        # plot new_data
+        fig = plt.figure()
+        ax1 = fig.add_axes([0, 0, 1, 1])
+
+        ax1.set_xlabel('$t$ [s]')
+        ax1.set_ylabel('$\\alpha$')
+        ax1.plot(new_data['t0'], new_data['alpha'])
+
+        return new_data, fig, ax1
+    else:
+        return new_data
 
 def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_length=100, fps=10):
     """
@@ -736,7 +739,7 @@ def plot_correlation(data, plot_cols=['R', 'C'], xlim=None, mpp=0.33, lb=3, plot
     fig = plt.figure()
     ax = fig.add_axes([0,0,1,1])
     cl_data = {'conc': [], 'cl': []}
-    symbol_list = ['o', '^', 'x', 's', '+', '*']
+    symbol_list = ['o', '^', 'x', 's', '+']
     data = data.sort_values(by=[plot_cols[0], 'conc'])
     
     # process data, apply xlim
