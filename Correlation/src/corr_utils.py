@@ -736,7 +736,7 @@ def plot_correlation(data, plot_cols=['R', 'C'], xlim=None, mpp=0.33, lb=3, plot
     fig = plt.figure()
     ax = fig.add_axes([0,0,1,1])
     cl_data = {'conc': [], 'cl': []}
-    symbol_list = ['o', '^', 'x', 's', '+']
+    symbol_list = ['o', '^', 'x', 's', '+', '*']
     data = data.sort_values(by=[plot_cols[0], 'conc'])
     
     # process data, apply xlim
