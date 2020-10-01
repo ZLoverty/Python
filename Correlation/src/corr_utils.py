@@ -952,3 +952,69 @@ def divergence(pivData, step=None, shape=None):
     div = dudx + dvdy
     
     return div
+
+def order_field(pivData):
+    """
+    Compute local order from pivData.
+    
+    Args:
+    pivData -- DataFrame containing (x, y, u, v)
+    
+    Returns:
+    order -- order field, an array of the shape of given velocity field
+    """
+    def inner(Ax, Ay, Bx, By):
+        """
+        define inner product between two matrices
+        """
+        return (Ax*Bx + Ay*By) / (Ax**2+Ay**2)**0.5 / (Bx**2+By**2)**0.5
+    col = len(pivData.x.drop_duplicates())
+    row = len(pivData.y.drop_duplicates())
+    u = np.array(pivData.u).reshape((row, col))
+    v = np.array(pivData.v).reshape((row, col))
+    u1 = np.roll(u, -1, axis=0) # up
+    v1 = np.roll(v, -1, axis=0) # up
+    u2 = np.roll(u, 1, axis=0) # down
+    v2 = np.roll(v, 1, axis=0) # down
+    u3 = np.roll(u, 1, axis=1) # right
+    v3 = np.roll(v, 1, axis=1) # right
+    u4 = np.roll(u, -1, axis=1) # left
+    v4 = np.roll(v, -1, axis=1) # left
+    
+    # do inner products with original matrix
+    I1 = inner(u, v, u1, v1)
+    I2 = inner(u, v, u2, v2)
+    I3 = inner(u, v, u3, v3)
+    I4 = inner(u, v, u4, v4)
+    
+    # average the products
+    order = (I1 + I2 + I3 + I4) / 4
+    
+    return order
+
+def order_df_correlation(df_folder, piv_folder, after=0.9):
+    """
+    Compute the local correlation between local density fluctuations and local flow order.
+    
+    Args:
+    df_folder -- local density fluctuations data folder
+    piv_folder -- piv data folder
+    after -- only process data after certain percentage, when 0, process all data and when 1, process only the last data.
+                Default is 0.9.
+    
+    Returns:
+    corr_list -- an array of correlations at different frames
+    """
+    
+    l = readdata(df_folder, 'npy')
+    l_crop = l.loc[l.Name.astype('int')>l.Name.astype('int')*0.9]
+    corr_list = []
+    for num, i in l_crop.iterrows():
+        f = int(i.Name)
+        df = np.load(i.Dir)
+        pivData = pd.read_csv(os.path.join(piv_folder, '{0:04d}-{1:04d}.csv'.format(f, f+1)))
+        order = order_field(pivData)
+        corr = corr2d(order, df)
+        corr_list.append(corr)
+    
+    return np.array(corr_list)
