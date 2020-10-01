@@ -392,7 +392,7 @@ def kinetics_from_light_on(data, plot=True):
     else:
         return new_data
 
-def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_length=100, fps=10):
+def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0.33, seg_length=100, fps=10, plot=True):
     """
     Plot evolution of number fluctuation exponents and light intensity on a same yyplot
     In addition, plot flow energy and flow order in the same figure as well
@@ -407,6 +407,7 @@ def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0
     mpp -- microns per pixel
     seg_length -- segment length when computing kinetics [frame]
     fps -- frames per second
+    plot -- plot the data or not, bool
     
     Returns:
     fig -- figure object
@@ -455,50 +456,53 @@ def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0
     # t2, O will be plotted on ax4
     O = eo_data.OP
     
-    # set up fig and ax
-    fig = plt.figure()
-    ax1 = fig.add_axes([0,0,1,1])
-    ax2 = ax1.twinx()
-    ax3 = ax1.twinx()
-    ax4 = ax1.twinx()
-    
-    # plot t, power
-    color = 'black'
-    ax1.set_xlabel('$t$ [s]')
-    ax1.set_ylabel('$\\alpha$', color=color)
-    ax1.plot(t, power, color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
-
-    # plot t1, intensity
-    color = wowcolor(0)
-    ax2.set_ylabel('$I$', color=color)
-    ax2.plot(t1, i, color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
-    
-    # plot t2, E
-    color = wowcolor(2)
-    ax3.set_ylabel('$E$', color=color)
-    ax3.plot(t2, E, color=color)
-    ax3.tick_params(axis='y', labelcolor=color)
-    ax3.spines["right"].set_position(("axes", 1.1))
-    
-    # plot t2, O
-    color = wowcolor(8)
-    ax4.set_ylabel('$OP$', color=color)
-    ax4.plot(t2, O, color=color)
-    ax4.tick_params(axis='y', labelcolor=color)
-    ax4.spines["right"].set_position(("axes", 1.2))
-    
-    ax = [ax1, ax2, ax3, ax4]
-    
     data = {'t0': t, 'alpha': power, 't1': t1, 'i': i, 't2': t2, 'E': E, 'OP': O}
     
-    return data, fig, ax
+    if plot == True:
+        # set up fig and ax
+        fig = plt.figure()
+        ax1 = fig.add_axes([0,0,1,1])
+        ax2 = ax1.twinx()
+        ax3 = ax1.twinx()
+        ax4 = ax1.twinx()
 
-def kinetics_eo_from_light_on(data):
+        # plot t, power
+        color = 'black'
+        ax1.set_xlabel('$t$ [s]')
+        ax1.set_ylabel('$\\alpha$', color=color)
+        ax1.plot(t, power, color=color)
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        # plot t1, intensity
+        color = wowcolor(0)
+        ax2.set_ylabel('$I$', color=color)
+        ax2.plot(t1, i, color=color)
+        ax2.tick_params(axis='y', labelcolor=color)
+
+        # plot t2, E
+        color = wowcolor(2)
+        ax3.set_ylabel('$E$', color=color)
+        ax3.plot(t2, E, color=color)
+        ax3.tick_params(axis='y', labelcolor=color)
+        ax3.spines["right"].set_position(("axes", 1.1))
+
+        # plot t2, O
+        color = wowcolor(8)
+        ax4.set_ylabel('$OP$', color=color)
+        ax4.plot(t2, O, color=color)
+        ax4.tick_params(axis='y', labelcolor=color)
+        ax4.spines["right"].set_position(("axes", 1.2))
+
+        ax = [ax1, ax2, ax3, ax4]   
+        return data, fig, ax
+    else:
+        return data
+
+def kinetics_eo_from_light_on(data, plot=True):
     """
     Args:
     data -- dict of (t0, alpha, t1, i, t2, E, OP), return value of plot_kinetics_eo()
+    plot -- plot the data or not
     
     Returns:
     new_data -- dict of (t0, alpha, t1, i, t2, E, OP), modified so that light-on time is 0
@@ -522,33 +526,36 @@ def kinetics_eo_from_light_on(data):
         else:
             new_data[kw] = np.array(data[kw])[data['t2']>=light_on_time]
     
-    # plot new_data
-    fig = plt.figure()
-    ax1 = fig.add_axes([0, 0, 1, 1])
-    
-    color = 'black'
-    ax1.set_xlabel('$t$ [s]')
-    ax1.set_ylabel('$\\alpha$', color=color)
-    ax1.plot(new_data['t0'], new_data['alpha'], color=color)
-    ax1.tick_params(axis='y', labelcolor=color)
-    
-    color = wowcolor(2)
-    ax2 = ax1.twinx()
-    ax2.set_ylabel('$E$', color=color)
-    ax2.plot(new_data['t2'], new_data['E'], color=color)
-    ax2.tick_params(axis='y', labelcolor=color)
+    if plot == True:
+        # plot new_data
+        fig = plt.figure()
+        ax1 = fig.add_axes([0, 0, 1, 1])
 
+        color = 'black'
+        ax1.set_xlabel('$t$ [s]')
+        ax1.set_ylabel('$\\alpha$', color=color)
+        ax1.plot(new_data['t0'], new_data['alpha'], color=color)
+        ax1.tick_params(axis='y', labelcolor=color)
+
+        color = wowcolor(2)
+        ax2 = ax1.twinx()
+        ax2.set_ylabel('$E$', color=color)
+        ax2.plot(new_data['t2'], new_data['E'], color=color)
+        ax2.tick_params(axis='y', labelcolor=color)
+
+
+        color = wowcolor(8)
+        ax3 = ax1.twinx()
+        ax3.set_ylabel('$OP$', color=color)
+        ax3.plot(new_data['t2'], new_data['OP'], color=color)
+        ax3.tick_params(axis='y', labelcolor=color)
+        ax3.spines["right"].set_position(("axes", 1.1))
+
+        ax = [ax1, ax2, ax3]
     
-    color = wowcolor(8)
-    ax3 = ax1.twinx()
-    ax3.set_ylabel('$OP$', color=color)
-    ax3.plot(new_data['t2'], new_data['OP'], color=color)
-    ax3.tick_params(axis='y', labelcolor=color)
-    ax3.spines["right"].set_position(("axes", 1.1))
-    
-    ax = [ax1, ax2, ax3]
-    
-    return new_data, fig, ax    
+        return new_data, fig, ax    
+    else:
+        return new_data
 
 def kinetics_eo_smooth(data):
     """
