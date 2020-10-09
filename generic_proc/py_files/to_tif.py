@@ -76,7 +76,7 @@ This script does not apply auto-contrast and save both 16-bit and 8-bit images.
 """ 
 
 """ SYNTAX
-python to_tif.py nd2Dir
+python to_tif.py nd2Dir remove
 """
 
 """ TEST PARAMS
