@@ -521,6 +521,95 @@ def local_df(img_folder, seg_length=50, winsize=50, step=25):
         
     return {'t': tL, 'std': stdL}
 
+def compute_energy_density(pivData):
+    """
+    Compute kinetic energy density in k space from piv data.
+    
+    Args:
+    pivData -- piv data
+    
+    Returns:
+    E -- kinetic energy field in k space
+    
+    Test:
+    pivData = pd.read_csv(r'E:\moreData\08032020\piv_imseq\01\3370-3371.csv')
+    compute_energy_density(pivData)
+    """
+    
+    row = len(pivData.y.drop_duplicates())
+    col = len(pivData.x.drop_duplicates())
+#     X = np.array(pivData.x).reshape((row, col))
+#     Y = np.array(pivData.y).reshape((row, col))
+    U = np.array(pivData.u).reshape((row, col))
+    V = np.array(pivData.v).reshape((row, col))
+    
+    u_fft = np.fft.fft2(U)
+    v_fft = np.fft.fft2(V)
+    
+    E = (u_fft * u_fft.conjugate() + v_fft * v_fft.conjugate()) / 2
+    
+    return E
+
+def compute_wavenumber_field(shape):
+    """
+    Compute the wave number field Kx and Ky, and magnitude field k. 
+    Note that this function works for even higher dimensional shape.
+    
+    Args:
+    shape -- shape of the velocity field and velocity fft field, tuple
+    
+    Returns:
+    k -- wavenumber magnitude field
+    K -- wavenumber fields in given dimensions
+    
+    Test:
+    shape = (42, 50)
+    k_mag, K = compute_wavenumber_field(shape)
+    """
+    
+    for num, length in enumerate(shape):
+        kx = np.array(range(0, length-1))
+        kx -= (length//2 - 1)
+        kx = np.roll(kx, -(length//2 - 1))
+        kx = np.concatenate((kx, np.array([0])))
+        if num == 0:            
+            k = (kx,)
+        else:
+            k += (kx,)
+        
+    K = np.meshgrid(*k, indexing='ij')
+    
+    for num, k1 in enumerate(K):
+        if num == 0:
+            ksq = k1 ** 2
+        else:
+            ksq += k1 ** 2
+    
+    k_mag = ksq ** 0.5
+    
+    return k_mag, K
+    
+def energy_spectrum(pivData):
+    """
+    Compute energy spectrum (E vs k) from pivData.
+    
+    Args:
+    pivData -- piv data
+    
+    Returns:
+    es -- energy spectrum, DataFrame (k, E)
+    """
+    
+    E = compute_energy_density(pivData)
+    k, K = compute_wavenumber_field(E.shape)
+    
+    ind = np.argsort(k.flatten())
+    k_plot = k.flatten()[ind]
+    E_plot = E.real.flatten()[ind]
+    
+    es = pd.DataFrame(data={'k': k_plot, 'E': E_plot})
+    
+    return es
     
 if __name__ == '__main__':
     img = io.imread(r'I:\Github\Python\Correlation\test_images\GNF\stat\40-1.tif')

@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=4:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/Correlation/src/py_files
+
+module load python3
+source activate pythonEnv
+python energy_spectrum.py ~/Data/08052020/piv_imseq/00 ~/Data/08052020/energy_spectrum/00 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/01 ~/Data/08052020/energy_spectrum/01 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/02 ~/Data/08052020/energy_spectrum/02 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/03 ~/Data/08052020/energy_spectrum/03 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/04 ~/Data/08052020/energy_spectrum/04 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/05 ~/Data/08052020/energy_spectrum/05 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/06 ~/Data/08052020/energy_spectrum/06 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/07 ~/Data/08052020/energy_spectrum/07 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/08 ~/Data/08052020/energy_spectrum/08 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/09 ~/Data/08052020/energy_spectrum/09 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/10 ~/Data/08052020/energy_spectrum/10 0.8 &
+python energy_spectrum.py ~/Data/08052020/piv_imseq/11 ~/Data/08052020/energy_spectrum/11 0.8 &
+wait
