@@ -550,28 +550,27 @@ def compute_energy_density(pivData):
     
     return E
 
-def compute_wavenumber_field(shape):
+def compute_wavenumber_field(shape, d):
     """
     Compute the wave number field Kx and Ky, and magnitude field k. 
     Note that this function works for even higher dimensional shape.
     
     Args:
     shape -- shape of the velocity field and velocity fft field, tuple
+    d -- sample spacing. This is the distance between adjacent samples, for example, velocities in PIV. 
+        The resulting frequency space has the unit which is inverse of the unit of d. The preferred unit of d is um.
     
     Returns:
     k -- wavenumber magnitude field
     K -- wavenumber fields in given dimensions
     
     Test:
-    shape = (42, 50)
-    k_mag, K = compute_wavenumber_field(shape)
+    shape = (5, 5)
+    k, K = compute_wavenumber_field(shape, 0.2)
     """
     
     for num, length in enumerate(shape):
-        kx = np.array(range(0, length-1))
-        kx -= (length//2 - 1)
-        kx = np.roll(kx, -(length//2 - 1))
-        kx = np.concatenate((kx, np.array([0])))
+        kx = np.fft.fftfreq(length, d=d)
         if num == 0:            
             k = (kx,)
         else:
@@ -601,7 +600,7 @@ def energy_spectrum(pivData):
     """
     
     E = compute_energy_density(pivData)
-    k, K = compute_wavenumber_field(E.shape)
+    k, K = compute_wavenumber_field(E.shape, 25*0.33)
     
     ind = np.argsort(k.flatten())
     k_plot = k.flatten()[ind]
