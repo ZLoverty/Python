@@ -24,7 +24,7 @@ l = readdata(piv_folder, 'csv')
 l_crop = l[l.index>l.index.max()*percentile]
 for num, i in l_crop.iterrows():
     pivData = pd.read_csv(i.Dir)
-    es = energy_spectrum(pivData)
+    es = energy_spectrum(pivData, sample_spacing)
     es.to_csv(os.path.join(out_folder, i.Name+'.csv'), index=False)
     with open(os.path.join(out_folder, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // {} finished!\n'.format(i.Name))

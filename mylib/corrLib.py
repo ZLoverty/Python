@@ -605,7 +605,7 @@ def energy_spectrum(pivData, d=25*0.33):
     """
     
     E = compute_energy_density(pivData)
-    k, K = compute_wavenumber_field(E.shape, 25*0.33)
+    k, K = compute_wavenumber_field(E.shape, d)
     
     ind = np.argsort(k.flatten())
     k_plot = k.flatten()[ind]
