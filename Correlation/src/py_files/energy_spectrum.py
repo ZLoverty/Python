@@ -10,6 +10,8 @@ out_folder = sys.argv[2]
 percentile = 0.8
 if len(sys.argv) > 3:
     percentile = float(sys.argv[3])
+if len(sys.argv) > 4:
+    sample_spacing = float(sys.argv[4])
     
 if os.path.exists(out_folder) == False:
     os.makedirs(out_folder)
@@ -32,6 +34,7 @@ with open(os.path.join(out_folder, 'log.txt'), 'a') as f:
     
 """ EDIT
 10022020 -- First edit
+10192020 -- Add sample_spacing argument
 """
 
 """ DESCRIPTION
@@ -39,17 +42,19 @@ Compute energy spectrum from PIV data.
 """
 
 """ SYNTAX
-python energy_spectrum.py piv_folder out_folder percentile
+python energy_spectrum.py piv_folder out_folder percentile sample_spacing
 
 piv_folder -- piv folder
 out_folder -- folder to save energy spectrum data
 percentile -- the videos are taken from low energy to high energy. For steady-state  analysis, only the frames towards the end of the videos should be    computed. percentile is between (0, 1). Default value 0.8 means the spectra of only the last 20% of frames are computed.
+sample_spacing -- distance between adjacent velocity vector
 """
 
 """ TEST PARAMS
 piv_folder -- E:\Github\Python\Correlation\test_images\test_corr\piv_folder
 out_folder -- E:\Github\Python\Correlation\test_images\energy_spectrum
 percentile -- 0.9
+sample_spacing -- 
 """
 
 """ LOG

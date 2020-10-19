@@ -588,15 +588,20 @@ def compute_wavenumber_field(shape, d):
     
     return k_mag, K
     
-def energy_spectrum(pivData):
+def energy_spectrum(pivData, d=25*0.33):
     """
     Compute energy spectrum (E vs k) from pivData.
     
     Args:
     pivData -- piv data
+    d -- sample spacing. This is the distance between adjacent samples, for example, velocities in PIV. 
+        The resulting frequency space has the unit which is inverse of the unit of d. The default unit of d is um.
     
     Returns:
     es -- energy spectrum, DataFrame (k, E)
+    
+    Edit:
+    10192020 -- add argument d as sample spacing
     """
     
     E = compute_energy_density(pivData)
