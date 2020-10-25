@@ -10,32 +10,6 @@ import time
 import pdb
 from numpy.polynomial.polynomial import polyvander
 
-# def corrS(X, Y, U, V):
-    # row, col = X.shape
-    # vsq = 0
-    # CA = np.zeros((row, col))
-    # CV = np.zeros((row, col))
-    # for i in range(0, row):
-        # for j in  range(0, col):
-            # vsq += U[i, j]**2 + V[i, j]**2
-    # for xin in range(0, col):
-        # for yin in range(0, row):
-            # count = 0
-            # CAt = 0
-            # CVt = 0
-            # for i in range(0, col-xin):
-                # for j in range(0, row-yin):
-                    # ua = U[j, i]
-                    # va = V[j, i]
-                    # ub = U[j+yin, i+xin]
-                    # vb = V[j+yin, i+xin]
-                    # CAt += (ua*ub+va*vb)/((ua**2+va**2)*(ub**2+vb**2))**.5
-                    # CVt += ua*ub + va*vb
-                    # count += 1
-            # CA[yin, xin] = CAt / count
-            # CV[yin, xin] = CVt / vsq     
-    # return CA, CV
-
 def corrS(X, Y, U, V):
     row, col = X.shape
     r = int(row/2)
@@ -53,28 +27,6 @@ def corrS(X, Y, U, V):
                 CA[yin, xin] = (Ax[0:row-yin, 0:col-xin] * Ax[yin:row, xin:col] + Ay[0:row-yin, 0:col-xin] * Ay[yin:row, xin:col]).mean()
                 CV[yin, xin] = (U[0:row-yin, 0:col-xin] * U[yin:row, xin:col] + V[0:row-yin, 0:col-xin] * V[yin:row, xin:col]).mean() / (U.std()**2+V.std()**2)
     return X[0:r, 0:c], Y[0:r, 0:c], CA, CV
-
-# def corrI(X, Y, I):
-    # I = I - I.mean()
-    # row, col = I.shape
-    # Isq = 0
-    # for i in range(0, row):
-        # for j in range(0, col):
-            # Isq += I[i, j]**2
-    # Isq = Isq / row / col
-    # CI = np.zeros((row, col))
-    # for xin in range(0, col):
-        # for yin in range(0, row):
-            # count = 0
-            # CIt = 0
-            # for i in range(0, col-xin):
-                # for j in range(0, row-yin):
-                    # Ia = I[j, i]
-                    # Ib = I[j+yin, i+xin]
-                    # CIt += Ia * Ib
-                    # count += 1
-            # CI[yin, xin] = CIt / count / Isq
-    # return CI
 
 def corrI(X, Y, I):
     row, col = I.shape
@@ -94,20 +46,6 @@ def corrI(X, Y, I):
                 CI[yin, xin] = (I[yin:, xin:] * I_shift[yin:, xin:]).mean() / normalizer
     return XI, YI, CI
     
-# def divide_windows(img, windowsize=[20, 20], step=10):
-    # row, col = img.shape
-    # windowsize[0] = int(windowsize[0])
-    # windowsize[1] = int(windowsize[1])
-    # step = int(step)
-    # X = np.array(range(0, col-windowsize[0], step))# + int(windowsize[0]/2)
-    # Y = np.array(range(0, row-windowsize[1], step))# + int(windowsize[1]/2)
-    # I = np.zeros((len(Y), len(X)))
-    # for indx, x in enumerate(X):
-        # for indy, y in enumerate(Y):
-            # window = img[y:y+windowsize[1], x:x+windowsize[0]]
-            # I[indy, indx] = window.mean()
-    # X, Y = np.meshgrid(X, Y)
-    # return X, Y, I
 
 def divide_windows(img, windowsize=[20, 20], step=10):
     row, col = img.shape
@@ -122,17 +60,6 @@ def divide_windows(img, windowsize=[20, 20], step=10):
     I = util.view_as_windows(img, windowsize, step=step).mean(axis=(2, 3))
     return X, Y, I
     
-# def distance_corr(X, Y, C):
-    # rList = []
-    # cList = []
-    # table = pd.DataFrame()
-    # for xr, yr, cr in zip(X, Y, C):
-        # for x, y, c in zip(xr, yr, cr):
-            # rList.append((x**2 + y**2)**.5)
-            # cList.append(c)
-    # table = table.assign(R=rList, C=cList)
-    # table.sort_values(by=['R'], inplace=True)
-    # return table
     
 def distance_corr(X, Y, C):
     r_corr = pd.DataFrame({'R': (X.flatten()**2 + Y.flatten()**2) ** 0.5, 'C': C.flatten()}).sort_values(by='R')
@@ -543,8 +470,8 @@ def compute_energy_density(pivData):
     U = np.array(pivData.u).reshape((row, col))
     V = np.array(pivData.v).reshape((row, col))
     
-    u_fft = np.fft.fft2(U)
-    v_fft = np.fft.fft2(V)
+    u_fft = np.fft.fft2(U, norm='ortho')
+    v_fft = np.fft.fft2(V, norm='ortho')
     
     E = (u_fft * u_fft.conjugate() + v_fft * v_fft.conjugate()) / 2
     
