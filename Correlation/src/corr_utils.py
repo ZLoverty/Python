@@ -1133,3 +1133,20 @@ def energy_spectrum_2(CV):
     
     return k_plot, E_plot
 
+def spatial_correlation(A, B):
+    """
+    Compute the spatial correlation between two 2-D matrices A and B.
+    A and B should have the same shape (m, n).
+    The output correlation matrix coordinates will denote the displacement between A and B, 
+    while the value denoting the correlation.
+    """
+    
+    assert(A.shape==B.shape)
+    
+    r, c = A.shape
+    corr = np.ones((r, c))
+    for xin in range(0, c):
+        for yin in range(0, r):
+            corr[yin, xin] = (A[0:r-yin, 0:c-xin] * B[yin:r, xin:c]).mean()
+    
+    return corr
