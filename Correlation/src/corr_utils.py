@@ -1025,3 +1025,111 @@ def order_df_correlation(df_folder, piv_folder, after=0.9):
         corr_list.append(corr)
     
     return np.array(corr_list)
+
+def read_piv(pivDir):
+    """
+    Read piv data from pivDir as X, Y, U, V
+    
+    X, Y, U, V = read_piv(pivDir)
+    """
+    pivData = pd.read_csv(pivDir)
+    row = len(pivData.y.drop_duplicates())
+    col = len(pivData.x.drop_duplicates())
+    X = np.array(pivData.x).reshape((row, col))
+    Y = np.array(pivData.y).reshape((row, col))
+    U = np.array(pivData.u).reshape((row, col))
+    V = np.array(pivData.v).reshape((row, col))
+    return X, Y, U, V
+
+def vspatial(X, Y, U, V):
+    """
+    Direct spatial velocity correlation (2D, not normalized)
+    The reason I write this on top of corrS is because for energy spectrum calculation, normalization to (-1, 1) is not needed.
+    
+    X, Y, CA, CV = vspatial(X, Y, U, V)
+    """
+    row, col = X.shape
+    r = row
+    c = col
+    vsqrt = (U ** 2 + V ** 2) ** 0.5
+    Ax = U / vsqrt
+    Ay = V / vsqrt
+    CA = np.ones((r, c))
+    CV = np.ones((r, c))
+    for xin in range(0, c):
+        for yin in range(0, r):
+            CA[yin, xin] = (Ax[0:row-yin, 0:col-xin] * Ax[yin:row, xin:col] + Ay[0:row-yin, 0:col-xin] * Ay[yin:row, xin:col]).mean()
+            CV[yin, xin] = (U[0:row-yin, 0:col-xin] * U[yin:row, xin:col] + V[0:row-yin, 0:col-xin] * V[yin:row, xin:col]).mean()
+    return X, Y, CA, CV
+
+def visualize_two_point_correlation(X, Y, U, V, CV):
+    """
+    Display PIV and velocity correlation field side by side
+    
+    visualize_two_point_correlation(X, Y, U, V, CV)
+    """
+    fig, ax = plt.subplots(nrows=1, ncols=2, dpi=300, figsize=(7, 2.7))
+    ax[0].quiver(X, Y, U, V, color='black', width=0.001)
+    ax[0].axis('equal')
+    # ax[0].axis('tight')
+    ticks = np.array(range(0, 50, 10))
+    ax[0].set_ylim(1080, 0)
+    ax[0].set_xlim(0, 1280)
+    ax[0].set_xticks(ticks*25)
+    ax[0].set_xticklabels(ticks*25)
+    ax[0].set_yticks(ticks*25)
+    ax[0].set_yticklabels(ticks*25)
+    ax[0].set_title('1 px = 0.33 um')
+    ax[1].imshow(CV, cmap='seismic')
+    
+    ax[1].set_xticks(ticks)
+    ax[1].set_xticklabels(ticks*25)
+    ax[1].set_yticks(ticks)
+    ax[1].set_yticklabels(ticks*25)
+    
+def calculate_and_visualize_energy_spectrum(CV):
+    """
+    The goal of this function is to calculate energy spectrum from FFT of velocity two-point correlation function, and visualize the resultant spectrum in terms of real, imaginary and absolute value. The absolute value shows a decay with wavenumber k as k^(-4/3).
+    
+    calculate_and_visualize_energy_spectrum(CV)
+    """
+    E = 1 / (2 / np.pi)**2 * np.fft.fft2(CV) * 0.33 * 0.33
+    # here the unit of CV is still the same as U and V (typically px/s), thus the unit of the correlation is px2/s2.
+    # To convert the unit to um2/s2, multiply the correlation by mpp^2 (0.33^2 for 20x lens)
+    k, K = corrLib.compute_wavenumber_field(E.shape, 25*0.33)
+
+    ind = np.argsort(k.flatten())
+    k_plot = k.flatten()[ind]
+    E_plot = E.flatten()[ind]
+
+    fig, ax = plt.subplots(nrows=1, ncols=2, dpi=300, figsize=(7, 3))
+    ax[0].plot(k_plot, E_plot.real, lw=0.5, ls='--', alpha=0.5, label='real')
+    ax[0].plot(k_plot, E_plot.imag, lw=0.5, ls='--', alpha=0.5, label='imag')
+    ax[0].plot(k_plot, abs(E_plot), lw=0.5, label='abs') 
+    ax[0].legend()
+    # ax[1].plot(k_plot, E_plot.real, lw=0.5, ls='--', alpha=0.5, label='real')
+    # ax[1].plot(k_plot, E_plot.imag, lw=0.5, ls='--', alpha=0.5, label='imag')
+    ax[1].plot(k_plot, abs(E_plot), lw=0.5, label='abs', color=bestcolor(2))
+    ax[1].loglog()
+    ax[1].legend()
+
+    # guide of the eye slope
+    x = np.array([0.01,0.03])
+    y = x ** -1.3 * 2e1
+    ax[1].plot(x, y, lw=0.5, ls='--', color='black')
+    ax[1].text(x.mean(), 1.1*y.mean(), '-1.3')
+    
+def energy_spectrum_2(CV):
+    """
+    Compute energy spectrum using method 2
+    """
+    
+    E = 1 / (2 / np.pi)**2 * np.fft.fft2(CV) * 0.33 * 0.33
+    k, K = corrLib.compute_wavenumber_field(E.shape, 25*0.33)
+
+    ind = np.argsort(k.flatten())
+    k_plot = k.flatten()[ind]
+    E_plot = E.flatten()[ind]
+    
+    return k_plot, E_plot
+
