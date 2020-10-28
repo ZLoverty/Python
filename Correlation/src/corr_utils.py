@@ -1150,3 +1150,59 @@ def spatial_correlation(A, B):
             corr[yin, xin] = (A[0:r-yin, 0:c-xin] * B[yin:r, xin:c]).mean()
     
     return corr
+
+def log_bin(xo, yo, n=100):
+    """
+    Bin x, y data on log scale
+    
+    Args:
+    xo -- input x
+    yo -- input y
+    n -- points after binning
+    
+    Returns:
+    x -- binned x
+    y -- means in bins
+    
+    Test:
+    pivDir = r'D:\density_fluctuations\08032020\piv_imseq\01\3000-3001.csv'
+    X, Y, U, V = read_piv(pivDir)
+    XS, YS, CA, CV = vspatial(X, Y, U, V)
+    k, E = energy_spectrum_2(CV)
+
+    xo = k
+    yo = abs(E)
+    x, y = log_bin(xo, yo, n=100)
+    plt.figure(dpi=300)
+
+    plt.plot(k, abs(E), lw=0.5, color=bestcolor(0), label='corrFT', ls=':')
+    plt.plot(x, y, lw=1, color=bestcolor(1), label='corrFT', marker='o', markersize=2, ls='')
+    plt.loglog()
+    """
+    x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n)
+    x = np.insert(x, 0, 0)
+    y = (np.histogram(xo, x, weights=yo)[0] /
+             np.histogram(xo, x)[0])
+    
+    return x[:-1], y
+
+def efft(a, n=None, axis=-1, norm=None):
+    """
+    even function fourier transform
+    """
+    
+    axes = np.arange(0, len(a.shape))
+    
+    if n == None:
+        n = a.shape[axis]        
+    
+    k = np.arange(0, n)
+    
+    m = np.arange(0, n) / n
+    
+    if axis == -1:
+        A = np.matmul(a, np.cos(-2 * np.pi * np.outer(m, k)))
+    else:
+        A = np.matmul(a.transpose(), np.cos(-2 * np.pi * np.outer(m, k))).transpose()
+    
+    return A
