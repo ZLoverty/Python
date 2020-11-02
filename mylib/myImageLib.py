@@ -41,9 +41,9 @@ def to8bit(img16):
     """
     # if img16.dtype != 'uint16':
         # raise ValueError('16-bit grayscale image is expected')
-    max = img16.max()
-    min = img16.min()
-    img8 = np.floor_divide(img16 - min , (max - min + 1) / 256)
+    maxx = img16.max()
+    minn = img16.min()
+    img8 = (img16 - minn) / (maxx - minn) * 255
     return img8.astype('uint8')
     
 def bpass(*args):

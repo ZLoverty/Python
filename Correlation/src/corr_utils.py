@@ -249,8 +249,7 @@ def plot_std(k_data, seg_length, tlim=None, xlim=None, lb=10, mpp=0.33, fps=10, 
     else:
         seg_list = np.floor(num_total / num_curves * (np.arange(num_curves))) +  data.segment.min()
     
-    fig = plt.figure()
-    ax = fig.add_axes([0,0,1,1])
+    fig, ax = plt.subplots(dpi=300)
     for num, i in enumerate(seg_list):
         subdata = data.loc[data.segment==i]
         x, y = postprocess_gnf(subdata, lb, xlim=xlim, sparse=3)
@@ -582,8 +581,7 @@ def kinetics_eo_smooth(data):
             new_data[kw] = data[kw]
             
     # plot new_data
-    fig = plt.figure()
-    ax1 = fig.add_axes([0.2, 0.25, 0.5, 0.7])
+    fig, ax1 = plt.subplots(dpi=300)
     
     color = 'black'
     ax1.set_xlabel('$t$ [s]')
@@ -603,7 +601,7 @@ def kinetics_eo_smooth(data):
     ax3.set_ylabel('$OP$', color=color)
     ax3.plot(new_data['t2'], new_data['OP'], color=color)
     ax3.tick_params(axis='y', labelcolor=color)
-    ax3.spines["right"].set_position(("axes", 1.3))
+    ax3.spines["right"].set_position(("axes", 1.2))
     
     ax = [ax1, ax2, ax3]
     
@@ -743,10 +741,9 @@ def plot_correlation(data, plot_cols=['R', 'C'], xlim=None, mpp=0.33, lb=3, plot
     """
     
     # Initialization
-    fig = plt.figure()
-    ax = fig.add_axes([0,0,1,1])
+    fig, ax = plt.subplots(dpi=300)
     cl_data = {'conc': [], 'cl': []}
-    symbol_list = ['o', '^', 'x', 's', '+']
+    symbol_list = ['o', '^', 'x', 's', '+', 'p']
     data = data.sort_values(by=[plot_cols[0], 'conc'])
     
     # process data, apply xlim
@@ -771,9 +768,8 @@ def plot_correlation(data, plot_cols=['R', 'C'], xlim=None, mpp=0.33, lb=3, plot
         ax.plot(xfit*mpp/lb, yfit, mec=wowcolor(num), label=str(nt), ls='',
                 marker=symbol_list[num], mfc=(0,0,0,0), markersize=4, markeredgewidth=0.5)
         cl_data['conc'].append(int(nt))
-        cl_data['cl'].append(1/p[0])
-    
-    ax.legend()     
+        cl_data['cl'].append(1/p[0])   
+        
     return ax, pd.DataFrame(cl_data).sort_values(by='conc')
 
 
@@ -1119,19 +1115,7 @@ def calculate_and_visualize_energy_spectrum(CV):
     ax[1].plot(x, y, lw=0.5, ls='--', color='black')
     ax[1].text(x.mean(), 1.1*y.mean(), '-1.3')
     
-def energy_spectrum_2(CV):
-    """
-    Compute energy spectrum using method 2
-    """
-    
-    E = 1 / (2 / np.pi)**2 * np.fft.fft2(CV) * 0.33 * 0.33
-    k, K = corrLib.compute_wavenumber_field(E.shape, 25*0.33)
 
-    ind = np.argsort(k.flatten())
-    k_plot = k.flatten()[ind]
-    E_plot = E.flatten()[ind]
-    
-    return k_plot, E_plot
 
 def spatial_correlation(A, B):
     """
