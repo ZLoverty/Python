@@ -448,9 +448,12 @@ def local_df(img_folder, seg_length=50, winsize=50, step=25):
         
     return {'t': tL, 'std': stdL}
 
-def compute_energy_density(pivData):
+def compute_energy_density(pivData, sample_spacing=25*0.33):
     """
-    Compute kinetic energy density in k space from piv data.
+    Compute kinetic energy density in k space from piv data. The unit of the return value is [velocity] * [length],
+    where [velocity] is the unit of pivData, and [length] is the unit of sample_spacing parameter.
+    Note, the default value of sampling_spacing does not have any significance. It is just the most convenient value for my first application,
+    and should be set with caution when a different magnification and PIV are used. 
     
     Args:
     pivData -- piv data
@@ -461,17 +464,27 @@ def compute_energy_density(pivData):
     Test:
     pivData = pd.read_csv(r'E:\moreData\08032020\piv_imseq\01\3370-3371.csv')
     compute_energy_density(pivData)
+    
+    Edit:
+    11020202 -- Add parameter sample_spacing, the distance between adjacent velocity (or data in general.
+                The spacing is used to rescale the DFT so that it has a unit of [velocity] * [length].
+                In numpy.fft, the standard fft function is defined as
+                
+                A_k = \sum\limits^{n-1}_{m=0} a_m \exp \left[ -2\pi i \frac{mk}{n} \right]
+                
+                The unit of this Fourier Transform $A_k$ is clearly the same as $a_m$. 
+                In order to get unit [velocity] * [length], and to make transform result consistent at different data density,
+                I introduce sample_spacing $d$ as a modifier of the DFT. After this modification, the energy spectrum computed
+                at various step size (of PIV) should give quantitatively similar results.
     """
     
     row = len(pivData.y.drop_duplicates())
     col = len(pivData.x.drop_duplicates())
-#     X = np.array(pivData.x).reshape((row, col))
-#     Y = np.array(pivData.y).reshape((row, col))
     U = np.array(pivData.u).reshape((row, col))
     V = np.array(pivData.v).reshape((row, col))
     
-    u_fft = np.fft.fft2(U, norm='ortho')
-    v_fft = np.fft.fft2(V, norm='ortho')
+    u_fft = np.fft.fft2(U) * sample_spacing * sample_spacing
+    v_fft = np.fft.fft2(V) * sample_spacing * sample_spacing
     
     E = (u_fft * u_fft.conjugate() + v_fft * v_fft.conjugate()) / 2
     
@@ -531,7 +544,7 @@ def energy_spectrum(pivData, d=25*0.33):
     10192020 -- add argument d as sample spacing
     """
     
-    E = compute_energy_density(pivData)
+    E = compute_energy_density(pivData, d)
     k, K = compute_wavenumber_field(E.shape, d)
     
     ind = np.argsort(k.flatten())

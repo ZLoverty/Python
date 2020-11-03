@@ -9,6 +9,7 @@ from scipy.optimize import curve_fit
 import corrLib
 import os
 from skimage import io
+from matplotlib.patches import Rectangle
 
 # general
 def data_log_mapping(kw='aug'):
@@ -91,6 +92,66 @@ def data_log():
     log['08062020']['num'] = list(range(0, 13))
     log['08062020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 10]
     return log
+
+
+# fig-1_experiment
+def scalebar_shape_position(img_shape):
+    """
+    Args:
+    img_shape -- tuple of 2 integers, (h_i, w_i)
+    
+    Returns:
+    scalebar_shape -- tuple of 2 intergers, (h_s, w_s)
+    position -- tuple of 2 integers (top left of scalebar), (x, y)
+    
+    Test:
+    img_shape = (800, 1000)
+    shape, xy = scalebar_shape_position(img_shape)
+    print("position: " + str(xy) + '\nshape: ' + str(shape))
+    """
+    h, w = img_shape
+    shape = (int(w/50), int(w/5))
+    margin = shape[0]
+    xy = (w - shape[1] - margin, h - shape[0] - margin)
+    return shape, xy
+
+def draw_scalebar(ax, shape, xy):
+    """
+    Args:
+    ax -- the axis on which image is shown
+    shape -- shape of scalebar
+    xy -- position of scalebar
+    
+    Returns:
+    None
+    """
+    
+    h, w = shape
+    rect = Rectangle(xy, w, h, color='white')
+    ax.add_patch(rect)
+    
+    return None
+
+def sparcify_piv(pivData, sparcity=2):
+    """
+    Args:
+    pivData -- DataFrame (x, y, u, v)
+    sparcity -- int, degree to which pivData is sparcified, higher is sparcer
+    
+    Returns:
+    sparcified_pivData -- DataFrame (x, y, u, v)
+    """
+    temp = {}
+    col = len(pivData.x.drop_duplicates())
+    row = len(pivData.y.drop_duplicates())
+    for c in pivData:
+        temp[c] = np.array(pivData[c]).reshape(row, col)[0:row:sparcity, 0:col:sparcity].flatten()
+    sparcified_pivData = pd.DataFrame(temp)
+    
+    return sparcified_pivData
+
+
+
 
 # fig-2_GNF
 

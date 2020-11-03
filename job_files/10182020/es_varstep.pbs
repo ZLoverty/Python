@@ -8,6 +8,6 @@ module load python3
 source activate pythonEnv
 python energy_spectrum.py ~/Data/08032020/piv_varstep/step=20/00 ~/Data/08032020/energy_spectrum_varstep/step=20/00 0.8 6.6 &
 python energy_spectrum.py ~/Data/08032020/piv_varstep/step=15/00 ~/Data/08032020/energy_spectrum_varstep/step=15/00 0.8 5 &
-python energy_spectrum.py ~/Data/08032020/piv_varstep/step=10/00 ~/Data/08032020/energy_spectrum_varstep/step=10/00 0.8 3.3&
-python energy_spectrum.py ~/Data/08032020/piv_varstep/step=5/00 ~/Data/08032020/energy_spectrum_varstep/step=5/00 0.8 1.65&
+python energy_spectrum.py ~/Data/08032020/piv_varstep/step=10/00 ~/Data/08032020/energy_spectrum_varstep/step=10/00 0.8 3.3 &
+python energy_spectrum.py ~/Data/08032020/piv_varstep/step=5/00 ~/Data/08032020/energy_spectrum_varstep/step=5/00 0.8 1.65 &
 wait
