@@ -476,6 +476,8 @@ def compute_energy_density(pivData, sample_spacing=25*0.33):
                 In order to get unit [velocity] * [length], and to make transform result consistent at different data density,
                 I introduce sample_spacing $d$ as a modifier of the DFT. After this modification, the energy spectrum computed
                 at various step size (of PIV) should give quantitatively similar results.
+    11042020 -- Replace the (* sample_spacing * sample_spacing) after v_fft with ( / row / col). This overwrites the edit I did on 11022020.
+                
     """
     
     row = len(pivData.y.drop_duplicates())
@@ -483,8 +485,8 @@ def compute_energy_density(pivData, sample_spacing=25*0.33):
     U = np.array(pivData.u).reshape((row, col))
     V = np.array(pivData.v).reshape((row, col))
     
-    u_fft = np.fft.fft2(U) * sample_spacing * sample_spacing
-    v_fft = np.fft.fft2(V) * sample_spacing * sample_spacing
+    u_fft = np.fft.fft2(U) / row / col
+    v_fft = np.fft.fft2(V) / row / col
     
     E = (u_fft * u_fft.conjugate() + v_fft * v_fft.conjugate()) / 2
     

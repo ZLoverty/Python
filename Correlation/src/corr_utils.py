@@ -1196,7 +1196,7 @@ def spatial_correlation(A, B):
     
     return corr
 
-def log_bin(xo, yo, n=100):
+def xy_bin(xo, yo, n=100, mode='log'):
     """
     Bin x, y data on log scale
     
@@ -1204,10 +1204,15 @@ def log_bin(xo, yo, n=100):
     xo -- input x
     yo -- input y
     n -- points after binning
+    mode -- 
     
     Returns:
     x -- binned x
     y -- means in bins
+    
+    Edit:
+    11042020 -- Change function name to xy_bin, to incorporate the mode parameter, so that the function can do both log space binning and linear space binning.
+                
     
     Test:
     pivDir = r'D:\density_fluctuations\08032020\piv_imseq\01\3000-3001.csv'
@@ -1224,8 +1229,12 @@ def log_bin(xo, yo, n=100):
     plt.plot(x, y, lw=1, color=bestcolor(1), label='corrFT', marker='o', markersize=2, ls='')
     plt.loglog()
     """
-    x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n)
-    x = np.insert(x, 0, 0)
+    if mode == 'log':
+        x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n-1)
+#         x = np.insert(x, 0, 0)
+    elif mode == 'lin':
+        x = np.linspace(xo[xo>0].min(), xo.max(), n-1)
+#         x = np.insert(x, 0, 0)
     y = (np.histogram(xo, x, weights=yo)[0] /
              np.histogram(xo, x)[0])
     
