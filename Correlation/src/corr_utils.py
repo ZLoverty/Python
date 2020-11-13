@@ -472,6 +472,9 @@ def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0
     Returns:
     fig -- figure object
     ax1 -- the axis of kinetics
+    
+    Edit:
+    11122020 -- add * mpp * mpp to E = eo_data.E, to make the unit of energy um^2/s^2
     """
     
     t = [] 
@@ -512,7 +515,7 @@ def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0
     i = i / i.max()
     # t2, E will be plotted on ax3
     t2 = eo_data.t
-    E = eo_data.E
+    E = eo_data.E * mpp * mpp
     # t2, O will be plotted on ax4
     O = eo_data.OP
     
@@ -541,7 +544,7 @@ def plot_kinetics_eo(k_data, i_data, eo_data, tlim=None, xlim=None, lb=10, mpp=0
 
         # plot t2, E
         color = wowcolor(2)
-        ax3.set_ylabel('$E$', color=color)
+        ax3.set_ylabel('$E$ [$\mu$m$^2$/s$^2$]', color=color)
         ax3.plot(t2, E, color=color)
         ax3.tick_params(axis='y', labelcolor=color)
         ax3.spines["right"].set_position(("axes", 1.1))
@@ -599,7 +602,7 @@ def kinetics_eo_from_light_on(data, plot=True):
 
         color = wowcolor(2)
         ax2 = ax1.twinx()
-        ax2.set_ylabel('$E$', color=color)
+        ax2.set_ylabel('$E$ [$\mu$m$^2$/s$^2$]', color=color)
         ax2.plot(new_data['t2'], new_data['E'], color=color)
         ax2.tick_params(axis='y', labelcolor=color)
 
@@ -652,7 +655,7 @@ def kinetics_eo_smooth(data):
     
     color = wowcolor(2)
     ax2 = ax1.twinx()
-    ax2.set_ylabel('$E$', color=color)
+    ax2.set_ylabel('$E$ [$\mu$m$^2$/s$^2$]', color=color)
     ax2.plot(new_data['t2'], new_data['E'], color=color)
     ax2.tick_params(axis='y', labelcolor=color)
 

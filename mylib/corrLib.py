@@ -477,7 +477,8 @@ def compute_energy_density(pivData, sample_spacing=25*0.33):
                 I introduce sample_spacing $d$ as a modifier of the DFT. After this modification, the energy spectrum computed
                 at various step size (of PIV) should give quantitatively similar results.
     11042020 -- Replace the (* sample_spacing * sample_spacing) after v_fft with ( / row / col). This overwrites the edit I did on 11022020.
-                
+    11112020 -- removed ( / row / col), add the area constant in energy_spectrum() function. 
+                Details can be found in https://zloverty.github.io/research/DF/blogs/energy_spectrum_2_methods_11112020.html                
     """
     
     row = len(pivData.y.drop_duplicates())
@@ -485,8 +486,8 @@ def compute_energy_density(pivData, sample_spacing=25*0.33):
     U = np.array(pivData.u).reshape((row, col))
     V = np.array(pivData.v).reshape((row, col))
     
-    u_fft = np.fft.fft2(U) / row / col
-    v_fft = np.fft.fft2(V) / row / col
+    u_fft = np.fft.fft2(U) 
+    v_fft = np.fft.fft2(V) 
     
     E = (u_fft * u_fft.conjugate() + v_fft * v_fft.conjugate()) / 2
     
@@ -544,9 +545,13 @@ def energy_spectrum(pivData, d=25*0.33):
     
     Edit:
     10192020 -- add argument d as sample spacing
+    11112020 -- add area constant, see details in https://zloverty.github.io/research/DF/blogs/energy_spectrum_2_methods_11112020.html
     """
     
-    E = compute_energy_density(pivData, d)
+    row = len(pivData.y.drop_duplicates())
+    col = len(pivData.x.drop_duplicates())
+    
+    E = compute_energy_density(pivData, d) / (row * d * col * d)
     k, K = compute_wavenumber_field(E.shape, d)
     
     ind = np.argsort(k.flatten())
