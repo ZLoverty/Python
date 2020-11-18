@@ -1,1 +1,8 @@
-Tue Nov 17 23:09:40 2020 // Frame low-2 detected
+img_folder: E:\Github\Python\Tracking\tracking\test_images
+output_folder: E:\Github\Python\Tracking\tracking\test_images
+area_min: 1500
+filter: yen
+Wed Nov 18 09:10:21 2020 // Frame high-1 detected
+Wed Nov 18 09:10:21 2020 // Frame high-2 detected
+Wed Nov 18 09:10:21 2020 // Frame low-1 detected
+Wed Nov 18 09:10:21 2020 // Frame low-2 detected

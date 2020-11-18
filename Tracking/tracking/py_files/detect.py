@@ -62,13 +62,23 @@ for num, i in l.iterrows():
     else:
         traj = traj.append(traj_temp)
         
-    with open(os.path.join(output_folder, 'log.txt'), 'w') as f: 
+    with open(os.path.join(output_folder, 'log.txt'), 'a') as f: 
         f.write(time.asctime() + ' // Frame ' + i.Name + ' detected\n')
     
+    if header == False:
+        if num == 0:
+            traj_temp.to_csv(os.path.join(output_folder, 'detect.csv'), index=False, header=header)
+        else:
+            traj_temp.to_csv(os.path.join(output_folder, 'detect.csv'), index=False, header=header, mode='a')
+            
+if header == True:
     traj.to_csv(os.path.join(output_folder, 'detect.csv'), index=False, header=header)
-
+    
+    
 """ EDIT
 11172020 - initial commit
+11182020 - fix saving bugs. Use mode 'a' for writing when header is turned off.
+           Change log open to mode 'a'
 """
         
 """ DESCRIPTION
@@ -89,7 +99,9 @@ area_min -- min area to filter false positive results, only area greater than th
 img_folder -- E:\Github\Python\Tracking\tracking\test_images
 out_folder -- E:\Github\Python\Tracking\tracking\test_images
 area_min -- 1500
+header -- 0
 [filter] -- [leave blank]
+
 """
 
 """ LOG
