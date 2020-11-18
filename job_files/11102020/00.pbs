@@ -1,0 +1,14 @@
+#!/bin/bash -l
+#PBS -l walltime=20:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/generic_proc/py_files
+
+module load python3
+source activate pythonEnv
+python bpass.py ~/Data/11102020/00.nd2 &
+python bpass.py ~/Data/11102020/01.nd2 &
+python bpass.py ~/Data/11102020/02.nd2 &
+python bpass.py ~/Data/11102020/03.nd2 &
+python bpass.py ~/Data/11102020/04.nd2 &
+wait

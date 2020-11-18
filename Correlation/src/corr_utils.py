@@ -1199,7 +1199,7 @@ def spatial_correlation(A, B):
     
     return corr
 
-def xy_bin(xo, yo, n=100, mode='log'):
+def xy_bin(xo, yo, n=100, mode='log', bins=None):
     """
     Bin x, y data on log scale
     
@@ -1215,7 +1215,7 @@ def xy_bin(xo, yo, n=100, mode='log'):
     
     Edit:
     11042020 -- Change function name to xy_bin, to incorporate the mode parameter, so that the function can do both log space binning and linear space binning.
-                
+    11172020 -- add bins kwarg, allow user to enter custom bins.
     
     Test:
     pivDir = r'D:\density_fluctuations\08032020\piv_imseq\01\3000-3001.csv'
@@ -1232,12 +1232,17 @@ def xy_bin(xo, yo, n=100, mode='log'):
     plt.plot(x, y, lw=1, color=bestcolor(1), label='corrFT', marker='o', markersize=2, ls='')
     plt.loglog()
     """
-    if mode == 'log':
-        x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n-1)
-#         x = np.insert(x, 0, 0)
-    elif mode == 'lin':
-        x = np.linspace(xo[xo>0].min(), xo.max(), n-1)
-#         x = np.insert(x, 0, 0)
+    
+    assert(len(xo)==len(yo))
+    
+    if bins is None:
+        if mode == 'log':
+            x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n-1)
+        elif mode == 'lin':
+            x = np.linspace(xo[xo>0].min(), xo.max(), n-1)
+    else:
+        x = bins
+        
     y = (np.histogram(xo, x, weights=yo)[0] /
              np.histogram(xo, x)[0])
     
