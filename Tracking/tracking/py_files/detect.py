@@ -16,10 +16,11 @@ import time
 img_folder = sys.argv[1]
 output_folder = sys.argv[2]
 area_min = int(sys.argv[3])
-header = bool(int(sys.argv[4]))
+area_max = int(sys.argv[4])
+header = bool(int(sys.argv[5]))
 filter = 'yen'
-if len(sys.argv) > 5:
-    filter = sys.argv[5]
+if len(sys.argv) > 6:
+    filter = sys.argv[6]
     
 if os.path.exists(output_folder) == False:
     os.makedirs(output_folder)
@@ -86,7 +87,7 @@ Particle tracking routine: the detect part
 """
         
 """ SYNTAX
-python detect.py img_folder out_folder area_min [filter]
+python detect.py img_folder out_folder area_min area_max header [filter]
 
 img_folder -- folder containing .tif images
 out_folder -- folder to save particle detection data (detect.csv, columns: Area, X, Y, Major, Minor, Angle, Slice)
@@ -99,6 +100,7 @@ area_min -- min area to filter false positive results, only area greater than th
 img_folder -- E:\Github\Python\Tracking\tracking\test_images
 out_folder -- E:\Github\Python\Tracking\tracking\test_images
 area_min -- 1500
+area_max -- 10000
 header -- 0
 [filter] -- [leave blank]
 
