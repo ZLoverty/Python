@@ -2,13 +2,13 @@
 #PBS -l walltime=20:00:00,nodes=1:ppn=8,mem=3gb
 #PBS -m abe
 #PBS -M liux3141@umn.edu
-cd ~/code/Python/generic_proc/py_files
+cd ~/code/Python/Tracking/tracking/py_files
 
 module load python3
 source activate pythonEnv
-python detect.py ~/Data/11102020/00 ~/Data/11102020/tracking/00 1500 0 &
-python detect.py ~/Data/11102020/01 ~/Data/11102020/tracking/01 1500 0 &
-python detect.py ~/Data/11102020/02 ~/Data/11102020/tracking/02 1500 0 &
-python detect.py ~/Data/11102020/03 ~/Data/11102020/tracking/03 1500 0 &
-python detect.py ~/Data/11102020/04 ~/Data/11102020/tracking/04 1500 0 &
+python detect.py ~/Data/11102020/00 ~/Data/11102020/tracking/00 1500 10000 0 &
+python detect.py ~/Data/11102020/01 ~/Data/11102020/tracking/01 1500 10000 0 &
+python detect.py ~/Data/11102020/02 ~/Data/11102020/tracking/02 1500 10000 0 &
+python detect.py ~/Data/11102020/03 ~/Data/11102020/tracking/03 1500 10000 0 &
+python detect.py ~/Data/11102020/04 ~/Data/11102020/tracking/04 1500 10000 0 &
 wait
