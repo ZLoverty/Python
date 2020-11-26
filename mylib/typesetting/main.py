@@ -6,10 +6,10 @@ def prl(preset='1-column-2-panel'):
     preset -- the type of preset to use (figure size and dpi)
     """
     presets = {}
-    presets['1-column-2-panel'] = (1.65, 2, 400)
-    presets['1-column-1-panel'] = (1.65, 4, 400)
+    presets['1-column-2-panel'] = (1.75, 1.5, 400)
+    presets['1-column-1-panel'] = (3.5, 3, 400)
     
-    h, w, dpi = presets[preset]
+    w, h, dpi = presets[preset]
     matplotlib.rcParams['figure.figsize'] = w, h
     matplotlib.rcParams['figure.dpi'] = dpi
     
@@ -42,6 +42,6 @@ def prl(preset='1-column-2-panel'):
     matplotlib.rcParams['legend.frameon'] = False
     
     # FONT
-#     matplotlib.rcParams['font.size'] = 'small'
+    matplotlib.rcParams['font.size'] = 10
     return None
     
