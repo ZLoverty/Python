@@ -93,6 +93,24 @@ def data_log():
     log['08062020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 10]
     return log
 
+def unified_symbols():    
+    color_dict = {
+        '0': 12,
+        '10': 9,
+        '20': 8,
+        '30': 7,
+        '40': 6,
+        '50': 5,
+        '60': 4,
+        '70': 3,
+        '80': 2,
+        '100': 1,
+        '120': 0
+    }
+    marker_list = ['o', 'p', 'P', '*', 'h', '+', 'x', 'D', 'd', 'v', '^', '<', '>', '1', '2', '3', '4']
+    return color_dict, marker_list
+
+
 
 # fig-1_experiment
 def scalebar_shape_position(img_shape):

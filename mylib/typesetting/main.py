@@ -7,7 +7,7 @@ def prl(preset='1-column-2-panel'):
     """
     presets = {}
     presets['1-column-2-panel'] = (1.75, 1.5, 400)
-    presets['1-column-1-panel'] = (3.5, 3, 400)
+    presets['1-column-1-panel'] = (3.5, 1.5, 400)
     
     w, h, dpi = presets[preset]
     matplotlib.rcParams['figure.figsize'] = w, h
