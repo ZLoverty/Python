@@ -1,5 +1,5 @@
-import pyprocess
-from smoothn import smoothn
+from openpiv import pyprocess
+from openpiv.smoothn import smoothn
 import numpy as np
 import matplotlib.pyplot as plt
 from skimage import io
