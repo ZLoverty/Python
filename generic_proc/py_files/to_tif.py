@@ -20,7 +20,7 @@ def illumination_correction(img, avg):
     return corrected
 
 nd2Dir = sys.argv[1]
-remove = True
+remove = False
 if len(sys.argv) > 2:
     remove = bool(int(sys.argv[2]))
 
