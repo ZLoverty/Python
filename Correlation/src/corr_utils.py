@@ -852,7 +852,7 @@ def plot_correlation(data, plot_cols=['R', 'C'], xlim=None, mpp=0.33, lb=3, plot
         cl_data['conc'].append(int(nt))
         cl_data['cl'].append(1/p[0])   
         
-    return ax, pd.DataFrame(cl_data).sort_values(by='conc')
+    return fig, ax, pd.DataFrame(cl_data).sort_values(by='conc')
 
 
 # fig-5 velocity and concentration
