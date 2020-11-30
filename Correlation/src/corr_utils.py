@@ -1286,3 +1286,37 @@ def efft(a, n=None, axis=-1, norm=None):
         A = np.matmul(a.transpose(), np.cos(-2 * np.pi * np.outer(m, k))).transpose()
     
     return A
+
+def autocorr_imseq(stack):
+    """
+    Compute intensity autocorrelation of an image sequence.
+    
+    Args:
+    seq -- image sequence, a DataFrame table containing a set of image names and directories. Return value of corrLib.readseq()
+    
+    Returns:
+    ac_mean -- the autocorrelation
+    
+    Test:
+    stack = np.load(r'E:\moreData\08032020\small_imseq\06\stack.npy')[3000:3600]
+    ac = autocorr_imseq(stack)
+    plt.plot(np.arange(0, 600)/30, ac)
+    """
+    def autocorr(x):
+        x = (x-x.mean()) / x.std()
+        result = np.correlate(x, x, mode='full')/len(x)
+        return result[len(result)//2:]
+    
+#     samples = []
+#     for num, i in seq.iterrows():
+#             X, Y, I = corrLib.divide_windows(io.imread(i.Dir), windowsize=[50, 50], step=300)
+#             samples.append(I)
+#     stack = np.stack(samples)
+    r = stack.reshape((stack.shape[0], stack.shape[1]*stack.shape[2])).transpose()
+    ac_list = []
+    for x in r:
+        ac = autocorr(x)
+        ac_list.append(ac)
+    ac_stack = np.stack(ac_list)
+    ac_mean = ac_stack.mean(axis=0)
+    return ac_mean
