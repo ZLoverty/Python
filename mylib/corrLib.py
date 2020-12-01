@@ -448,7 +448,7 @@ def local_df(img_folder, seg_length=50, winsize=50, step=25):
         
     return {'t': tL, 'std': stdL}
 
-def compute_energy_density(pivData, sample_spacing=25*0.33):
+def compute_energy_density(pivData, d=25*0.33, MPP=0.33):
     """
     Compute kinetic energy density in k space from piv data. The unit of the return value is [velocity] * [length],
     where [velocity] is the unit of pivData, and [length] is the unit of sample_spacing parameter.
@@ -457,6 +457,8 @@ def compute_energy_density(pivData, sample_spacing=25*0.33):
     
     Args:
     pivData -- piv data
+    d -- sample spacing
+    MPP -- microns per pixel
     
     Returns:
     E -- kinetic energy field in k space
@@ -478,16 +480,19 @@ def compute_energy_density(pivData, sample_spacing=25*0.33):
                 at various step size (of PIV) should give quantitatively similar results.
     11042020 -- Replace the (* sample_spacing * sample_spacing) after v_fft with ( / row / col). This overwrites the edit I did on 11022020.
     11112020 -- removed ( / row / col), add the area constant in energy_spectrum() function. 
-                Details can be found in https://zloverty.github.io/research/DF/blogs/energy_spectrum_2_methods_11112020.html                
+                Details can be found in https://zloverty.github.io/research/DF/blogs/energy_spectrum_2_methods_11112020.html     
+    11302020 -- 1) Convert unit of velocity, add optional arg MPP (microns per pixel)
+                2) Add * d * d to both velocity FFT's to account for the missing length in default FFT algorithm
+                3) The energy spectrum calculated by this function shows a factor of ~3 difference when comparing \int E(k) dk with v**2.sum()/2
     """
     
     row = len(pivData.y.drop_duplicates())
     col = len(pivData.x.drop_duplicates())
-    U = np.array(pivData.u).reshape((row, col))
-    V = np.array(pivData.v).reshape((row, col))
+    U = np.array(pivData.u).reshape((row, col)) * MPP
+    V = np.array(pivData.v).reshape((row, col)) * MPP
     
-    u_fft = np.fft.fft2(U) 
-    v_fft = np.fft.fft2(V) 
+    u_fft = np.fft.fft2(U) * d * d
+    v_fft = np.fft.fft2(V) * d * d
     
     E = (u_fft * u_fft.conjugate() + v_fft * v_fft.conjugate()) / 2
     
@@ -546,6 +551,7 @@ def energy_spectrum(pivData, d=25*0.33):
     Edit:
     10192020 -- add argument d as sample spacing
     11112020 -- add area constant, see details in https://zloverty.github.io/research/DF/blogs/energy_spectrum_2_methods_11112020.html
+    11302020 -- 1) The energy spectrum calculated by this function shows a factor of ~3 difference when comparing \int E(k) dk with v**2.sum()/2
     """
     
     row = len(pivData.y.drop_duplicates())
