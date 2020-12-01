@@ -1,6 +1,6 @@
 piv_folder: E:\Github\Python\Correlation\test_images\test_corr\piv_folder
 out_folder: E:\Github\Python\Correlation\test_images\energy_spectrum
-percentile: 0.8
-Mon Oct 12 17:50:50 2020 // Computation starts!
-Mon Oct 12 17:50:50 2020 // 3004-3005 finished!
-Mon Oct 12 17:50:50 2020 // Computation ends!
+percentile: 0.9
+Mon Nov 30 18:22:04 2020 // Computation starts!
+Mon Nov 30 18:22:04 2020 // 3004-3005 finished!
+Mon Nov 30 18:22:04 2020 // Computation ends!

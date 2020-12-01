@@ -211,6 +211,9 @@ def readdata(folder, ext='csv'):
     
     Returns:
     fileList -- a DataFrame with columns 'Name' and 'Dir'
+    
+    Edit:
+    11302020 -- reset the index of fileList, so that further trimming of data by index gets easier
     """
     dataDirs = dirrec(folder, '*.' + ext)
     nameList = []
@@ -222,7 +225,7 @@ def readdata(folder, ext='csv'):
         dirList.append(dataDir)
     fileList = pd.DataFrame()
     fileList = fileList.assign(Name=nameList, Dir=dirList)
-    fileList = fileList.sort_values(by=['Name'])
+    fileList = fileList.sort_values(by=['Name']).reset_index(drop=True)
     return fileList
 
 def df2(imgstack, size_min=5, step=250, method='linear'):
