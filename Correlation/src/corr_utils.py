@@ -1255,9 +1255,9 @@ def xy_bin(xo, yo, n=100, mode='log', bins=None):
     
     if bins is None:
         if mode == 'log':
-            x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n-1)
+            x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n+1)
         elif mode == 'lin':
-            x = np.linspace(xo[xo>0].min(), xo.max(), n-1)
+            x = np.linspace(xo[xo>0].min(), xo.max(), n+1)
     else:
         x = bins
         

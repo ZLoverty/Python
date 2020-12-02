@@ -1,6 +1,0 @@
-img_folder: /home/xcheng/liux3141/Data/08032020/00/8-bit
-save_folder: /home/xcheng/liux3141/Data/08032020/local_df/00/dt=10
-seg_length: 10
-winsize: 50
-step: 25
-Tue Sep  8 15:07:12 2020 // computation starts!

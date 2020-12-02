@@ -6,16 +6,17 @@ cd ~/code/Python/Correlation/src/py_files
 
 module load python3
 source activate pythonEnv
-python energy_spectrum.py ~/Data/08042020/piv_imseq/00 ~/Data/08042020/energy_spectrum/00 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/01 ~/Data/08042020/energy_spectrum/01 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/02 ~/Data/08042020/energy_spectrum/02 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/03 ~/Data/08042020/energy_spectrum/03 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/04 ~/Data/08042020/energy_spectrum/04 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/05 ~/Data/08042020/energy_spectrum/05 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/06 ~/Data/08042020/energy_spectrum/06 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/07 ~/Data/08042020/energy_spectrum/07 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/08 ~/Data/08042020/energy_spectrum/08 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/09 ~/Data/08042020/energy_spectrum/09 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/10 ~/Data/08042020/energy_spectrum/10 0.8 8.3 &
-python energy_spectrum.py ~/Data/08042020/piv_imseq/11 ~/Data/08042020/energy_spectrum/11 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/00 ~/Data/08042020/energy_spectrum_10/00 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/01 ~/Data/08042020/energy_spectrum_10/01 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/02 ~/Data/08042020/energy_spectrum_10/02 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/03 ~/Data/08042020/energy_spectrum_10/03 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/04 ~/Data/08042020/energy_spectrum_10/04 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/05 ~/Data/08042020/energy_spectrum_10/05 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/06 ~/Data/08042020/energy_spectrum_10/06 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/07 ~/Data/08042020/energy_spectrum_10/07 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/08 ~/Data/08042020/energy_spectrum_10/08 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/09 ~/Data/08042020/energy_spectrum_10/09 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/10 ~/Data/08042020/energy_spectrum_10/10 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/11 ~/Data/08042020/energy_spectrum_10/11 0.8 8.3 &
+python energy_spectrum.py ~/Data/08042020/piv_step_10/12 ~/Data/08042020/energy_spectrum_10/12 0.8 8.3 &
 wait
