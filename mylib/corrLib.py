@@ -515,6 +515,11 @@ def compute_wavenumber_field(shape, d):
     k -- wavenumber magnitude field
     K -- wavenumber fields in given dimensions
     
+    Edit:
+    12022020 -- multiply 2pi to the wavenumber to account for the built-in 2pi in the fft method. 
+                This factor leads to a difference in the magnitude of 1D energy spectra.
+                Note: the dimensionless wavenumber should remain unchanged.
+    
     Test:
     shape = (5, 5)
     k, K = compute_wavenumber_field(shape, 0.2)
@@ -535,7 +540,7 @@ def compute_wavenumber_field(shape, d):
         else:
             ksq += k1 ** 2
     
-    k_mag = ksq ** 0.5
+    k_mag = ksq ** 0.5 * 2 * np.pi
     
     return k_mag, K
     

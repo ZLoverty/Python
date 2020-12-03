@@ -44,21 +44,15 @@ def data_log_mapping(kw='aug'):
     
     return dirs
 
-def data_log():
-    log = {}
-    log['08032020'] = {}
-    log['08032020']['num'] = list(range(0, 15))
-    log['08032020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 10, 10, 10, 10, 10, 10, 10, 10]
-    log['08042020'] = {}
-    log['08042020']['num'] = list(range(0, 12))
-    log['08042020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 10, 10, 10]
-    log['08052020'] = {}
-    log['08052020']['num'] = list(range(0, 12))
-    log['08052020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 10, 10, 10]
-    log['08062020'] = {}
-    log['08062020']['num'] = list(range(0, 13))
-    log['08062020']['fps'] = [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 10]
-    return log
+def tentative_log():
+    """
+    Another log function of density fluctuations data.
+    """
+    conc = [120, 100, 85, 80, 70, 60, 50, 40, 30, 20, 10]
+    folders = ['08062020', '08062020', '08052020', '08032020', '08042020', '08032020', '08042020', '08032020', '08042020', '08032020', '08042020']
+    sample_num = [range(3, 6), range(0, 3), range(3, 6), range(0, 3), range(0, 3), range(3, 6), range(3, 6), range(6, 9), range(6, 9), range(9, 12), range(9, 12)]
+    return conc, folders, sample_num
+
 
 def illumination_correction(img, avg):
     """
