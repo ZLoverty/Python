@@ -72,7 +72,7 @@ This script does not apply auto-contrast and save both 16-bit and 8-bit images.
 06162020 - No longer export 16-bit images.
 08162020 - 1. write input arguments in log.txt
            2. (important) add illumination correction. All frames will be corrected according to the whole video.
-08182020 - Add argument 'remove', determining if background subtraction is applied or not. Default to True.
+08182020 - Add argument 'remove', determining if background subtraction is applied or not. Default to False.
 """ 
 
 """ SYNTAX
