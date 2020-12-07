@@ -42,6 +42,6 @@ def prl(preset='1-column-2-panel'):
     matplotlib.rcParams['legend.frameon'] = False
     
     # FONT
-    matplotlib.rcParams['font.size'] = 10
+    matplotlib.rcParams['font.size'] = 8
     return None
     
