@@ -87,28 +87,7 @@ for idx in range(1, len(seg)):
 data.to_csv(os.path.join(folder_out, 'kinetics_data.csv'), index=False)
 with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
     f.write(time.asctime() + ' // ' + 'Output data')    
-# lb = 3
-# mpp = 0.33
-# k = 0
-# for idx in data.frame.drop_duplicates():
-    # subdata = data.loc[data.frame==idx]
-    # xx = subdata.n / (lb/mpp)**2
-    # yy = subdata.d / subdata.n**.5
-    # yy = yy / yy.iat[0]
-    # plt.plot(xx[0:len(xx):3], yy[0:len(yy):3], label='{:d}-{:d}'.format((idx-1)*seg_length, idx*seg_length-1), ls='', marker='s', \
-            # mfc=(0,0,0,0), mec=wowcolor(k), markersize=10)
-    # k += 1
-# plt.legend()
-# plt.xscale('log')
-# plt.yscale('log')
-# plt.xlabel('$l^2/l_b^2$')
-# plt.ylabel('$\Delta N/\sqrt{N}$')
-
-# guide of the eye slope
-# x = np.array([100, 500])
-# y = x**0.5 / 2
-# plt.plot(x, y)
-# plt.text(0.8*x[0]+0.2*x[1], y.mean(), '0.5')                    
+                  
 
 """ SYNTAX
 python df2_kinetics.py folder folder_out seg_length 
