@@ -725,44 +725,6 @@ def kinetics_eo_smooth(data):
     
     return new_data, fig, ax
 
-def df2(folder):
-    l = readseq(folder)
-    img = io.imread(l.Dir.loc[0])
-    size_min = 5
-    step = 50*size_min
-    L = min(img.shape)
-    boxsize = np.unique(np.floor(np.logspace(np.log10(size_min),
-                        np.log10((L-size_min)/2),100)))
-    
-    df = pd.DataFrame()
-    for num, i in l.iterrows():
-        img = io.imread(i.Dir)
-        framedf = pd.DataFrame()
-        for bs in boxsize: 
-            X, Y, I = divide_windows(img, windowsize=[bs, bs], step=step)
-            tempdf = pd.DataFrame().assign(I=I.flatten(), t=int(i.Name), size=bs, 
-                           number=range(0, len(I.flatten())))
-            framedf = framedf.append(tempdf)
-        df = df.append(framedf)
-
-    df_out = pd.DataFrame()
-    for number in df.number.drop_duplicates():
-        subdata1 = df.loc[df.number==number]
-        for s in subdata1['size'].drop_duplicates():
-            subdata = subdata1.loc[subdata1['size']==s]
-            d = s**2 * np.array(subdata.I).std()
-            n = s**2 
-            tempdf = pd.DataFrame().assign(n=[n], d=d, size=s, number=number)
-            df_out = df_out.append(tempdf)
-
-    average = pd.DataFrame()
-    for s in df_out['size'].drop_duplicates():
-        subdata = df_out.loc[df_out['size']==s]
-        avg = subdata.drop(columns=['size', 'number']).mean().to_frame().T
-        average = average.append(avg)
-        
-    return average
-
 
 # fig3_spatial-correlations
 def exp(x, a):
@@ -1357,7 +1319,7 @@ def autocorr_imseq(stack):
     ac_mean = ac_stack.mean(axis=0)
     return ac_mean
 
-def structured_spectra(pivData, **kwargs):
+def structured_spectra(pivData, d=25*0.33, **kwargs):
     """
     Generate energy spectra that matches the length scales of GNF data, given by bins.
     
@@ -1380,7 +1342,7 @@ def structured_spectra(pivData, **kwargs):
     structured_spectra = compute_structured_spectra(pivData, bins=np.flip(bins))
     """
     
-    es = corrLib.energy_spectrum(pivData)
+    es = corrLib.energy_spectrum(pivData, d=d)
     es = es.loc[es.k>0] # make sure the 1/es.k step won't encounter error
     
     x, y = xy_bin(es.k, es.E, **kwargs)
@@ -1390,7 +1352,7 @@ def structured_spectra(pivData, **kwargs):
     
     return spectra
 
-def construct_spectra_series(piv_folder, t_list, bins):
+def construct_spectra_series(piv_folder, t_list, bins, d=25*0.33):
     """
     Construct energy spectra series data, in the same structure as that of rearranged GNF data.
     
@@ -1413,7 +1375,7 @@ def construct_spectra_series(piv_folder, t_list, bins):
     
     for num, t in enumerate(t_list):
         pivData = pd.read_csv(os.path.join(piv_folder, '{0:04d}-{1:04d}.csv'.format(t, t+1)))
-        spectra = structured_spectra(pivData, bins=bins).rename(columns={'E': t})
+        spectra = structured_spectra(pivData, d=d, bins=bins).rename(columns={'E': t})
         if num == 0:
             master = spectra
         else:
