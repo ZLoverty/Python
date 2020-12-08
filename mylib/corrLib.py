@@ -280,6 +280,60 @@ def df2(imgstack, size_min=5, step=250, method='linear'):
         
     return average
 
+def df2_(img_stack, boxsize=None, size_min=5, step=250):
+    """
+    Compute number fluctuations of an image stack (3D np.array, frame*h*w)
+    
+    Args:
+    img_stack -- a stack of image, a 3D array
+    boxsize -- a list-like of integers, specify the subsystem size to look at.
+                If None, generate a log spaced array within (size_min, L/2) (pixels), with 100 points
+    size_min -- the smallest box size
+    step -- step used when dividing image into windows
+                
+    Returns:
+    df -- DataFrame of n and d, where n is box area (px^2) and d is total number fluctuations (box_area*dI)
+    
+    Edit:
+    12072020 -- initial commit.
+    
+    """    
+    L = min(img_stack.shape[1:3])
+    if boxsize == None:
+        boxsize = np.unique(np.floor(np.logspace(np.log10(size_min), np.log10(L/2), 100)))
+    
+    dI_list = []
+    for bs in boxsize:
+        I = divide_stack(img_stack, winsize=[bs, bs], step=step)
+        dI = I.std(axis=0).mean() * bs ** 2
+        dI_list.append(dI)
+    
+    return pd.DataFrame({'n': np.array(boxsize)**2, 'd': dI_list})
+
+def divide_stack(img_stack, winsize=[50, 50], step=25):
+    """
+    Divide image stack into several evenly spaced windows of stack. Average the pixel intensity within each window.
+    For example, a 30*30*30 image stack, if we apply a divide_stack, with winsize=[15, 15] and step=15,
+    the resulting divided stack will be (30, 4).
+    
+    Args:
+    img_stack -- a stack of image, a 3D array, axis0 should be frame number
+    winsize -- division scheme, default to [50, 50]
+    step -- division scheme, default ot 25
+    
+    Returns:
+    divided_array -- the result
+    
+    Edit:
+    12072020 -- initial commit.
+    """
+    length = img_stack.shape[0]
+    divide = util.view_as_windows(img_stack, window_shape=[length, *winsize], step=step).mean(axis=(-1, -2))
+    # reshape
+    divided_array = divide.reshape((np.prod(divide.shape[:3]), length)).transpose()
+    
+    return divided_array
+    
 def plot_gnf(gnf_data):
     """
     Used for small scale test of gnf analysis. 
