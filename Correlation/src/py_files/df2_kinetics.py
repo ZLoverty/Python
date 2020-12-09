@@ -53,7 +53,7 @@ for idx in range(1, len(seg)):
     for num, i in l_crop.iterrows():
         img_list.append(io.imread(i.Dir))
     img_stack = np.stack(img_list, axis=0)
-    frame_data = cl.df2_(img_stack)    
+    frame_data = cl.df2_(img_stack, size_min=1)    
     data = data.append(frame_data.assign(segment=idx))
     with open(os.path.join(folder_out, 'log.txt'), 'a') as f:
         f.write(time.asctime() + ' // ' + 'Segment {0:d}: frame {1:04d}-{2:04d}, take spatial average\n'.format(idx, seg[idx-1], seg[idx]))
