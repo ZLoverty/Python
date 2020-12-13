@@ -1,0 +1,12 @@
+#!/bin/bash -l
+#PBS -l walltime=16:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/PIV/src/py_files
+
+module load python3
+source activate pythonEnv
+python piv_overlay.py ~/Data/12092020/piv_step_50/00 ~/Data/12092020/00/8-bit ~/Data/12092020/piv_overlay/00 1 &
+python piv_overlay.py ~/Data/12092020/piv_step_50/01 ~/Data/12092020/01/8-bit ~/Data/12092020/piv_overlay/01 1 &
+python piv_overlay.py ~/Data/12092020/piv_step_50/02 ~/Data/12092020/02/8-bit ~/Data/12092020/piv_overlay/02 1 &
+wait
