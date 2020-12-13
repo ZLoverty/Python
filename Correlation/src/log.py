@@ -50,7 +50,15 @@ def experiment_log(verbose=False):
         'exposure_time': [4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4],
         'thickness': [140, 140, 140, 140, 140, 140, 100, 100, 100, 200, 200, 200, 20]
     }
-    
+    log_dict['12122020'] = { # transform daily log to a dict, each parameter forms a list
+        'run_number': range(0, 9),
+        'conc': [60, 60, 60, 70, 70, 70, 80, 80, 80],        
+        'FPS': [30, 30, 30, 30, 30, 30, 30, 30, 30],
+        'MPP': np.ones(9) * 0.33,
+        'length': [3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600, 3600],
+        'exposure_time': [7, 7, 7, 7, 7, 7, 7, 7, 7],
+        'thickness': [140, 140, 140, 140, 140, 140, 140, 140, 140]
+    }
     # Check integrity: each column from the same day should be of the same length
     for kw in log_dict:
         if verbose == True:
