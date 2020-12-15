@@ -99,6 +99,7 @@ def unified_symbols():
         '70': 3,
         '80': 2,
         '85': 10,
+        '90': 11,
         '100': 1,
         '120': 0
     }
@@ -1217,13 +1218,14 @@ def spatial_correlation(A, B):
 
 def xy_bin(xo, yo, n=100, mode='log', bins=None):
     """
-    Bin x, y data on log scale
+    Bin x, y data on log or linear scale
     
     Args:
     xo -- input x
     yo -- input y
     n -- points after binning
     mode -- 
+    bins -- set the bins to bin data together
     
     Returns:
     x -- binned x

@@ -1,0 +1,34 @@
+#!/bin/bash -l
+#PBS -l walltime=3:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/generic_proc/py_files
+
+module load python3
+source activate pythonEnv
+python to_tif.py ~/Data/12132020/00.nd2 &
+python to_tif.py ~/Data/12132020/01.nd2 &
+python to_tif.py ~/Data/12132020/02.nd2 &
+python to_tif.py ~/Data/12132020/03.nd2 &
+python to_tif.py ~/Data/12132020/04.nd2 &
+python to_tif.py ~/Data/12132020/05.nd2 &
+python to_tif.py ~/Data/12132020/06.nd2 &
+python to_tif.py ~/Data/12132020/07.nd2 &
+python to_tif.py ~/Data/12132020/08.nd2 &
+python to_tif.py ~/Data/12132020/09.nd2 &
+python to_tif.py ~/Data/12132020/10.nd2 &
+python to_tif.py ~/Data/12132020/11.nd2 &
+python to_tif.py ~/Data/12132020/12.nd2 &
+python to_tif.py ~/Data/12132020/13.nd2 &
+python to_tif.py ~/Data/12132020/14.nd2 &
+python to_tif.py ~/Data/12132020/15.nd2 &
+python to_tif.py ~/Data/12132020/16.nd2 &
+python to_tif.py ~/Data/12132020/17.nd2 &
+python to_tif.py ~/Data/12132020/18.nd2 &
+python to_tif.py ~/Data/12132020/19.nd2 &
+python to_tif.py ~/Data/12132020/20.nd2 &
+python to_tif.py ~/Data/12132020/21.nd2 &
+python to_tif.py ~/Data/12132020/22.nd2 &
+python to_tif.py ~/Data/12132020/23.nd2 &
+python to_tif.py ~/Data/12132020/24.nd2 &
+wait
