@@ -186,6 +186,7 @@ def postprocess_gnf(gnf_data, lb, xlim=None, sparse=3, normalize='1', volume_fra
                  '1': rescale y with y[0]
                  'small-scale': rescale y with y[0] / \sqrt{1 - volume_fraction}. Additional volume_fraction arg is required.
                  None: no normalization will be applied.
+                 'dN': do not normalize dn by the square root of length scale
     
     Returns:
     x, y -- a tuple that can be plotted directly using plt.plot(x, y)
@@ -233,7 +234,11 @@ def postprocess_gnf(gnf_data, lb, xlim=None, sparse=3, normalize='1', volume_fra
         assert(xlim[0] <= 1) # make sure the first data point is at a smaller scale than lb
         xx = data.n / lb**2
         yy = data.d / data.n**0.5
-        yy = yy / yy.iat[0] * (1 - volume_fraction) ** 0.5        
+        yy = yy / yy.iat[0] * (1 - volume_fraction) ** 0.5
+    elif normalize == 'dN':
+        xx = data.n / lb**2
+        yy = data.d
+        yy = yy / yy.iat[0]
     else:
         raise ValueError('Invalid normalize argument')
     
