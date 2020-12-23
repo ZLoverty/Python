@@ -1,0 +1,21 @@
+#!/bin/bash -l
+#PBS -l walltime=20:00:00,nodes=1:ppn=8,mem=3gb
+#PBS -m abe
+#PBS -M liux3141@umn.edu
+cd ~/code/Python/PIV/src/py_files
+
+module load python3
+source activate pythonEnv
+python piv_imseq.py ~/Data/12212020/00/8-bit ~/Data/12212020/piv_step_25/00 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/01/8-bit ~/Data/12212020/piv_step_25/01 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/02/8-bit ~/Data/12212020/piv_step_25/02 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/03/8-bit ~/Data/12212020/piv_step_25/03 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/04/8-bit ~/Data/12212020/piv_step_25/04 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/05/8-bit ~/Data/12212020/piv_step_25/05 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/06/8-bit ~/Data/12212020/piv_step_25/06 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/07/8-bit ~/Data/12212020/piv_step_25/07 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/08/8-bit ~/Data/12212020/piv_step_25/08 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/09/8-bit ~/Data/12212020/piv_step_25/09 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/10/8-bit ~/Data/12212020/piv_step_25/10 50 25 30 1 1 &
+python piv_imseq.py ~/Data/12212020/11/8-bit ~/Data/12212020/piv_step_25/11 50 25 30 1 1 &
+wait
