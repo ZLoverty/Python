@@ -166,7 +166,7 @@ def test():
     plt.show()
 
 def pre_processing(img):
-    fft = fft2_imagej(window)
+    fft = fft2_imagej(img)
     smooth = img_smooth(fft)
     thres = imgAutoThreshold(smooth)
     return thres
