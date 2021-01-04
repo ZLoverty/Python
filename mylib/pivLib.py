@@ -35,6 +35,21 @@ def imseqPIV(folder, winsize, overlap, dt):
         else:
             data = data.append(frame_data.assign(frame=num))
     return data
+
+def read_piv(pivDir):
+    """
+    Read piv data from pivDir as X, Y, U, V
+    
+    X, Y, U, V = read_piv(pivDir)
+    """
+    pivData = pd.read_csv(pivDir)
+    row = len(pivData.y.drop_duplicates())
+    col = len(pivData.x.drop_duplicates())
+    X = np.array(pivData.x).reshape((row, col))
+    Y = np.array(pivData.y).reshape((row, col))
+    U = np.array(pivData.u).reshape((row, col))
+    V = np.array(pivData.v).reshape((row, col))
+    return X, Y, U, V
     
 if __name__ == '__main__':
     # set PIV parameters
