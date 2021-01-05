@@ -11,8 +11,9 @@ winsize = int(sys.argv[3])
 overlap = int(sys.argv[4])
 fps = int(sys.argv[5])
 header = True
-if len(sys.argv) > 6:
+if len(sys.argv) == 7:
     smooth = bool(int(sys.argv[6]))
+if len(sys.argv) == 8:
     header = bool(int(sys.argv[7]))
 
 if os.path.exists(output_folder) == 0:
@@ -30,9 +31,6 @@ l = readseq(input_folder)
 k = 0 # serve as a flag for I0 and I1
 
 for num, i in l.iterrows():
-    # if num % 2 == 0:
-        # I0 = io.imread(i.Dir)
-        # continue 
     if k % 2 == 0:
         I0 = io.imread(i.Dir)
         n0 = i.Name
@@ -47,12 +45,13 @@ for num, i in l.iterrows():
 
 """ EDIT
 11172020 -- add header param to remove header of output data (generate Yi's data mainly)
+01052020 -- add independent condition for header and smooth optional parameters
 """
 
 
 
 """ SYNTAX
-python piv_imseq.py input_folder output_folder winsize overlap fps [header]
+python piv_imseq.py input_folder output_folder winsize overlap fps [smooth, header]
 """
         
 """  TEST PARAMS
