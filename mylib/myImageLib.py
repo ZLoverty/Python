@@ -187,3 +187,21 @@ def track_spheres_dt(img, num_particles):
 
 def gauss1(x,a,x0,sigma):
     return a*exp(-(x-x0)**2/(2*sigma**2))  
+
+
+def show_progress(progress, label='', bar_length=60):
+    """ Display a progress bar
+    Args:
+    progress -- float between 0 and 1
+    label -- a string displayed before the progress bar
+    bar_length -- the length of the progress bar
+    
+    Returns:
+    None
+    
+    Test:
+    >>> show_progress(0.7, label='0812-data')
+    """
+    N_finish = int(progress*bar_length)
+    N_unfinish = bar_length - N_finish
+    print('{0} [{1}{2}] {3:.1f}%'.format(label, '#'*N_finish, '-'*N_unfinish, progress*100))
