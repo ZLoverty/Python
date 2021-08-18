@@ -12,6 +12,10 @@ Detailed explanation of the .raw file structure can be found in extractImages.ip
 
 Written by Z. L.
 Jul 16, 2021
+
+Edit
+Aug 18, 2021 -- Generate log file, recording the total frames of .raw.
+                This is to check if the image extraction is complete.
 """
 
 def check_necessary_files(folder):
@@ -34,6 +38,20 @@ def read_raw_image_info(info_file):
     fps, h, w = a.split('\n')[0:3]
     return int(fps), int(h), int(w)
 
+def write_log(folder, num_images):
+    """
+    Generate a log file to the same folder as .raw file.
+    Records the total number of frames in .raw.
+    This log is used to check if the image extraction is complete.
+    
+    Args:
+    folder -- folder of .raw
+    num_images -- total number of frames in .raw
+    """
+    
+    with open(os.path.join(folder, 'extract_log.txt'), 'w') as f:
+        f.write("Raw image has {:d} frames".format(num_images))
+        
 def raw_to_tif(raw_file, img_dim, save_folder):
     """ Read RawImage.raw and save .tif images    
     Args:
@@ -66,6 +84,10 @@ def raw_to_tif(raw_file, img_dim, save_folder):
     
     # reshape the images from 1D to 2D
     images_reshape = images.reshape(num_images, h, w)
+    
+    # write log 
+    folder = os.path.split(raw_file)[0]
+    write_log(folder, num_images)
     
     # save the images as .tif sequence in save_folder
     if os.path.exists(save_folder) == False:
