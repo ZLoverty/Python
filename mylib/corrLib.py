@@ -629,7 +629,57 @@ def energy_spectrum(pivData, d=25*0.33):
     es = pd.DataFrame(data={'k': k_plot, 'E': E_plot})
     
     return es
+
+def xy_bin(xo, yo, n=100, mode='log', bins=None):
+    """
+    Bin x, y data on log or linear scale
     
+    Args:
+    xo -- input x
+    yo -- input y
+    n -- points after binning
+    mode -- 
+    bins -- set the bins to bin data together
+    
+    Returns:
+    x -- binned x
+    y -- means in bins
+    
+    Edit:
+    11042020 -- Change function name to xy_bin, to incorporate the mode parameter, so that the function can do both log space binning and linear space binning.
+    11172020 -- add bins kwarg, allow user to enter custom bins.
+    
+    Test:
+    pivDir = r'D:\density_fluctuations\08032020\piv_imseq\01\3000-3001.csv'
+    X, Y, U, V = read_piv(pivDir)
+    XS, YS, CA, CV = vspatial(X, Y, U, V)
+    k, E = energy_spectrum_2(CV)
+
+    xo = k
+    yo = abs(E)
+    x, y = log_bin(xo, yo, n=100)
+    plt.figure(dpi=300)
+
+    plt.plot(k, abs(E), lw=0.5, color=bestcolor(0), label='corrFT', ls=':')
+    plt.plot(x, y, lw=1, color=bestcolor(1), label='corrFT', marker='o', markersize=2, ls='')
+    plt.loglog()
+    """
+    
+    assert(len(xo)==len(yo))
+    
+    if bins is None:
+        if mode == 'log':
+            x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n+1)
+        elif mode == 'lin':
+            x = np.linspace(xo.min(), xo.max(), n+1)
+    else:
+        x = np.sort(bins)
+        
+    y = (np.histogram(xo, x, weights=yo)[0] /
+             np.histogram(xo, x)[0])
+    
+    return x[:-1], y
+
 if __name__ == '__main__':
     img = io.imread(r'I:\Github\Python\Correlation\test_images\GNF\stat\40-1.tif')
     df_data = density_fluctuation(img)
