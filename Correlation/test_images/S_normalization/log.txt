@@ -1,0 +1,44 @@
+Same illumination intensity test GNF - 121320202
+---------
+
+All samples are illuminated at 12 V, only D filter in, **image at 40 um above bottom**. 2 ND filters and blue filters below.
+All videos are 1 min, 1800 frames at steady state.
+
+Exposure: 5 ms
+Readout mode: Global
+Readout Rate: 560 MHz
+Dynamic Range: Gain 1
+Sensor mode: normal
+
+5 * 24 = 120 GB in total
+---------
+
+#	conc	FPS	MPP	Sample
+0	50	30	0.33	0
+1	50	30	0.33	0
+2	50	30	0.33	1
+3	50	30	0.33	1
+4	60	30	0.33	0
+5	60	30	0.33	0
+6	60	30	0.33	1
+7	60	30	0.33	1
+8	70	30	0.33	0
+9	70	30	0.33	0
+10	70	30	0.33	1
+11	70	30	0.33	1
+
+
+12	80	30	0.33	0
+13	80	30	0.33	0
+14	80	30	0.33	1
+15	80	30	0.33	1
+16	90	30	0.33	0
+17	90	30	0.33	0
+18	90	30	0.33	1
+19	90	30	0.33	1
+20	100	30	0.33	0
+21	100	30	0.33	0
+22	100	30	0.33	1
+23	100	30	0.33	1
+
+24	80	30	033	1	Use one ND filters
