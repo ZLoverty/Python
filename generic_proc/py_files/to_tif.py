@@ -5,6 +5,17 @@ import time
 import os
 import sys
 
+def to8bit(img16):
+    """
+    Enhance contrast and convert to 8-bit
+    """
+    # if img16.dtype != 'uint16':
+        # raise ValueError('16-bit grayscale image is expected')
+    maxx = img16.max()
+    minn = img16.min()
+    img8 = (img16 - minn) / (maxx - minn) * 255
+    return img8.astype('uint8')
+
 def illumination_correction(img, avg):
     """
     Correct the illumination inhomogeneity in microscope images.
@@ -28,13 +39,16 @@ if len(sys.argv) > 2:
 folder, file = os.path.split(nd2Dir)
 
 name, ext = os.path.splitext(file)
-saveDir = os.path.join(folder, name)
+saveDir = os.path.join(folder, name, 'raw')
 saveDir8 = os.path.join(folder, name, '8-bit')
 if os.path.exists(saveDir) == False:
     os.makedirs(saveDir)
 with open(os.path.join(saveDir, 'log.txt'), 'w') as f:
     f.write('nd2Dir = ' + str(nd2Dir) + '\n')
-
+if os.path.exists(saveDir8) == False:
+    os.makedirs(saveDir8)
+with open(os.path.join(saveDir8, 'log.txt'), 'w') as f:
+    f.write('nd2Dir = ' + str(nd2Dir) + '\n')
 # Compute average
 # to minimize the memory needed, I first loop over an nd2 file to get the average
 # Then loop one more time to compute the output
@@ -55,11 +69,13 @@ if remove == True:
 with ND2Reader(nd2Dir) as images:
     for num, image in enumerate(images):
         # img8 = (image/2**3).astype('uint8')
+        # 8-bit image now are only used for visualization, i.e. convert to videos
+        io.imsave(os.path.join(saveDir8, '%05d.tif'.format(num)), to8bit(image))
         if image.mean() > threshold and remove == True:
             corrected = illumination_correction(image, avg)
         else:
             corrected = image
-        io.imsave(os.path.join(saveDir, 'exp1%05d.tif' % num), corrected, check_contrast=False)
+        io.imsave(os.path.join(saveDir, '%05d.tif' % num), corrected, check_contrast=False)
         with open(os.path.join(saveDir, 'log.txt'), 'a') as f:
             f.write(time.asctime() + ' // Frame {0:04d} converted\n'.format(num))
 
@@ -76,6 +92,8 @@ This script does not apply auto-contrast and save both 16-bit and 8-bit images.
 10282021 - Remove "8-bit" folder, export original images instead of converting to 8-bit
 11042021 - 1. Set `check_contrast` to False to avoid CLI spamming
            2. Add 'exp1' before the image number, in accordance to Cristian's image naming convention
+11262021 - 1. Remove the 'exp1' flag at the beginning of each image file
+           2. Add saturated 8-bit image output for visualization (this means we need a big overhead of disk space!)
 """
 
 """ SYNTAX

@@ -1,0 +1,2 @@
+nd2Dir = ..\test_images\test.nd2
+Fri Nov 26 00:13:50 2021 // Frame 0000 converted
