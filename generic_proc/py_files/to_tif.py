@@ -70,7 +70,7 @@ with ND2Reader(nd2Dir) as images:
     for num, image in enumerate(images):
         # img8 = (image/2**3).astype('uint8')
         # 8-bit image now are only used for visualization, i.e. convert to videos
-        io.imsave(os.path.join(saveDir8, '%05d.tif'.format(num)), to8bit(image))
+        io.imsave(os.path.join(saveDir8, '{:05d}.tif'.format(num)), to8bit(image))
         if image.mean() > threshold and remove == True:
             corrected = illumination_correction(image, avg)
         else:
