@@ -1,1 +1,1 @@
-nd2Dir = ..\test_images\test.nd2
+nd2Dir = ../test_images/test.nd2

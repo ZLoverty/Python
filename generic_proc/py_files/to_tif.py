@@ -4,6 +4,7 @@ from nd2reader import ND2Reader
 import time
 import os
 import sys
+import shutil
 
 def to8bit(img16):
     """
@@ -30,12 +31,29 @@ def illumination_correction(img, avg):
     corrected = (img / avg * img.mean() / (img / avg).mean()).astype('uint8')
     return corrected
 
+def disk_capacity_check(file):
+    """Check if the capacity of disk is larger than twice of the file size.
+    Args:
+    file -- directory of the (.nd2) file being converted
+    Returns:
+    flag -- bool, True if capacity is enough.
+    """
+    fs = os.path.getsize(file) / 2**30
+    ds = shutil.disk_usage(file)[2] / 2**30
+    print("File size {0:.1f} GB, Disk size {1:.1f} GB".format(fs, ds))
+    return ds > 2 * fs
+
 nd2Dir = sys.argv[1]
 remove = False
 if len(sys.argv) > 2:
     remove = bool(int(sys.argv[2]))
 
+# disk capacity check
+if disk_capacity_check(nd2Dir) == False:
+    print("No enough disk capacity!")
+    exit()
 
+print("DISK CAPACITY OK")
 folder, file = os.path.split(nd2Dir)
 
 name, ext = os.path.splitext(file)
@@ -94,6 +112,7 @@ This script does not apply auto-contrast and save both 16-bit and 8-bit images.
            2. Add 'exp1' before the image number, in accordance to Cristian's image naming convention
 11262021 - 1. Remove the 'exp1' flag at the beginning of each image file
            2. Add saturated 8-bit image output for visualization (this means we need a big overhead of disk space!)
+11302021 - Add disk_capacity_check function to avoid running out disk space
 """
 
 """ SYNTAX
