@@ -22,11 +22,13 @@ def corrS(X, Y, U, V):
     EDIT
     ====
     Dec 13, 2021 -- i) Replace all the `mean()` function to nanmean, to handle masked PIV data. ii) Add doc string.
+    Dec 15, 2021 -- if norm `vsqrt` is 0, set it to np.nan to avoid divided by zero warning!
     """
     row, col = X.shape
     r = int(row/2)
     c = int(col/2)
     vsqrt = (U ** 2 + V ** 2) ** 0.5
+    vsqrt[vsqrt==0] = np.nan # if norm is 0, set it to np.nan to avoid divided by zero warning!
     U = U - np.nanmean(U)
     V = V - np.nanmean(V)
     Ax = U / vsqrt
