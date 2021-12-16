@@ -23,6 +23,7 @@ def corrS(X, Y, U, V):
     ====
     Dec 13, 2021 -- i) Replace all the `mean()` function to nanmean, to handle masked PIV data. ii) Add doc string.
     Dec 15, 2021 -- if norm `vsqrt` is 0, set it to np.nan to avoid divided by zero warning!
+    Dec 16, 2021 -- Shift the output X, Y origin to 0, 0, so that 0 distance will have the correlation function = 1. More intuitive.
     """
     row, col = X.shape
     r = int(row/2)
@@ -41,7 +42,7 @@ def corrS(X, Y, U, V):
             if xin != 0 or yin != 0:
                 CA[yin, xin] = np.nanmean((Ax[0:row-yin, 0:col-xin] * Ax[yin:row, xin:col] + Ay[0:row-yin, 0:col-xin] * Ay[yin:row, xin:col]))
                 CV[yin, xin] = np.nanmean((U[0:row-yin, 0:col-xin] * U[yin:row, xin:col] + V[0:row-yin, 0:col-xin] * V[yin:row, xin:col])) / (np.nanstd(U)**2+np.nanstd(V)**2)
-    return X[0:r, 0:c], Y[0:r, 0:c], CA, CV
+    return X[0:r, 0:c] - X[0, 0], Y[0:r, 0:c] - Y[0, 0], CA, CV
 
 def corrI(X, Y, I):
     row, col = I.shape
@@ -77,7 +78,19 @@ def divide_windows(img, windowsize=[20, 20], step=10):
 
 
 def distance_corr(X, Y, C):
-    r_corr = pd.DataFrame({'R': (X.flatten()**2 + Y.flatten()**2) ** 0.5, 'C': C.flatten()}).sort_values(by='R')
+    """ Convert 2d correlation matrix into 1d.
+    Args:
+    X, Y -- 2d coordinates, can be either 2d matrices or flattened matrices
+    C -- correlation matrix, can be either 2d matrices or flattened matrices
+    Return:
+    r_corr -- a DataFrame of ["R", "C"].
+    Edit:
+    Dec 16, 2021 -- i) check input dimension, if it's 1, do not use `flatten`, ii) add doc string
+    """
+    if len(X.shape) == 2:
+        r_corr = pd.DataFrame({'R': (X.flatten()**2 + Y.flatten()**2) ** 0.5, 'C': C.flatten()}).sort_values(by='R')
+    else:
+        r_corr = pd.DataFrame({'R': (X**2 + Y**2) ** 0.5, 'C': C}).sort_values(by='R')
     return r_corr
 
 def corrIseq(folder, **kwargs):
@@ -663,25 +676,9 @@ def xy_bin(xo, yo, n=100, mode='log', bins=None):
     Edit:
     11042020 -- Change function name to xy_bin, to incorporate the mode parameter, so that the function can do both log space binning and linear space binning.
     11172020 -- add bins kwarg, allow user to enter custom bins.
-
-    Test:
-    pivDir = r'D:\density_fluctuations\08032020\piv_imseq\01\3000-3001.csv'
-    X, Y, U, V = read_piv(pivDir)
-    XS, YS, CA, CV = vspatial(X, Y, U, V)
-    k, E = energy_spectrum_2(CV)
-
-    xo = k
-    yo = abs(E)
-    x, y = log_bin(xo, yo, n=100)
-    plt.figure(dpi=300)
-
-    plt.plot(k, abs(E), lw=0.5, color=bestcolor(0), label='corrFT', ls=':')
-    plt.plot(x, y, lw=1, color=bestcolor(1), label='corrFT', marker='o', markersize=2, ls='')
-    plt.loglog()
+    Dec 16, 2021 -- fix divided by 0 issue.
     """
-
     assert(len(xo)==len(yo))
-
     if bins is None:
         if mode == 'log':
             x = np.logspace(np.log10(xo[xo>0].min()), np.log10(xo.max()), n+1)
@@ -689,11 +686,12 @@ def xy_bin(xo, yo, n=100, mode='log', bins=None):
             x = np.linspace(xo.min(), xo.max(), n+1)
     else:
         x = np.sort(bins)
-
-    y = (np.histogram(xo, x, weights=yo)[0] /
-             np.histogram(xo, x)[0])
-
-    return x[:-1], y
+    top = np.histogram(xo, x, weights=yo)[0]
+    bot = np.histogram(xo, x)[0]
+    ind = bot > 0
+    xb = ((x[1:] + x[:-1]) / 2)[ind]
+    yb = top[ind] / bot[ind]
+    return xb, yb
 
 if __name__ == '__main__':
     img = io.imread(r'I:\Github\Python\Correlation\test_images\GNF\stat\40-1.tif')
