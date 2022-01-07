@@ -88,7 +88,8 @@ def PIV_masked(I0, I1, winsize, overlap, dt, mask):
     Dec 15, 2021 -- After testing 2 masking procedure, option 1 is better.
                     Two procedures produce similar results, but option 1 is faster.
                     So this function temporarily uses option 1, until a better procedure comes.
-
+    Jan 07, 2022 -- Change mask threshold from 1 to 0.5, this will include more velocities.
+    
     MASKING PROCEDURE
     =================
     Option 1:
@@ -107,7 +108,7 @@ def PIV_masked(I0, I1, winsize, overlap, dt, mask):
     I0_mask = I0 * mask
     I1_mask = I1 * mask
     x, y, u, v = PIV(I0_mask, I1_mask, winsize, overlap, dt)
-    mask_w = divide_windows(mask, windowsize=[winsize, winsize], step=winsize-overlap)[2] >= 1
+    mask_w = divide_windows(mask, windowsize=[winsize, winsize], step=winsize-overlap)[2] >= 0.5
     assert(mask_w.shape==x.shape)
     u[~mask_w] = np.nan
     v[~mask_w] = np.nan
