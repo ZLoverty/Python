@@ -693,6 +693,49 @@ def xy_bin(xo, yo, n=100, mode='log', bins=None):
     yb = top[ind] / bot[ind]
     return xb, yb
 
+def autocorr_t(x):
+    """Compute the temporal autocorrelation of a 1-D signal.
+    Args:
+    x -- 1-D signal
+    dt -- the time interval between two signals (default to 1)
+    Returns:
+    corr -- correlation array
+    t -- time difference
+    """
+    xn = x - x.mean()
+    corr = np.correlate(xn, xn, mode="same")[len(xn)//2:] / np.inner(xn, xn)
+    return corr
+
+def vacf_piv(vstack, dt, mode="direct"):
+    """Compute averaged vacf from PIV data.
+    This is a wrapper of function autocorr_t(), adding the averaging over all the velocity spots.
+    Args:
+    vstack -- a 2-D np array of velocity data. axis-0 is time and axes-1,2 are spots in velocity field.
+                Usually, this stack can be constracted by `np.stack(u_list)` and then reshape to flatten axes 1 and 2.
+    dt -- time between two data points
+    mode -- the averaging method, can be "direct" or "weighted".
+            "weighted" will use mean velocity as the averaging weight, whereas "direct" uses 1.
+    Returns:
+    corrData -- DataFrame of (corr, t)
+    """
+    # rearrange vstack
+    assert(len(vstack.shape)==3)
+    stack_r = vstack.reshape((vstack.shape[0], -1)).T
+    # compute autocorrelation
+    corr_list = []
+    weight = 1
+    normalizer = 0
+    for x in stack_r:
+        if np.isnan(x[0]) == False: # masked out part has velocity as nan, which cannot be used for correlation computation
+            if mode == "weighted":
+                weight = abs(x).mean()
+            normalizer += weight
+            corr = autocorr_t(x) * weight
+            corr_list.append(corr)
+    corr_mean = np.stack(corr_list, axis=0).sum(axis=0) / normalizer
+
+    return pd.DataFrame({"c": corr_mean, "t": np.arange(len(corr_mean)) * dt}).set_index("t")
+
 if __name__ == '__main__':
     img = io.imread(r'I:\Github\Python\Correlation\test_images\GNF\stat\40-1.tif')
     df_data = density_fluctuation(img)

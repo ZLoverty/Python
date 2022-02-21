@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from skimage import io
 import pandas as pd
 from scipy.signal import medfilt2d
-from corrLib import divide_windows
+from corrLib import divide_windows, readdata
 import os
 
 def PIV1(I0, I1, winsize, overlap, dt, smooth=True):
@@ -89,7 +89,7 @@ def PIV_masked(I0, I1, winsize, overlap, dt, mask):
                     Two procedures produce similar results, but option 1 is faster.
                     So this function temporarily uses option 1, until a better procedure comes.
     Jan 07, 2022 -- Change mask threshold from 1 to 0.5, this will include more velocities.
-    
+
     MASKING PROCEDURE
     =================
     Option 1:
@@ -113,6 +113,24 @@ def PIV_masked(I0, I1, winsize, overlap, dt, mask):
     u[~mask_w] = np.nan
     v[~mask_w] = np.nan
     return x, y, u, v
+
+def read_piv_stack(folder, cutoff=None):
+    """Read PIV data in given folder and stack the velocity data
+    Args:
+    folder -- PIV data folder
+    Returns:
+    ustack, vstack -- 3D arrays of (t, x, y)"""
+    l = readdata(folder, "csv")
+    u_list = []
+    v_list = []
+    for num, i in l.iterrows():
+        x, y, u, v = read_piv(i.Dir)
+        u_list.append(u)
+        v_list.append(v)
+        if cutoff is not None:
+            if num > cutoff:
+                break
+    return np.stack(u_list, axis=0), np.stack(v_list, axis=0)
 
 if __name__ == '__main__':
     # set PIV parameters
