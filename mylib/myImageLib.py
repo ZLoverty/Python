@@ -4,6 +4,7 @@ from scipy import fftpack
 from scipy.signal import medfilt2d, convolve2d, fftconvolve
 from scipy.optimize import curve_fit
 from scipy import exp
+import pandas as pd
 
 def dirrec(path, filename):
     """
@@ -15,7 +16,7 @@ def dirrec(path, filename):
     Return
         dirList ... a list of full directories of files with name <filename>
     Note
-        <filename> can be partially specified, e.g. '*.py' to search for all the 
+        <filename> can be partially specified, e.g. '*.py' to search for all the
         .py files or 'track*' to search for all files starting with 'track'.
     """
     dirList = []
@@ -32,7 +33,7 @@ def dirrec(path, filename):
                 if file.startswith(filename[:-1]):
                     dirList.append(os.path.join(r, file))
             elif file == filename:
-                dirList.append(os.path.join(r, file))            
+                dirList.append(os.path.join(r, file))
     return dirList
 
 def to8bit(img16):
@@ -45,7 +46,7 @@ def to8bit(img16):
     minn = img16.min()
     img8 = (img16 - minn) / (maxx - minn) * 255
     return img8.astype('uint8')
-    
+
 def bpass(*args):
     img8 = args[0]
     low = args[1]
@@ -54,9 +55,9 @@ def bpass(*args):
         filt = np.zeros(img.shape)
         h, w = img.shape
         center = [int(w/2), int(h/2)]
-        Y, X = np.ogrid[:h, :w]        
+        Y, X = np.ogrid[:h, :w]
         dist = ((X - center[0])**2 + (Y-center[1])**2)**.5
-        
+
         filt[(dist>low)&(dist<=high)] = 1
         return filt
     filt = gen_filter(img8, low, high)
@@ -76,8 +77,8 @@ def bestcolor(n):
 def wowcolor(n):
     colors = ['#C41F3B', '#A330C9', '#FF7D0A', '#A9D271', '#40C7EB',
               '#00FF96', '#F58CBA', '#FFF569', '#0070DE', '#8787ED',
-              '#C79C6E', '#BBBBBB', '#1f77b4', '#ff7f0e', '#2ca02c', 
-              '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', 
+              '#C79C6E', '#BBBBBB', '#1f77b4', '#ff7f0e', '#2ca02c',
+              '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f',
               '#bcbd22', '#17becf']
     return colors[n]
 
@@ -100,7 +101,7 @@ def FastPeakFind(data):
         data = data.astype('float32')
     mf = medfilt2d(data, kernel_size=3)
     mf = mf.astype('float32')
-    thres = max(min(np.amax(mf,axis=0)), min(np.amax(mf,axis=1)))    
+    thres = max(min(np.amax(mf,axis=0)), min(np.amax(mf,axis=1)))
     filt = matlab_style_gauss2D()
     conv = convolve2d(mf, filt, mode='same')
     w_idx = conv > thres
@@ -159,20 +160,20 @@ def maxk(array, num_max):
 
 def track_spheres_dt(img, num_particles):
     def gauss1(x,a,x0,sigma):
-        return a*exp(-(x-x0)**2/(2*sigma**2)) 
+        return a*exp(-(x-x0)**2/(2*sigma**2))
     cent = FastPeakFind(img)
     num_particles = min(num_particles, cent.shape[1])
     peaks = img[cent[0], cent[1]]
     ind = maxk(peaks, num_particles)
     max_coor_tmp = cent[:, ind]
     max_coor = max_coor_tmp.astype('float32')
-    pk_value = peaks[ind]    
+    pk_value = peaks[ind]
     for num in range(0, num_particles):
         try:
             x = max_coor_tmp[0, num]
             y = max_coor_tmp[1, num]
             fitx1 = np.asarray(range(x-7, x+8))
-            fity1 = np.asarray(img[range(x-7, x+8), y])        
+            fity1 = np.asarray(img[range(x-7, x+8), y])
             popt,pcov = curve_fit(gauss1, fitx1, fity1, p0=[1, x, 3])
             max_coor[0, num] = popt[1]
             fitx2 = np.asarray(range(y-7, y+8))
@@ -186,8 +187,7 @@ def track_spheres_dt(img, num_particles):
     return max_coor, pk_value
 
 def gauss1(x,a,x0,sigma):
-    return a*exp(-(x-x0)**2/(2*sigma**2))  
-
+    return a*exp(-(x-x0)**2/(2*sigma**2))
 
 def show_progress(progress, label='', bar_length=60):
     """ Display a progress bar
@@ -195,13 +195,40 @@ def show_progress(progress, label='', bar_length=60):
     progress -- float between 0 and 1
     label -- a string displayed before the progress bar
     bar_length -- the length of the progress bar
-    
+
     Returns:
     None
-    
+
     Test:
     >>> show_progress(0.7, label='0812-data')
     """
     N_finish = int(progress*bar_length)
     N_unfinish = bar_length - N_finish
     print('{0} [{1}{2}] {3:.1f}%'.format(label, '#'*N_finish, '-'*N_unfinish, progress*100))
+
+def readdata(folder, ext='csv'):
+    """
+    Read data files with given extensions in a folder.
+
+    Args:
+    folder -- the folder to search in
+    ext -- (optional) file extension of data files looked for, default to 'csv'
+
+    Returns:
+    fileList -- a DataFrame with columns 'Name' and 'Dir'
+
+    Edit:
+    11302020 -- reset the index of fileList, so that further trimming of data by index gets easier
+    """
+    dataDirs = dirrec(folder, '*.' + ext)
+    nameList = []
+    dirList = []
+    for dataDir in dataDirs:
+        path, file = os.path.split(dataDir)
+        name, ext = os.path.splitext(file)
+        nameList.append(name)
+        dirList.append(dataDir)
+    fileList = pd.DataFrame()
+    fileList = fileList.assign(Name=nameList, Dir=dirList)
+    fileList = fileList.sort_values(by=['Name']).reset_index(drop=True)
+    return fileList
