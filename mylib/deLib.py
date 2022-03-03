@@ -12,7 +12,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 from skimage import io
 from myImageLib import readdata
-from pivLib import read_piv, PIV
+from pivLib import read_piv, PIV, PIV_masked
 import corrTrack
 import os
 # %% codecell
@@ -121,8 +121,43 @@ class droplet_image:
         traj.to_json(os.path.join(save_folder, "droplet_traj.json"))
         with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
             json.dump(params, f)
-    def piv_overlay(self, piv_folder, out_folder):
-        pass
+    def piv_overlay_fixed(self, piv_folder, out_folder, sparcity):
+        """Draw PIV overlay for fixed mask PIV data (unify old code in class)"""
+        def determine_arrow_scale(u, v, sparcity):
+            row, col = u.shape
+            return max(np.nanmax(u), np.nanmax(v)) * col / sparcity / 1.5
+        if os.path.exists(out_folder) == False:
+            os.makedirs(out_folder)
+        l = readdata(piv_folder, "csv")
+        # determine scale using the first frame
+        x, y, u, v = read_piv(l.Dir[0])
+        scale = determine_arrow_scale(u, v, sparcity)
+
+        for num, i in l.iterrows():
+            name = i.Name.split("-")[0]
+            index = self.sequence.loc[self.sequence.Name==name].index[0]
+            img = self.get_image(index)
+            x, y, u, v = read_piv(i.Dir)
+            # sparcify
+            row, col = x.shape
+            xs = x[0:row:sparcity, 0:col:sparcity]
+            ys = y[0:row:sparcity, 0:col:sparcity]
+            us = u[0:row:sparcity, 0:col:sparcity]
+            vs = v[0:row:sparcity, 0:col:sparcity]
+            # plot quiver
+            dpi = 300
+            figscale = 1
+            w, h = img.shape[1] / dpi, img.shape[0] / dpi
+            fig = Figure(figsize=(w*figscale, h*figscale)) # on some server `plt` is not supported
+            canvas = FigureCanvas(fig) # necessary?
+            ax = fig.add_axes([0, 0, 1, 1])
+            ax.imshow(img, cmap='gray')
+            ax.quiver(xs, ys, us, vs, color='yellow', width=0.003, \
+                        scale=scale, scale_units='width') # it's better to set a fixed scale, see *Analysis of Collective Motions in Droplets* Section IV.A.2 for more info.
+            ax.axis('off')
+            # save figure
+            fig.savefig(os.path.join(out_folder, name + '.jpg'), dpi=dpi)
+
     def piv_overlay_moving(self, piv_folder, out_folder, traj, piv_params, sparcity=1):
         """Draw PIV overlay for moving mask piv data (only on cropped images)"""
         def determine_arrow_scale(u, v, sparcity):
@@ -160,6 +195,23 @@ class droplet_image:
             ax.axis('off')
             # save figure
             fig.savefig(os.path.join(out_folder, name + '.jpg'), dpi=dpi)
+    def fixed_mask_piv(self, save_folder, winsize, overlap, dt, mask_dir):
+        mask = io.imread(mask_dir)
+        if os.path.exists(save_folder) == False:
+            os.makedirs(save_folder)
+        for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
+            I0 = self.get_image(i0)
+            I1 = self.get_image(i1)
+            x, y, u, v = PIV_masked(I0, I1, winsize, overlap, dt, mask)
+            # generate dataframe and save to file
+            data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
+            data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
+        params = {"winsize": winsize,
+                  "overlap": overlap,
+                  "dt": dt,
+                  "mask_dir": mask_dir}
+        with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
+            json.dump(params, f)
 
 
 # %% codecell
@@ -287,6 +339,7 @@ if __name__=="__main__":
     img = DI.get_cropped_image(0, traj, mask_shape)
     plt.imshow(img)
     # %% codecell
+    # test moving_mask_piv()
     save_folder = r"test_images\moving_mask_piv\piv_result"
     winsize = 20
     overlap = 10
@@ -296,8 +349,7 @@ if __name__=="__main__":
     mask_shape = (174, 174)
     DI.moving_mask_piv(save_folder, winsize, overlap, dt, mask_dir, xy0, mask_shape)
     # %% codecell
-    pd.read_json(os.path.join(save_folder, "droplet_traj.json"))
-    # %% codecell
+    # test piv_overlay_moving()
     piv_folder = r"test_images\moving_mask_piv\piv_result"
     out_folder = r"test_images\moving_mask_piv\piv_overlay_moving"
     traj = pd.read_json(os.path.join(piv_folder, "droplet_traj.json"))
@@ -305,6 +357,7 @@ if __name__=="__main__":
         piv_params = json.load(f)
     DI.piv_overlay_moving(piv_folder, out_folder, traj, piv_params, sparcity=1)
     # %% codecell
+    # output cropped images for note figure
     out_folder = r"test_images\moving_mask_piv\cropped_images"
     if os.path.exists(out_folder) == False:
         os.makedirs(out_folder)
@@ -319,3 +372,17 @@ if __name__=="__main__":
         ax.imshow(img, cmap='gray')
         ax.axis("off")
         fig.savefig(os.path.join(out_folder, "{}.jpg".format(DI.get_image_name(i))))
+    # %% codecell
+    # test fixed_mask_piv()
+    save_folder = r"test_images\fixed_mask_piv\piv_result"
+    winsize = 20
+    overlap = 10
+    dt = 0.02
+    mask_dir = r"test_images\moving_mask_piv\mask.tif"
+    DI.fixed_mask_piv(save_folder, winsize, overlap, dt, mask_dir)
+    # %% codecell
+    # test piv_overlay_fixed()
+    piv_folder = r"test_images\fixed_mask_piv\piv_result"
+    out_folder = r"test_images\fixed_mask_piv\piv_overlay_fixed"
+    sparcity = 1
+    DI.piv_overlay_fixed(piv_folder, out_folder, sparcity=sparcity)
