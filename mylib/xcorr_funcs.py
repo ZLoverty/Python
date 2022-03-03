@@ -12,7 +12,7 @@ def normxcorr2(template, image, mode="full"):
     Length of each dimension must be less than length of image.
     :param image: N-D array
     :param mode: Options, "full", "valid", "same"
-    full (Default): The output of fftconvolve is the full discrete linear convolution of the inputs. 
+    full (Default): The output of fftconvolve is the full discrete linear convolution of the inputs.
     Output size will be image size + 1/2 template size in each dimension.
     valid: The output consists only of those elements that do not rely on the zero-padding.
     same: The output is the same size as image, centered with respect to the ‘full’ output.
@@ -31,7 +31,7 @@ def normxcorr2(template, image, mode="full"):
     # Faster to flip up down and left right then use fftconvolve instead of scipy's correlate
     ar = np.flipud(np.fliplr(template))
     out = fftconvolve(image, ar.conj(), mode=mode)
-    
+
     image = fftconvolve(np.square(image), a1, mode=mode) - \
             np.square(fftconvolve(image, a1, mode=mode)) / (np.prod(template.shape))
 
@@ -43,9 +43,9 @@ def normxcorr2(template, image, mode="full"):
 
     # Remove any divisions by 0 or very close to 0
     out[np.where(np.logical_not(np.isfinite(out)))] = 0
-    
-    return -out
-    
+
+    return out
+
 def matlab_style_gauss2D(shape=(3,3),sigma=0.5):
     """
     2D gaussian mask - should give the same result as MATLAB's
@@ -59,7 +59,7 @@ def matlab_style_gauss2D(shape=(3,3),sigma=0.5):
     if sumh != 0:
         h /= sumh
     return h
-    
+
 def FastPeakFind(data):
     if str(data.dtype) != 'float32':
         data = data.astype('float32')
@@ -68,19 +68,19 @@ def FastPeakFind(data):
     # plt.imshow(data)
     # plt.title('Raw xCorr')
     # pdb.set_trace()
-    
+
     # plt.subplot(2,2,2)
     mf = medfilt2d(data, kernel_size=3)
     mf = mf.astype('float32')
     # plt.imshow(mf)
-    # plt.title('Median filtered')   
-    
+    # plt.title('Median filtered')
+
     # plt.subplot(2,2,3)
     thres = max(min(np.amax(mf,axis=0)), min(np.amax(mf,axis=1)))
-    
+
     # pdb.set_trace()
     # bw = mf[1 if mf_ > thres for mf_ in mf]
-    
+
     filt = matlab_style_gauss2D()
     conv = convolve2d(mf, filt, mode='same')
     w_idx = conv > thres
@@ -122,10 +122,10 @@ def maxk(array, num_max):
     idx = np.argsort(array)
     idx2 = np.flip(idx)
     return idx2[0, 0:num_max]
-    
+
 def gauss1(x,a,x0,sigma):
-    return a*exp(-(x-x0)**2/(2*sigma**2))    
-    
+    return a*exp(-(x-x0)**2/(2*sigma**2))
+
 
 if __name__ == '__main__':
     # data = np.loadtxt('test_array.dat', delimiter='\t')
