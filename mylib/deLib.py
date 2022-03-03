@@ -86,39 +86,23 @@ class droplet_image:
             count += 1
             if count >= n:
                 break
-    def test(self):
-        image_sequence = readdata(os.path.join(folder, "16", "raw"), "tif")[:1000]
-        mask = io.imread(os.path.join(folder, "mask", "16.tif"))
-        xy0 = (173, 165)
-        mask_shape = (174, 174)
-        di = droplet_image(image_sequence, mask, xy0, mask_shape)
     def get_image_name(self, index):
         return self.sequence.Name[index]
-    def save_params(self, save_folder):
-        params = {"mask_shape": (int(self.mask_shape[0]), int(self.mask_shape[1]))}
-        with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
-            json.dump(params, f)
-    def moving_mask_piv(self, save_folder, winsize, overlap, dt, mask_dir, xy0, mask_shape):
-        """Perform moving mask PIV and save PIV results and parameters in save_folder"""
+    def fixed_mask_piv(self, save_folder, winsize, overlap, dt, mask_dir):
         mask = io.imread(mask_dir)
         if os.path.exists(save_folder) == False:
             os.makedirs(save_folder)
-        traj = self.droplet_traj(mask, xy0)
         for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
-            I0 = self.get_cropped_image(i0, traj, mask_shape)
-            I1 = self.get_cropped_image(i1, traj, mask_shape)
-            x, y, u, v = PIV(I0, I1, winsize, overlap, dt)
+            I0 = self.get_image(i0)
+            I1 = self.get_image(i1)
+            x, y, u, v = PIV_masked(I0, I1, winsize, overlap, dt, mask)
             # generate dataframe and save to file
             data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
             data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
         params = {"winsize": winsize,
                   "overlap": overlap,
                   "dt": dt,
-                  "mask_dir": mask_dir,
-                  "droplet_initial_position (xy0)": (int(xy0[0]), int(xy0[1])),
-                  "mask_shape": (int(mask_shape[0]), int(mask_shape[1]))}
-        # save traj and param data in .json files, so that only PIV data are saved in .csv files
-        traj.to_json(os.path.join(save_folder, "droplet_traj.json"))
+                  "mask_dir": mask_dir}
         with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
             json.dump(params, f)
     def piv_overlay_fixed(self, piv_folder, out_folder, sparcity):
@@ -157,7 +141,29 @@ class droplet_image:
             ax.axis('off')
             # save figure
             fig.savefig(os.path.join(out_folder, name + '.jpg'), dpi=dpi)
-
+    def moving_mask_piv(self, save_folder, winsize, overlap, dt, mask_dir, xy0, mask_shape):
+        """Perform moving mask PIV and save PIV results and parameters in save_folder"""
+        mask = io.imread(mask_dir)
+        if os.path.exists(save_folder) == False:
+            os.makedirs(save_folder)
+        traj = self.droplet_traj(mask, xy0)
+        for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
+            I0 = self.get_cropped_image(i0, traj, mask_shape)
+            I1 = self.get_cropped_image(i1, traj, mask_shape)
+            x, y, u, v = PIV(I0, I1, winsize, overlap, dt)
+            # generate dataframe and save to file
+            data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
+            data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
+        params = {"winsize": winsize,
+                  "overlap": overlap,
+                  "dt": dt,
+                  "mask_dir": mask_dir,
+                  "droplet_initial_position (xy0)": (int(xy0[0]), int(xy0[1])),
+                  "mask_shape": (int(mask_shape[0]), int(mask_shape[1]))}
+        # save traj and param data in .json files, so that only PIV data are saved in .csv files
+        traj.to_json(os.path.join(save_folder, "droplet_traj.json"))
+        with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
+            json.dump(params, f)
     def piv_overlay_moving(self, piv_folder, out_folder, traj, piv_params, sparcity=1):
         """Draw PIV overlay for moving mask piv data (only on cropped images)"""
         def determine_arrow_scale(u, v, sparcity):
@@ -195,23 +201,7 @@ class droplet_image:
             ax.axis('off')
             # save figure
             fig.savefig(os.path.join(out_folder, name + '.jpg'), dpi=dpi)
-    def fixed_mask_piv(self, save_folder, winsize, overlap, dt, mask_dir):
-        mask = io.imread(mask_dir)
-        if os.path.exists(save_folder) == False:
-            os.makedirs(save_folder)
-        for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
-            I0 = self.get_image(i0)
-            I1 = self.get_image(i1)
-            x, y, u, v = PIV_masked(I0, I1, winsize, overlap, dt, mask)
-            # generate dataframe and save to file
-            data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
-            data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
-        params = {"winsize": winsize,
-                  "overlap": overlap,
-                  "dt": dt,
-                  "mask_dir": mask_dir}
-        with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
-            json.dump(params, f)
+    
 
 
 # %% codecell
