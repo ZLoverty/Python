@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 from skimage import io
 import pandas as pd
 from scipy.signal import medfilt2d
-from corrLib import divide_windows, readdata
+from corrLib import divide_windows, readdata, autocorr1d, corrS, distance_corr, xy_bin
 import os
-
+import scipy
+# %% codecell
 def PIV1(I0, I1, winsize, overlap, dt, smooth=True):
     u0, v0 = pyprocess.extended_search_area_piv(I0.astype(np.int32), I1.astype(np.int32), window_size=winsize, overlap=overlap, dt=dt, search_area_size=winsize)
     x, y = pyprocess.get_coordinates(image_size=I0.shape, search_area_size=winsize, window_size=winsize, overlap=overlap)
@@ -132,15 +133,120 @@ def read_piv_stack(folder, cutoff=None):
                 break
     return np.stack(u_list, axis=0), np.stack(v_list, axis=0)
 
+# %% codecell
+class piv_data:
+    """Tools for PIV data downstream analysis, such as correlation, mean velocity,
+    derivative fields, energy, enstrophy, energy spectrum, etc."""
+    def __init__(self, file_list, fps=50):
+        """file_list: return value of readdata"""
+        self.piv_sequence = file_list
+        self.dt = 2 / fps # time between two data files
+        self.stack = self.load_stack()
+    def load_stack(self, cutoff=None):
+        u_list = []
+        v_list = []
+        for num, i in l.iterrows():
+            x, y, u, v = read_piv(i.Dir)
+            u_list.append(u)
+            v_list.append(v)
+            if cutoff is not None:
+                if num > cutoff:
+                    break
+        return np.stack(u_list, axis=0), np.stack(v_list, axis=0)
+    def vacf(self, mode="direct", smooth_window=3, xlim=None, plot=False):
+        """Compute averaged vacf from PIV data.
+        This is a wrapper of function autocorr1d(), adding the averaging over all the velocity spots.
+        Args:
+        mode -- the averaging method, can be "direct" or "weighted".
+                "weighted" will use mean velocity as the averaging weight, whereas "direct" uses 1.
+        smooth_window -- window size for gaussian smoothing in time
+        xlim -- xlim for plotting the VACF, does not affect the return value
+        Returns:
+        corrData -- DataFrame of (t, corrx, corry)
+        """
+        # rearrange vstack from (f, h, w) to (f, h*w), then transpose
+        corr_components = []
+        for name, stack in zip(["corrx", "corry"], self.stack):
+            stack = scipy.ndimage.gaussian_filter(stack, (smooth_window/4,0,0))
+            stack_r = stack.reshape((stack.shape[0], -1)).T
+            # compute autocorrelation
+            corr_list = []
+            weight = 1
+            normalizer = 0
+            for x in stack_r:
+                if np.isnan(x[0]) == False: # masked out part has velocity as nan, which cannot be used for correlation computation
+                    if mode == "weighted":
+                        weight = abs(x).mean()
+                    corr = autocorr1d(x) * weight
+                    if np.isnan(corr.sum()) == False:
+                        normalizer += weight
+                        corr_list.append(corr)
+            corr_mean = np.nansum(np.stack(corr_list, axis=0), axis=0) / normalizer
+            corr_components.append(pd.DataFrame({"c": corr_mean, "t": np.arange(len(corr_mean)) * self.dt}).set_index("t").rename(columns={"c": name}))
+        ac = pd.concat(corr_components, axis=1)
+        # plot autocorrelation functions
+        if plot == True:
+            fig, ax = plt.subplots(figsize=(3.5, 3), dpi=100)
+            ax.plot(ac.index, ac.corrx, label="$C_x$")
+            ax.plot(ac.index, ac.corry, label="$C_y$")
+            ax.plot(ac.index, ac.mean(axis=1), label="mean", color="black")
+            ax.set_xlabel("time (s)")
+            ax.set_ylabel("VACF")
+            ax.legend(frameon=False)
+            ax.set_xlim([0, ac.index.max()])
+            if xlim is not None:
+                ax.set_xlim(xlim)
+        return ac
+    def corrS2d(self, mode="sample", n=10, plot=False):
+        """Spatial correlation of velocity field.
+        mode -- "sample" or "full"
+                "sample" will sample n frames to compute the correlation
+                "full" will sample all available frames to compute the correlation (could be computationally expensive)
+        n -- number of frames to sample"""
+        interval = max(len(self.piv_sequence) // n, 1)
+        CV_list = []
+        for num, i in self.piv_sequence[::interval].iterrows():
+            x, y, u, v = read_piv(i.Dir)
+            X, Y, CA, CV = corrS(x, y, u, v)
+            CV_list.append(CV)
+        CV_mean = np.stack(CV_list, axis=0).mean(axis=0)
+        if plot == True:
+            plt.imshow(CV_mean)
+            plt.colorbar()
+        return X, Y, CV_mean
+    def corrS1d(self, mode="sample", n=10, xlim=None, plot=False):
+        """Compute 2d correlation and convert to 1d. 1d correlation will be represented
+        as pd.DataFrame of (R, C)."""
+        X, Y, CV = self.corrS2d(mode=mode, n=n)
+        dc = distance_corr(X, Y, CV)
+        if plot == True:
+            fig, ax = plt.subplots(figsize=(3.5, 3), dpi=100)
+            ax.plot(dc.R, dc.C)
+            ax.set_xlim([0, dc.R.max()])
+            ax.set_xlabel("$r$ (pixel)")
+            ax.set_ylabel("spatial correlation")
+            if xlim is not None:
+                ax.set_xlim(xlim)
+        return dc
+# %% codecell
 if __name__ == '__main__':
-    # set PIV parameters
-    winsize = 50 # pixels
-    searchsize = 100  # pixels, search in image B
-    overlap = 25 # pixels
-    dt = 0.033 # frame interval (sec)
-    # imgDir = r'R:\Dip\DF\PIV_analysis\1.tif'
-    # data = tiffstackPIV(imgDir, winsize, searchsize, overlap, dt)
-    folder = r'D:\Wei\Dynamics_raw\60'
-    data = imseqPIV(folder, winsize, overlap, dt)
-    data.to_csv(os.path.join(folder, 'pivData.csv'), index=False)
-    # plt.quiver(data.x, data.y, data.u, data.v)
+    # %% codecell
+    folder = r"test_images\moving_mask_piv\piv_result"
+    l = readdata(folder, "csv")
+    piv = piv_data(l, fps=50)
+    vacf = piv.vacf(smooth_window=2, xlim=[0, 0.1])
+    # autocorr1d(np.array([1,1,1]))
+    # %% codecell
+    corr1d = piv.corrS1d(n=600, xlim=[0, 170], plot=True)
+    # %% codecell
+
+    # %% codecell
+    x, y, u, v = read_piv(os.path.join(folder, "00143-00144.csv"))
+    X, Y, CA, CV = corrS(x, y, u, v)
+    dc = distance_corr(X, Y, CV)
+    plt.plot(dc.R, dc.C)
+
+    r, c = xy_bin(dc.R, dc.C)
+    plt.plot(r, c)
+
+    dc
