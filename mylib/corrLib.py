@@ -693,7 +693,7 @@ def xy_bin(xo, yo, n=100, mode='log', bins=None):
     yb = top[ind] / bot[ind]
     return xb, yb
 
-def autocorr_t(x):
+def autocorr1d(x):
     """Compute the temporal autocorrelation of a 1-D signal.
     Args:
     x -- 1-D signal
@@ -730,7 +730,7 @@ def vacf_piv(vstack, dt, mode="direct"):
             if mode == "weighted":
                 weight = abs(x).mean()
             normalizer += weight
-            corr = autocorr_t(x) * weight
+            corr = autocorr1d(x) * weight
             corr_list.append(corr)
     corr_mean = np.stack(corr_list, axis=0).sum(axis=0) / normalizer
 
