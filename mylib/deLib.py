@@ -45,6 +45,7 @@ class droplet_image:
         xyc = self.process_first_image(mask)
         xym_list = []
         for num, i in self.sequence.iterrows():
+            print("Tracking droplet in image {:05d}".format(num), end="\r")
             img = io.imread(i.Dir)
             xy, pkv = corrTrack.track_spheres(img, mask, 1)
             xym_list.append(np.flip(xy.squeeze()))
@@ -148,6 +149,7 @@ class droplet_image:
             os.makedirs(save_folder)
         traj = self.droplet_traj(mask, xy0)
         for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
+            print("Processing images {0:05d}-{1:05d}".format(i0, i1), end="\r")
             I0 = self.get_cropped_image(i0, traj, mask_shape)
             I1 = self.get_cropped_image(i1, traj, mask_shape)
             x, y, u, v = PIV(I0, I1, winsize, overlap, dt)
@@ -201,7 +203,7 @@ class droplet_image:
             ax.axis('off')
             # save figure
             fig.savefig(os.path.join(out_folder, name + '.jpg'), dpi=dpi)
-    
+
 
 
 # %% codecell
