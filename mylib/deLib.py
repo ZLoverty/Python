@@ -45,7 +45,7 @@ class droplet_image:
         xyc = self.process_first_image(mask)
         xym_list = []
         for num, i in self.sequence.iterrows():
-            print("Tracking droplet in image {:05d}".format(num), end="\r")
+            print("Tracking droplet: {}".format(self.get_image_name(num)), end="\r")
             img = io.imread(i.Dir)
             xy, pkv = corrTrack.track_spheres(img, mask, 1)
             xym_list.append(np.flip(xy.squeeze()))
@@ -55,7 +55,8 @@ class droplet_image:
         self.traj = traj
         return traj
     def get_cropped_image(self, index, traj, mask_shape):
-        """Retrieve cropped image by index"""
+        """Retrieve cropped image by index.
+        Mar 10, 2022 -- boundary protection."""
         x = int(traj.x[index])
         y = int(traj.y[index])
         h, w = mask_shape
@@ -64,7 +65,8 @@ class droplet_image:
         y0 = y - h // 2
         y1 = y0 + h
         img = self.get_image(index)
-        cropped = img[y0:y1, x0:x1]
+        ih, iw = img.shape
+        cropped = img[max(y0, 0): min(y1, ih), max(x0, 0): min(x1, iw)]
         return cropped
     def get_image(self, index):
         """Retrieve image by index"""
@@ -144,28 +146,36 @@ class droplet_image:
             fig.savefig(os.path.join(out_folder, name + '.jpg'), dpi=dpi)
     def moving_mask_piv(self, save_folder, winsize, overlap, dt, mask_dir, xy0, mask_shape):
         """Perform moving mask PIV and save PIV results and parameters in save_folder"""
-        mask = io.imread(mask_dir)
+        # create save_folder
         if os.path.exists(save_folder) == False:
             os.makedirs(save_folder)
-        traj = self.droplet_traj(mask, xy0)
-        for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
-            print("Processing images {0:05d}-{1:05d}".format(i0, i1), end="\r")
-            I0 = self.get_cropped_image(i0, traj, mask_shape)
-            I1 = self.get_cropped_image(i1, traj, mask_shape)
-            x, y, u, v = PIV(I0, I1, winsize, overlap, dt)
-            # generate dataframe and save to file
-            data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
-            data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
+        # save params in .json file, so that only PIV data are saved in .csv files
         params = {"winsize": winsize,
                   "overlap": overlap,
                   "dt": dt,
                   "mask_dir": mask_dir,
                   "droplet_initial_position (xy0)": (int(xy0[0]), int(xy0[1])),
                   "mask_shape": (int(mask_shape[0]), int(mask_shape[1]))}
-        # save traj and param data in .json files, so that only PIV data are saved in .csv files
-        traj.to_json(os.path.join(save_folder, "droplet_traj.json"))
+        # save traj data in .json file, so that only PIV data are saved in .csv files
         with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
             json.dump(params, f)
+        # track droplet
+        mask = io.imread(mask_dir)
+        traj = self.droplet_traj(mask, xy0)
+        traj.to_json(os.path.join(save_folder, "droplet_traj.json"))
+        # PIV
+        print("")
+        for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
+            name0 = self.get_image_name(i0)
+            name1 = self.get_image_name(i1)
+            print("PIV: {0}-{1}".format(name0, name1), end="\r")
+            I0 = self.get_cropped_image(i0, traj, mask_shape)
+            I1 = self.get_cropped_image(i1, traj, mask_shape)
+            x, y, u, v = PIV(I0, I1, winsize, overlap, dt)
+            # generate dataframe and save to file
+            data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
+            data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
+
     def piv_overlay_moving(self, piv_folder, out_folder, traj, piv_params, sparcity=1):
         """Draw PIV overlay for moving mask piv data (only on cropped images)"""
         def determine_arrow_scale(u, v, sparcity):
