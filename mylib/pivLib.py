@@ -228,6 +228,23 @@ class piv_data:
             if xlim is not None:
                 ax.set_xlim(xlim)
         return dc
+    def mean_velocity(self, mode="abs", plot=False):
+        """Mean velocity time series.
+        mode -- "abs" or "square"."""
+        vm_list = []
+        for num, i in self.piv_sequence.iterrows():
+            x, y, u, v = read_piv(i.Dir)
+            if mode == "abs":
+                vm = ((u ** 2 + v ** 2) ** 0.5).mean()
+            elif mode == "square":
+                vm = (u ** 2 + v ** 2).mean() ** 0.5
+            vm_list.append(vm)
+        if plot == True:
+            fig, ax = plt.subplots(figsize=(3.5, 3), dpi=100)
+            ax.plot(np.arange(len(vm_list))*self.dt, vm_list)
+            ax.set_xlabel("time (s)")
+            ax.set_ylabel("mean velocity (px/s)")
+        return pd.DataFrame({"t": np.arange(len(vm_list))*self.dt, "v_mean": vm_list})
 # %% codecell
 if __name__ == '__main__':
     # %% codecell
@@ -239,14 +256,5 @@ if __name__ == '__main__':
     # %% codecell
     corr1d = piv.corrS1d(n=600, xlim=[0, 170], plot=True)
     # %% codecell
-
+    piv.mean_velocity(plot=True)
     # %% codecell
-    x, y, u, v = read_piv(os.path.join(folder, "00143-00144.csv"))
-    X, Y, CA, CV = corrS(x, y, u, v)
-    dc = distance_corr(X, Y, CV)
-    plt.plot(dc.R, dc.C)
-
-    r, c = xy_bin(dc.R, dc.C)
-    plt.plot(r, c)
-
-    dc
