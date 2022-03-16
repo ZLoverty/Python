@@ -108,7 +108,7 @@ class droplet_image:
                   "mask_dir": mask_dir}
         with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
             json.dump(params, f)
-    def piv_overlay_fixed(self, piv_folder, out_folder, sparcity):
+    def piv_overlay_fixed(self, piv_folder, out_folder, sparcity=1):
         """Draw PIV overlay for fixed mask PIV data (unify old code in class)"""
         def determine_arrow_scale(u, v, sparcity):
             row, col = u.shape
@@ -165,6 +165,7 @@ class droplet_image:
         traj.to_json(os.path.join(save_folder, "droplet_traj.json"))
         # PIV
         print("")
+        n = 0
         for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
             name0 = self.get_image_name(i0)
             name1 = self.get_image_name(i1)
@@ -175,8 +176,10 @@ class droplet_image:
             # generate dataframe and save to file
             data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
             data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
-
-    def piv_overlay_moving(self, piv_folder, out_folder, traj, piv_params, sparcity=1):
+            n += 1
+            if n != 0 and n % 100 == 0:
+                print("PIV: {0}-{1}".format(name0, name1))
+    def piv_overlay_moving(self, piv_folder, out_folder, traj, piv_params, sparcity=1, crop=True):
         """Draw PIV overlay for moving mask piv data (only on cropped images)"""
         def determine_arrow_scale(u, v, sparcity):
             row, col = u.shape
