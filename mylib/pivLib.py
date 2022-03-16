@@ -145,8 +145,13 @@ class piv_data:
     def load_stack(self, cutoff=None):
         u_list = []
         v_list = []
-        for num, i in l.iterrows():
+        for num, i in self.piv_sequence.iterrows():
             x, y, u, v = read_piv(i.Dir)
+            if num == 0:
+                shape = x.shape
+            else:
+                if x.shape != shape:
+                    break
             u_list.append(u)
             v_list.append(v)
             if cutoff is not None:
@@ -207,6 +212,11 @@ class piv_data:
         CV_list = []
         for num, i in self.piv_sequence[::interval].iterrows():
             x, y, u, v = read_piv(i.Dir)
+            if num == 0:
+                shape = x.shape
+            else:
+                if x.shape != shape:
+                    break
             X, Y, CA, CV = corrS(x, y, u, v)
             CV_list.append(CV)
         CV_mean = np.stack(CV_list, axis=0).mean(axis=0)
@@ -235,9 +245,9 @@ class piv_data:
         for num, i in self.piv_sequence.iterrows():
             x, y, u, v = read_piv(i.Dir)
             if mode == "abs":
-                vm = ((u ** 2 + v ** 2) ** 0.5).mean()
+                vm = np.nanmean((u ** 2 + v ** 2) ** 0.5)
             elif mode == "square":
-                vm = (u ** 2 + v ** 2).mean() ** 0.5
+                vm = np.nanmean((u ** 2 + v ** 2) ** 0.5)
             vm_list.append(vm)
         if plot == True:
             fig, ax = plt.subplots(figsize=(3.5, 3), dpi=100)
