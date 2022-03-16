@@ -173,6 +173,8 @@ class droplet_image:
             I0 = self.get_cropped_image(i0, traj, mask_shape)
             I1 = self.get_cropped_image(i1, traj, mask_shape)
             x, y, u, v = PIV(I0, I1, winsize, overlap, dt)
+            # apply (circular) mask to u and v: implement in the piv_data class
+
             # generate dataframe and save to file
             data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
             data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
