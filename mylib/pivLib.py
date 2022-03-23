@@ -137,11 +137,11 @@ def read_piv_stack(folder, cutoff=None):
 class piv_data:
     """Tools for PIV data downstream analysis, such as correlation, mean velocity,
     derivative fields, energy, enstrophy, energy spectrum, etc."""
-    def __init__(self, file_list, fps=50):
+    def __init__(self, file_list, fps=50, cutoff=250):
         """file_list: return value of readdata"""
         self.piv_sequence = file_list
         self.dt = 2 / fps # time between two data files
-        self.stack = self.load_stack()
+        self.stack = self.load_stack(cutoff=cutoff)
     def load_stack(self, cutoff=None):
         u_list = []
         v_list = []
