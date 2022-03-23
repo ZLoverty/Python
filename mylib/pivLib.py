@@ -158,7 +158,7 @@ class piv_data:
                 if num > cutoff:
                     break
         return np.stack(u_list, axis=0), np.stack(v_list, axis=0)
-    def vacf(self, mode="direct", smooth_window=3, xlim=None, plot=False):
+    def vacf(self, mode="direct", smooth_method="gaussian", smooth_window=3, xlim=None, plot=False):
         """Compute averaged vacf from PIV data.
         This is a wrapper of function autocorr1d(), adding the averaging over all the velocity spots.
         Args:
@@ -168,12 +168,18 @@ class piv_data:
         xlim -- xlim for plotting the VACF, does not affect the return value
         Returns:
         corrData -- DataFrame of (t, corrx, corry)
+        Edit:
+        Mar 23, 2022 -- add smoothn smoothing option
         """
         # rearrange vstack from (f, h, w) to (f, h*w), then transpose
         corr_components = []
         for name, stack in zip(["corrx", "corry"], self.stack):
-            stack = scipy.ndimage.gaussian_filter(stack, (smooth_window/4,0,0))
             stack_r = stack.reshape((stack.shape[0], -1)).T
+            stack_r = stack_r[~np.isnan(stack_r).any(axis=1)]
+            if smooth_method == "gaussian":
+                stack_r = scipy.ndimage.gaussian_filter(stack_r, (0, smooth_window/4))
+            elif smooth_method == "smoothn":
+                stack_r = smoothn(stack_r, axis=1)[0]
             # compute autocorrelation
             corr_list = []
             weight = 1
