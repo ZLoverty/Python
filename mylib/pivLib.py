@@ -133,6 +133,30 @@ def read_piv_stack(folder, cutoff=None):
                 break
     return np.stack(u_list, axis=0), np.stack(v_list, axis=0)
 
+def tangent_unit(point, center):
+    """Compute tangent unit vector based on point coords and center coords.
+    Args:
+    point -- 2-tuple
+    center -- 2-tuple
+    Returns:
+    tu -- tangent unit vector
+    """
+    point = np.array(point)
+    # center = np.array(center)
+    r = np.array((point[0] - center[0], point[1] - center[1]))
+    # the following two lines set the initial value for the x of the tangent vector
+    ind = np.logical_or(r[1] > 0, np.logical_and(r[1] == 0, r[0] > 0))
+    x1 = np.ones(point.shape[1:])
+    x1[ind] = -1
+    y1 = np.zeros(point.shape[1:])
+    x1[(r[1]==0)] = 0
+    y1[(r[1]==0)&(r[0]>0)] = -1
+    y1[(r[1]==0)&(r[0]<0)] = 1
+
+    y1[r[1]!=0] = np.divide(x1 * r[0], r[1], where=r[1]!=0)[r[1]!=0]
+    length = (x1**2 + y1**2) ** 0.5
+    return np.divide(np.array([x1, y1]), length, out=np.zeros_like(np.array([x1, y1])), where=length!=0)
+
 # %% codecell
 class piv_data:
     """Tools for PIV data downstream analysis, such as correlation, mean velocity,
@@ -261,12 +285,55 @@ class piv_data:
             ax.set_xlabel("time (s)")
             ax.set_ylabel("mean velocity (px/s)")
         return pd.DataFrame({"t": np.arange(len(vm_list))*self.dt, "v_mean": vm_list})
+    def order_parameter(self, center, mode="wioland"):
+        def wioland2013(pivData, center):
+            """Compute order parameter with PIV data and droplet center coords using the method from wioland2013.
+            Args:
+            pivData -- DataFrame of x, y, u, v
+            center -- 2-tuple droplet center coords
+            Return:
+            OP -- float, max to 1
+            """
+            pivData = pivData.dropna()
+            point = (pivData.x, pivData.y)
+            tu = tangent_unit(point, center)
+            # \Sigma vt
+            sum_vt = abs((pivData.u * tu[0] + pivData.v * tu[1])).sum()
+            sum_v = ((pivData.u**2 + pivData.v**2) ** 0.5).sum()
+            OP = (sum_vt/sum_v - 2/np.pi) / (1 - 2/np.pi)
+            return OP
+        def hamby2018(pivData, center):
+            """Computes order parameter using the definition in Hamby 2018.
+            Args:
+            pivData - DataFrame of x, y, u, v
+            center - 2-tuple center of droplet
+            Returns:
+            OP - order parameter
+            """
+            pivData = pivData.dropna()
+            tu = tangent_unit((pivData.x, pivData.y), center)
+            pivData = pivData.assign(tu=tu[0], tv=tu[1])
+            OP = (pivData.u * pivData.tu + pivData.v * pivData.tv).sum() / ((pivData.u ** 2 + pivData.v ** 2) ** 0.5).sum()
+            return OP
+        OP_list = []
+        if mode == "wioland":
+            for num, i in self.piv_sequence.iterrows():
+                pivData = pd.read_csv(i.Dir)
+                OP = wioland2013(pivData, center)
+                OP_list.append(OP)
+        elif mode == "hamby":
+            for num, i in self.piv_sequence.iterrows():
+                pivData = pd.read_csv(i.Dir)
+                OP = hamby2018(pivData, center)
+                OP_list.append(OP)
+        return pd.DataFrame({"t": np.arange(len(OP_list)) * self.dt, "OP": OP_list})
 # %% codecell
 if __name__ == '__main__':
     # %% codecell
     folder = r"test_images\moving_mask_piv\piv_result"
     l = readdata(folder, "csv")
     piv = piv_data(l, fps=50)
+    # %% codecell
     vacf = piv.vacf(smooth_window=2, xlim=[0, 0.1])
     # autocorr1d(np.array([1,1,1]))
     # %% codecell
@@ -274,3 +341,5 @@ if __name__ == '__main__':
     # %% codecell
     piv.mean_velocity(plot=True)
     # %% codecell
+    op = piv.order_parameter((87, 87), mode="hamby")
+    op
