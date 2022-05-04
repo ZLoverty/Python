@@ -614,26 +614,28 @@ class de_data():
         plt.grid(which="both", ls=":")
         plt.xlim([1, 30])
         plt.loglog()
-    def Rinf2_over_tau(self):
-        """Plot $R_\infty^2 / \tau^*$ vs. $(D-d)/d^2$"""
+    def Rinf2_over_tau(self, x="(D-d)/d^2", ax=None):
+        """Plot $R_\infty^2 / \tau^*$ vs. $(D-d)/d^2$
+        Edit:
+        05032022 -- add custom x-axis"""
         log = self.data
         log1 = log.dropna(subset=["Rinfy", "t2"])
         binsize = 20 # OD bin size
-        plt.figure(figsize=(3.5,3), dpi=100)
+        if ax == None:
+            fig, ax = plt.subplots(figsize=(3.5,3), dpi=100)
         bin_starts = range(0, int(log1.OD.max()), binsize)
         cmap = plt.cm.get_cmap("tab10")
         for num, bs in enumerate(bin_starts):
             log2 = log1.loc[(log1.OD>bs)&(log1.OD<=bs+binsize)]
             log3 = log2.loc[log2.Comment!="Chile"]
             log4 = log2.loc[log2.Comment=="Chile"]
-            plt.scatter(log3["(D-d)/d^2"], log3.Rinfy/(log3.t2), color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
-            plt.scatter(log4["(D-d)/d^2"], log4.Rinfy/(log4.t2), edgecolors=cmap(num), marker="^", fc=(0,0,0,0))
-
-        plt.xlabel("$(D-d)/d^2$")
-        plt.ylabel("$R_\infty^2 / \\tau^*$")
-        plt.legend(ncol=2, fontsize=6, loc="lower right")
-        plt.grid(which="both", ls=":")
-        plt.loglog()
+            ax.scatter(log3[x], log3.Rinfy/(log3.t2), color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
+            ax.scatter(log4[x], log4.Rinfy/(log4.t2), edgecolors=cmap(num), marker="^", fc=(0,0,0,0))
+        ax.set_xlabel("${}$".format(x))
+        ax.set_ylabel("$R_\infty^2 / \\tau^*$")
+        ax.legend(ncol=2, fontsize=6, loc="lower right")
+        ax.grid(which="both", ls=":")
+        ax.loglog()
     def rescale_Rinf_OD(self):
         """Plot Rinf/OD vs. (D-d)/d^2"""
         log = self.data
