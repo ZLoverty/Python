@@ -16,6 +16,7 @@ from pivLib import read_piv, PIV, PIV_masked
 import corrTrack
 import os
 import trackpy as tp
+
 # %% codecell
 
 class droplet_image:
@@ -614,7 +615,7 @@ class de_data():
         plt.grid(which="both", ls=":")
         plt.xlim([1, 30])
         plt.loglog()
-    def Rinf2_over_tau(self, x="(D-d)/d^2", ax=None):
+    def Rinf2_over_tau(self, x="(D-d)/d^2", ax=None, xlabel=None):
         """Plot $R_\infty^2 / \tau^*$ vs. $(D-d)/d^2$
         Edit:
         05032022 -- add custom x-axis"""
@@ -631,7 +632,9 @@ class de_data():
             log4 = log2.loc[log2.Comment=="Chile"]
             ax.scatter(log3[x], log3.Rinfy/(log3.t2), color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
             ax.scatter(log4[x], log4.Rinfy/(log4.t2), edgecolors=cmap(num), marker="^", fc=(0,0,0,0))
-        ax.set_xlabel("${}$".format(x))
+        if xlabel == None:
+            xlabel = x
+        ax.set_xlabel("${}$".format(xlabel))
         ax.set_ylabel("$R_\infty^2 / \\tau^*$")
         ax.legend(ncol=2, fontsize=6, loc="lower right")
         ax.grid(which="both", ls=":")
