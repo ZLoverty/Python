@@ -415,10 +415,10 @@ class de_data():
             if highlight_Chile_data == True:
                 log3 = log2.loc[log2.Comment!="Chile"]
                 log4 = log2.loc[log2.Comment=="Chile"]
-                plt.scatter(log3["(D-d)/d^2"], log3.t2, color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
-                plt.scatter(log4["(D-d)/d^2"], log4.t2, edgecolors=cmap(num), marker="^", fc=(0,0,0,0))
+                plt.scatter(log3["(D-d)/d^2"], log3.t2_fit, color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
+                plt.scatter(log4["(D-d)/d^2"], log4.t2_fit, edgecolors=cmap(num), marker="^", fc=(0,0,0,0))
             else:
-                plt.scatter(log2["(D-d)/d^2"], log2.t2, color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
+                plt.scatter(log2["(D-d)/d^2"], log2.t2_fit, color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
         plt.xlabel("$(D-d)/d^2$")
         plt.ylabel("$\\tau^*$ (s)")
         plt.legend(ncol=2, fontsize=6)
