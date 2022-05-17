@@ -677,9 +677,39 @@ class de_data():
         plt.legend(ncol=2, fontsize=6)
         plt.grid(which="both", ls=":")
         plt.loglog()
-    def scatter(self, mode="log", highlight_Chile_data=True):
-        """I want to implement a more flexible plotting tool to test ideas, but it seems difficult"""
-        pass
+    def scatter(self, x="D-d", y="DA_fit", xlabel=None, ylabel=None, ax=None, mode="log", highlight_Chile_data=True):
+        """I want to implement a more flexible plotting tool to test ideas.
+        The data will still be plotted in OD bins of 20. The args allow one to specify which column(s) to plot,
+        and what label(s) to use for the xy-axes.
+        Edit:
+        05172022 -- Initial commit."""
+        log = self.data
+        log1 = log.dropna(subset=["Rinfy", "t2"])
+        binsize = 20 # OD bin size
+        if ax == None:
+            fig, ax = plt.subplots(figsize=(3.5,3), dpi=100)
+        bin_starts = range(0, int(log1.OD.max()), binsize)
+        cmap = plt.cm.get_cmap("tab10")
+        for num, bs in enumerate(bin_starts):
+            log2 = log1.loc[(log1.OD>bs)&(log1.OD<=bs+binsize)]
+            log3 = log2.loc[log2.Comment!="Chile"]
+            log4 = log2.loc[log2.Comment=="Chile"]
+            if highlight_Chile_data == True:
+                ax.scatter(log3[x], log3[y], color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
+                ax.scatter(log4[x], log4[y], edgecolors=cmap(num), marker="^", fc=(0,0,0,0))
+            else:
+                ax.scatter(log2[x], log2[y], color=cmap(num), label="{0:d}-{1:d}".format(bs,bs+binsize))
+        if xlabel == None:
+            xlabel = x
+        if ylabel == None:
+            ylabel = y
+        ax.set_xlabel("{}".format(xlabel))
+        ax.set_ylabel("{}".format(ylabel))
+        ax.legend(ncol=2, fontsize=6, loc="lower right")
+        if mode == "log":
+            ax.grid(which="both", ls=":")
+            ax.loglog()
+        return ax
 
 # %% codecell
 if __name__=="__main__":
