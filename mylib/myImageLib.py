@@ -183,8 +183,8 @@ def track_spheres_dt(img, num_particles):
             max_coor[:, num] = max_coor_tmp[:, num]
             continue
     return max_coor, pk_value
-def gauss1(x,a,x0,sigma):
-    return a*exp(-(x-x0)**2/(2*sigma**2))
+def gauss1(x,a,x0,sigma,b):
+    return a*exp(-(x-x0)**2/(2*sigma**2)) + b
 def show_progress(progress, label='', bar_length=60):
     """ Display a progress bar
     Args:
