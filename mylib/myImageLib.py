@@ -370,6 +370,7 @@ class rawImage:
         print("File size {0:.1f} GB, Disk size {1:.1f} GB".format(fs, ds))
         return ds > 2 * fs
 # %% codecell
+
 if __name__=="__main__":
     # %% codecell
     # test rawImage class
