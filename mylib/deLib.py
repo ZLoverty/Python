@@ -684,7 +684,7 @@ class de_data():
         Edit:
         05172022 -- Initial commit."""
         log = self.data
-        log1 = log.dropna(subset=["Rinfy", "t2"])
+        # log1 = log.dropna(subset=["Rinfy", "t2"])
         binsize = 20 # OD bin size
         if ax == None:
             fig, ax = plt.subplots(figsize=(3.5,3), dpi=100)
