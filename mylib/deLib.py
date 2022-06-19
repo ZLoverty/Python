@@ -683,7 +683,7 @@ class de_data():
         and what label(s) to use for the xy-axes.
         Edit:
         05172022 -- Initial commit."""
-        log = self.data
+        log1 = self.data
         # log1 = log.dropna(subset=["Rinfy", "t2"])
         binsize = 20 # OD bin size
         if ax == None:
