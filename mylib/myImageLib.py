@@ -200,7 +200,7 @@ def show_progress(progress, label='', bar_length=60):
     """
     N_finish = int(progress*bar_length)
     N_unfinish = bar_length - N_finish
-    print('{0} [{1}{2}] {3:.1f}%'.format(label, '#'*N_finish, '-'*N_unfinish, progress*100))
+    print('{0} [{1}{2}] {3:.1f}%'.format(label, '#'*N_finish, '-'*N_unfinish, progress*100), end="\r")
 def readdata(folder, ext='csv'):
     """
     Read data files with given extensions in a folder.
@@ -286,6 +286,8 @@ class rawImage:
 
         # read the binary files, in partitions if needed
         num = 0
+        n_images = int(file_size // unit_size)
+        t0 = time.monotonic()
         while remaining_size > 0:
             # load np.array from buffer
             if remaining_size > buffer_size:
@@ -311,11 +313,8 @@ class rawImage:
                 # num = label[0] + label[1] * 2 ** 16 + 1 # convert image label to uint32 to match the info in StagePosition.txt
                 io.imsave(os.path.join(save_folder, 'raw', '{:05d}.tif'.format(num)), img, check_contrast=False)
                 io.imsave(os.path.join(save_folder, '8-bit', '{:05d}.tif'.format(num)), to8bit(img), check_contrast=False)
-
-                # with open(os.path.join(out_raw_folder, 'log.txt'), 'a') as f:
-                #     f.write(time.asctime() + ' // frame {:05d}'.format(num))
-                # with open(os.path.join(out_8_folder, 'log.txt'), 'a') as f:
-                #     f.write(time.asctime() + ' // frame {:05d}'.format(num))
+                t1 = time.monotonic() - t0
+                show_progress(num / n_images, label="{:.1f} frame/s".format(num / t1))
                 num += 1
                 if cutoff is not None:
                     if num > cutoff:
@@ -340,24 +339,14 @@ class rawImage:
             os.makedirs(saveDir)
         if os.path.exists(saveDir8) == False:
             os.makedirs(saveDir8)
-        # with open(os.path.join(saveDir, 'log.txt'), 'w') as f:
-        #     f.write('nd2Dir = ' + str(nd2Dir) + '\n')
-        # with open(os.path.join(saveDir8, 'log.txt'), 'w') as f:
-        #     f.write('nd2Dir = ' + str(nd2Dir) + '\n')
-
+        t0 = time.monotonic()
         with ND2Reader(self.file) as images:
+            n_images = len(images)
             for num, image in enumerate(images):
-                # img8 = (image/2**3).astype('uint8')
-                # 8-bit image now are only used for visualization, i.e. convert to videos
-                # therefore, they are autocontrasted on each frame.
                 io.imsave(os.path.join(saveDir8, '{:05d}.tif'.format(num)), to8bit(image))
-                # if image.mean() > threshold and remove == True:
-                #     corrected = illumination_correction(image, avg)
-                # else:
-                #     corrected = image
                 io.imsave(os.path.join(saveDir, '%05d.tif' % num), image, check_contrast=False)
-                # with open(os.path.join(saveDir, 'log.txt'), 'a') as f:
-                #     f.write(time.asctime() + ' // Frame {0:04d} converted\n'.format(num))
+                t1 = time.monotonic() - t0
+                show_progress(num / n_images, label="{:.1f} frame/s".format(num/t1))
     def _disk_capacity_check(self):
         """Check if the capacity of disk is larger than twice of the file size.
         Args:
