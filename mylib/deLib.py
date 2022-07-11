@@ -331,9 +331,10 @@ class de_data():
         print(self.data)
     def parameter_space(self, highlight_Chile_data=True):
         """D vs. d, with color coded OD"""
-        log1 = self.data.dropna(subset=["Rinfy", "t2"])
-        binsize = 20 # OD bin size
-        plt.figure(figsize=(3.5,3),dpi=100)
+        # log1 = self.data.dropna(subset=["Rinfy", "t2"])
+        log1 = self.data
+        binsize = 10 # OD bin size
+        plt.figure(figsize=(3.5,3),dpi=300)
         bin_starts = range(0, int(log1.OD.max()), binsize)
         cmap = plt.cm.get_cmap("tab10")
         for num, bs in enumerate(bin_starts):
@@ -685,13 +686,15 @@ class de_data():
         05172022 -- Initial commit."""
         log1 = self.data
         # log1 = log.dropna(subset=["Rinfy", "t2"])
-        binsize = 20 # OD bin size
+        binsize = 10 # OD bin size
         if ax == None:
-            fig, ax = plt.subplots(figsize=(3.5,3), dpi=100)
+            fig, ax = plt.subplots(figsize=(3.5,3), dpi=300)
         bin_starts = range(0, int(log1.OD.max()), binsize)
         cmap = plt.cm.get_cmap("tab10")
         for num, bs in enumerate(bin_starts):
             log2 = log1.loc[(log1.OD>bs)&(log1.OD<=bs+binsize)]
+            if len(log2) == 0:
+                continue
             log3 = log2.loc[log2.Comment!="Chile"]
             log4 = log2.loc[log2.Comment=="Chile"]
             if highlight_Chile_data == True:

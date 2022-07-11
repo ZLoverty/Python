@@ -1,4 +1,4 @@
-from openpiv import tools, pyprocess, validation, filters, scaling
+from openpiv import pyprocess, validation, filters, scaling
 from openpiv.smoothn import smoothn
 import numpy as np
 import matplotlib.pyplot as plt
