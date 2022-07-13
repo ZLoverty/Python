@@ -163,29 +163,106 @@ def compute_radius(params, x, y):
 
     return radius
 
-def fit_circle(x, y, updating_rate=0.1):
+def compute_hessian(params, x, y):
+    """
+    Compute the gradient of objective function at given point params
+
+    Args:
+    params -- the point where the gradient is evaluated
+    x, y -- two coords of given points
+
+    Returns:
+    hess -- hessian matrix at the given point
+    """
+
+    assert(len(x)==len(y))
+    a = params['a']
+    b = params['b']
+
+    r = ((x - a)**2 + (y-b)**2)**0.5
+    u = (x - a) / r
+    v = (y - b) / r
+
+    h11 = 1 - u.mean() ** 2 - r.mean() * (v ** 2 / r).mean()
+    h12 = - u.mean() * v.mean() + r.mean() * (u*v/r).mean()
+    h21 = h12
+    h22 = 1 - v.mean() ** 2 - r.mean() * (u ** 2 / r).mean()
+
+    hess = 2 * np.array([[h11, h12],
+                         [h21, h22]])
+    return hess
+
+def update_params_abdul(params, grads, hessian, updating_rate):
+    """
+    Use grads to update params.
+
+    Args:
+    params -- fitting parameters
+    grads -- gradient evaluated at params, by compute_gradient()
+    hessian -- hessian matrix, computed by compute_hessian()
+    updating_rate -- the speed of updating the parameters
+
+    Returns:
+    updated_params -- updated parameters
+    """
+
+    hess_lambda = hessian + updating_rate * np.identity(2)
+    grads_mat = np.array([grads["a"], grads["b"]])
+    hmat = - np.matmul(np.linalg.inv(hess_lambda), grads_mat)
+    h = {"a": hmat[0], "b": hmat[1]}
+    updated_params = {}
+
+    for kw in params:
+        updated_params[kw] = params[kw] + h[kw]
+
+    return updated_params
+
+def fit_circle(x, y, updating_rate=0.1, method="naive"):
     """
     Fit a set of points x and y with a circle (a, b, r), using gradient descent method
 
     Args:
     x, y -- coordinates of a set of points
     updating_rate -- rate of gradient descent
+    method -- "naive": use lambda*grads to update params
+              "abdul": use hessian matrix
+              "linear": use linear method (Coope 1993)
 
     Returns:
     output_params -- parameters of fitted circle
+
+    Edit:
+    07132022 -- Implement "abdul" and "linear" methods, based on Abdul 2014 and Coope 1993
     """
+    def fun(y, *args):
+        return ((np.matmul(args[0], y) - args[1]) ** 2).sum()
+    if method == "linear":
+        B = np.stack((x, y, np.ones(x.shape)), axis=1)
+        d = x ** 2 + y ** 2
+        x0 = np.array([x.mean(), y.mean(), 0])
+        res = minimize(fun, x0, args=(B, d))
+        y = res["x"]
+        a, b = y[0]/2, y[1]/2 # recover results
+        r = (y[2] + a**2 + b**2) ** 0.5
+        return {"a": a, "b": b, "r": r}, res["nit"]
 
     xr, yr, cache = center_normalize_xy(x, y)
     params = {'a': xr.mean(), 'b': yr.mean()}
     grad_norm = 1
-    while grad_norm > 1e-12:
+    n_iter = 0
+    while grad_norm > 3e-8:
         grads = compute_gradient(params, xr, yr)
-        params = update_params(params, grads, updating_rate)
+        if method == "naive":
+            params = update_params(params, grads, updating_rate)
+        elif method == "abdul":
+            hess = compute_hessian(params, xr, yr)
+            params = update_params_abdul(params, grads, hess, updating_rate)
         grad_norm = (grads['a']**2 + grads['b']**2)**0.5
+        n_iter += 1
     output_params = scale_back(params, cache)
     output_params['r'] = compute_radius(output_params, x, y)
 
-    return output_params
+    return output_params, n_iter
 
 if __name__ == '__main__':
     img = io.imread(r'E:\Google Drive\Pictures and videos\research\DD\crack_pattern_of_bacterial_suspension_droplet.png', as_gray=True)
