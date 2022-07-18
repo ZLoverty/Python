@@ -339,6 +339,8 @@ class de_data():
         cmap = plt.cm.get_cmap("tab10")
         for num, bs in enumerate(bin_starts):
             log2 = log1.loc[(log1.OD>bs)&(log1.OD<=bs+binsize)]
+            if len(log2) == 0:
+                continue
             if highlight_Chile_data == True:
                 log3 = log2.loc[log2.Comment!="Chile"]
                 log4 = log2.loc[log2.Comment=="Chile"]

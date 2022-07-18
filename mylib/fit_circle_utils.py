@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib as mpl
 import ctypes
+from scipy.optimize import minimize
 
 """
 Drying picture analyzing app utility functions
