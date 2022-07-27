@@ -710,7 +710,7 @@ class de_data():
             ylabel = y
         ax.set_xlabel("{}".format(xlabel))
         ax.set_ylabel("{}".format(ylabel))
-        ax.legend(ncol=2, fontsize=6, loc="lower right")
+        ax.legend(ncol=1, fontsize=6, loc="upper left")
         if mode == "log":
             ax.grid(which="both", ls=":")
             ax.loglog()
