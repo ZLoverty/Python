@@ -277,7 +277,7 @@ class piv_data:
             if mode == "abs":
                 vm = np.nanmean((u ** 2 + v ** 2) ** 0.5)
             elif mode == "square":
-                vm = np.nanmean((u ** 2 + v ** 2) ** 0.5)
+                vm = np.nanmean((u ** 2 + v ** 2))  ** 0.5
             vm_list.append(vm)
         if plot == True:
             fig, ax = plt.subplots(figsize=(3.5, 3), dpi=100)
