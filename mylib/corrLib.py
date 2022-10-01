@@ -541,12 +541,12 @@ def compute_energy_density(pivData, d=25*0.33, MPP=0.33):
     and should be set with caution when a different magnification and PIV are used.
 
     Args:
-    pivData -- piv data
-    d -- sample spacing
+    pivData -- 2D piv data, DataFrame of x, y, u, v
+    d -- sample spacing, in unit of microns
     MPP -- microns per pixel
 
     Returns:
-    E -- kinetic energy field in k space
+    E -- kinetic energy field in wavenumber (k) space
 
     Test:
     pivData = pd.read_csv(r'E:\moreData\08032020\piv_imseq\01\3370-3371.csv')
