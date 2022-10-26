@@ -21,13 +21,19 @@ import trackpy as tp
 
 class droplet_image:
     """Container of functions related to confocal droplet images"""
-    def __init__(self, image_sequence):
+    def __init__(self, image_sequence, fps, mpp):
         """image_sequence: dataframe of image dir info, readdata return value
         mask: image mask, the same as PIV mask
         xy0: 2-tuple of droplet initial coordinates, read from positions.csv file
         mask_shape: shape of the circular mask, 2-tuple specifying the rect bounding box of the mask, typically a square
                     read from positions.csv file"""
         self.sequence = image_sequence
+        self.fps = fps
+        self.mpp = mpp
+    def __repr__(self):
+        I0 = io.imread(self.sequence.iloc[0, 1])
+        return "length: {0:d}, image size: {1}, fps: {2:.1f}, mpp: {3:.2f}".format(
+                len(self.sequence), str(I0.shape), self.fps, self.mpp)
     def __len__(self):
         return len(self.sequence)
     def process_first_image(self, mask):
@@ -93,23 +99,30 @@ class droplet_image:
                 break
     def get_image_name(self, index):
         return self.sequence.Name[index]
-    def fixed_mask_piv(self, save_folder, winsize, overlap, dt, mask_dir):
+    def fixed_mask_piv(self, winsize, overlap, mask_dir):
+        """Edit:
+        08092022 -- Return PIV results instead of saving to file.
+                    Remove arg save_folder .
+                    Remove arg dt, add required arg fps in __init__ instead
+        """
+        dt = 1 / self.fps
         mask = io.imread(mask_dir)
-        if os.path.exists(save_folder) == False:
-            os.makedirs(save_folder)
+        data = {}
         for i0, i1 in zip(self.sequence.index[::2], self.sequence.index[1::2]):
             I0 = self.get_image(i0)
             I1 = self.get_image(i1)
             x, y, u, v = PIV_masked(I0, I1, winsize, overlap, dt, mask)
             # generate dataframe and save to file
-            data = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
-            data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
+            tmp = pd.DataFrame({"x": x.flatten(), "y": y.flatten(), "u": u.flatten(), "v": v.flatten()})
+            data["{0}-{1}".format(self.get_image_name(i0), self.get_image_name(i1))] = tmp
+            # data.to_csv(os.path.join(save_folder, "{0}-{1}.csv".format(self.get_image_name(i0), self.get_image_name(i1))), index=False)
         params = {"winsize": winsize,
                   "overlap": overlap,
                   "dt": dt,
                   "mask_dir": mask_dir}
-        with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
-            json.dump(params, f)
+        # with open(os.path.join(save_folder, "piv_params.json"), "w") as f:
+        #     json.dump(params, f)
+        return data, params
     def piv_overlay_fixed(self, piv_folder, out_folder, sparcity=1):
         """Draw PIV overlay for fixed mask PIV data (unify old code in class)"""
         def determine_arrow_scale(u, v, sparcity):
@@ -710,7 +723,7 @@ class de_data():
             ylabel = y
         ax.set_xlabel("{}".format(xlabel))
         ax.set_ylabel("{}".format(ylabel))
-        ax.legend(ncol=2, fontsize=6, loc="lower right")
+        ax.legend(ncol=1, fontsize=6, loc="upper left")
         if mode == "log":
             ax.grid(which="both", ls=":")
             ax.loglog()
@@ -878,9 +891,12 @@ if __name__=="__main__":
     # Test droplet_image class
     # %% codecell
     # create object
-    folder = r"test_images\moving_mask_piv\raw"
+    folder = "test_images/moving_mask_piv/raw"
     l = readdata(folder, "tif")
-    DI = droplet_image(l)
+    DI = droplet_image(l, 50, 0.33)
+    # %% codecell
+    # test __repr__
+    DI
     # %% codecell
     # test droplet_traj()
     mask_dir = r"test_images\moving_mask_piv\mask.tif"
@@ -935,12 +951,12 @@ if __name__=="__main__":
         fig.savefig(os.path.join(out_folder, "{}.jpg".format(DI.get_image_name(i))))
     # %% codecell
     # test fixed_mask_piv()
-    save_folder = r"test_images\fixed_mask_piv\piv_result"
     winsize = 20
     overlap = 10
     dt = 0.02
-    mask_dir = r"test_images\moving_mask_piv\mask.tif"
-    DI.fixed_mask_piv(save_folder, winsize, overlap, dt, mask_dir)
+    mask_dir = "test_images/moving_mask_piv/mask.tif"
+    piv, params = DI.fixed_mask_piv(winsize, overlap, mask_dir)
+    params
     # %% codecell
     # test piv_overlay_fixed()
     piv_folder = r"test_images\fixed_mask_piv\piv_result"

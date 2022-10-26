@@ -541,12 +541,12 @@ def compute_energy_density(pivData, d=25*0.33, MPP=0.33):
     and should be set with caution when a different magnification and PIV are used.
 
     Args:
-    pivData -- piv data
-    d -- sample spacing
+    pivData -- 2D piv data, DataFrame of x, y, u, v
+    d -- sample spacing, in unit of microns
     MPP -- microns per pixel
 
     Returns:
-    E -- kinetic energy field in k space
+    E -- kinetic energy field in wavenumber (k) space
 
     Test:
     pivData = pd.read_csv(r'E:\moreData\08032020\piv_imseq\01\3370-3371.csv')
@@ -693,18 +693,32 @@ def xy_bin(xo, yo, n=100, mode='log', bins=None):
     yb = top[ind] / bot[ind]
     return xb, yb
 
-def autocorr1d(x):
+def autocorr1d(x, t):
     """Compute the temporal autocorrelation of a 1-D signal.
     Args:
-    x -- 1-D signal
-    dt -- the time interval between two signals (default to 1)
+    x -- 1-D signal,
+    t -- the corresponding time of the signal, should be np.array 1d
     Returns:
-    corr -- correlation array
-    t -- time difference
+    corr -- correlation array, with lag time as index
+    lagt -- lag time of the correlation function
+
+    Edit:
+    07272022 -- Handle time series with missing values.
     """
-    xn = x - x.mean()
-    corr = np.correlate(xn, xn, mode="same")[len(xn)//2:] / np.inner(xn, xn)
-    return corr
+    if any(np.isnan(x)):
+        xn = x - np.nanmean(x)
+        x2 = np.nanmean(xn * xn)
+        c_list = []
+        for s in range(0, len(xn)//2):
+            xx = np.roll(xn, shift=s)
+            xx[:s] = np.nan
+            c_list.append(np.nanmean(xn * xx ))
+        corr = np.array(c_list) / x2
+    else:
+        xn = x - np.nanmean(x)
+        corr = np.correlate(xn, xn, mode="same")[len(xn)//2:] / np.inner(xn, xn)
+    lagt = (t - t[0])[:len(corr)]
+    return corr, lagt
 
 def vacf_piv(vstack, dt, mode="direct"):
     """Compute averaged vacf from PIV data.
