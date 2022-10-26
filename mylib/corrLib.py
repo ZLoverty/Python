@@ -717,6 +717,8 @@ def vacf_piv(vstack, dt, mode="direct"):
             "weighted" will use mean velocity as the averaging weight, whereas "direct" uses 1.
     Returns:
     corrData -- DataFrame of (corr, t)
+    Edit:
+    10262022 -- add condition x.sum() != 0, avoids nan in all-zero columns.
     """
     # rearrange vstack
     assert(len(vstack.shape)==3)
@@ -726,12 +728,13 @@ def vacf_piv(vstack, dt, mode="direct"):
     weight = 1
     normalizer = 0
     for x in stack_r:
-        if np.isnan(x[0]) == False: # masked out part has velocity as nan, which cannot be used for correlation computation
+        if np.isnan(x.sum()) == False and x.sum() != 0: # masked out part has velocity as nan, which cannot be used for correlation computation
             if mode == "weighted":
                 weight = abs(x).mean()
             normalizer += weight
             corr = autocorr1d(x) * weight
             corr_list.append(corr)
+            print(x.sum(), corr.sum())
     corr_mean = np.stack(corr_list, axis=0).sum(axis=0) / normalizer
 
     return pd.DataFrame({"c": corr_mean, "t": np.arange(len(corr_mean)) * dt}).set_index("t")
