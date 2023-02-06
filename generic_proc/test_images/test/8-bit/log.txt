@@ -1,1 +1,0 @@
-nd2Dir = ../test_images/test.nd2

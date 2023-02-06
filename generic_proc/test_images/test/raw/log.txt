@@ -1,2 +1,0 @@
-nd2Dir = ../test_images/test.nd2
-Tue Nov 30 14:41:15 2021 // Frame 0000 converted
